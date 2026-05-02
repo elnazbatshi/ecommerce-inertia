@@ -16,6 +16,7 @@ const model = ref([
             { label: 'ویژگی‌ها', icon: 'pi pi-fw pi-sliders-h', to: '/attributes' },
             { label: 'نقش‌ها و دسترسی‌ها', icon: 'pi pi-fw pi-lock', to: '/accesses' },
             { label: 'سفارش‌ها', icon: 'pi pi-fw pi-shopping-cart', to: '/orders' },
+            { label: 'پرداخت‌ها', icon: 'pi pi-fw pi-credit-card', to: '/payments' },
             { label: 'مشتریان', icon: 'pi pi-fw pi-users', to: '/customers' }
         ]
     }

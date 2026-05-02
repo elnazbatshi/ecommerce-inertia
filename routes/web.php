@@ -9,6 +9,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use Inertia\Inertia;
 
@@ -39,6 +40,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/orders/{order}/status', [OrderController::class, 'changeStatus'])->name('orders.change-status');
     Route::patch('/orders/{order}/payment-status', [OrderController::class, 'changePaymentStatus'])->name('orders.change-payment-status');
     Route::resource('orders', OrderController::class);
+    Route::patch('/payments/{payment}/status', [PaymentController::class, 'changeStatus'])->name('payments.change-status');
+    Route::patch('/payments/{payment}/refund', [PaymentController::class, 'refund'])->name('payments.refund');
+    Route::resource('payments', PaymentController::class)->except(['create', 'edit']);
     Route::post('/customers/{customer}/addresses', [AddressController::class, 'store'])->name('customers.addresses.store');
     Route::put('/customers/{customer}/addresses/{address}', [AddressController::class, 'update'])->name('customers.addresses.update');
     Route::delete('/customers/{customer}/addresses/{address}', [AddressController::class, 'destroy'])->name('customers.addresses.destroy');
