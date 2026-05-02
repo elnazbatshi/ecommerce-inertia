@@ -1,0 +1,20 @@
+.layout-main-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: space-between;
+    padding: 6rem 2rem 0 2rem;
+    transition: margin-left var(--layout-section-transition-duration);
+}
+
+.layout-main {
+    flex: 1 1 auto;
+    padding-bottom: 2rem;
+}
+
+.p-datatable .p-datatable-header {
+    border-top-left-radius: 0.6rem;   /* گوشه بالا چپ */
+    border-top-right-radius: 0.6rem;  /* گوشه بالا راست */
+    overflow: hidden;                 /* اگه محتوا بیرون بزنه برش بخوره */
+    background-color: var(--surface-card); /* اختیاری: رنگ header */
+}
