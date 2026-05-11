@@ -3,7 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Attribute;
-use App\Services\SlugService;
+use App\Http\Services\SlugService;
 
 class AttributeObserver
 {

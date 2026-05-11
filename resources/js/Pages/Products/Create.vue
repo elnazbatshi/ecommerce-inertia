@@ -1,7 +1,7 @@
 <script setup>
 import TopNavTitle from '@/Components/Global/TopNavTitle.vue';
 import TagInput from '@/Components/TagInput.vue';
-import ProductImageUploader from '@/Components/ProductImageUploader.vue';
+import ImageUploader from '@/Components/ImageUploader.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
@@ -9,6 +9,7 @@ import { computed } from 'vue';
 const props = defineProps({
     categories: { type: Array, default: () => [] },
     brands: { type: Array, default: () => [] },
+    posts: { type: Array, default: () => [] },
     attributes: { type: Array, default: () => [] },
     statusOptions: { type: Array, default: () => [] },
     typeOptions: { type: Array, default: () => [] }
@@ -38,6 +39,7 @@ const form = useForm({
     status: 'draft',
     type: 'simple',
     stock: 0,
+    related_post_ids: [],
     variants: []
 });
 
@@ -49,7 +51,7 @@ const attributeValueOptions = computed(() => props.attributes.flatMap((attribute
 ));
 const seoTitle = computed(() => form.meta_title || form.name || 'عنوان محصول');
 const seoDescription = computed(() => form.meta_description || form.description || 'توضیحات کوتاه محصول در این قسمت نمایش داده می‌شود.');
-const seoUrl = computed(() => `${window.location.origin}/products/${form.slug || 'slug-auto'}`);
+const seoUrl = computed(() => `${window.location.origin}/products/${form.slug || 'نامک-خودکار'}`);
 
 const addVariant = () => {
     form.variants.push({
@@ -58,6 +60,7 @@ const addVariant = () => {
         discount_price: null,
         stock: 0,
         image: null,
+        remove_image: false,
         attribute_values: []
     });
 };
@@ -123,7 +126,7 @@ const errorFor = (field) => form.errors[field];
                         <InputText v-model="form.origin" class="w-full" />
                     </div>
                     <div>
-                        <label class="mb-2 block font-medium">SKU</label>
+                        <label class="mb-2 block font-medium">کد کالا</label>
                         <InputText v-model="form.sku" class="w-full" />
                         <small v-if="errorFor('sku')" class="text-red-600">{{ errorFor('sku') }}</small>
                     </div>
@@ -135,6 +138,10 @@ const errorFor = (field) => form.errors[field];
                     <div class="md:col-span-3">
                         <label class="mb-2 block font-medium">توضیحات</label>
                         <Textarea v-model="form.description" rows="4" class="w-full" />
+                    </div>
+                    <div class="md:col-span-3">
+                        <label class="mb-2 block font-medium">مقالات مرتبط سئو</label>
+                        <MultiSelect v-model="form.related_post_ids" :options="posts" optionLabel="title" optionValue="id" filter display="chip" class="w-full" />
                     </div>
                 </div>
             </div>
@@ -165,45 +172,45 @@ const errorFor = (field) => form.errors[field];
             </div>
 
             <div class="card">
-                <h2 class="mb-4 text-lg font-semibold">SEO</h2>
+                <h2 class="mb-4 text-lg font-semibold">سئو</h2>
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
-                        <label class="mb-2 block font-medium">Slug</label>
+                        <label class="mb-2 block font-medium">نامک</label>
                         <InputText v-model="form.slug" class="w-full" placeholder="اگر خالی باشد خودکار از نام ساخته می‌شود" />
                         <small class="text-surface-500">اگر خالی باشد خودکار از نام محصول ساخته می‌شود.</small>
                         <small v-if="errorFor('slug')" class="block text-red-600">{{ errorFor('slug') }}</small>
                     </div>
                     <div>
-                        <label class="mb-2 block font-medium">Canonical URL</label>
-                        <InputText v-model="form.canonical_url" class="w-full" placeholder="https://example.com/product" />
+                        <label class="mb-2 block font-medium">نشانی اصلی</label>
+                        <InputText v-model="form.canonical_url" class="w-full" placeholder="https://example.com/p/123" />
                         <small v-if="errorFor('canonical_url')" class="text-red-600">{{ errorFor('canonical_url') }}</small>
                     </div>
                     <div>
                         <div class="mb-2 flex justify-between">
-                            <label class="font-medium">Meta Title</label>
+                            <label class="font-medium">عنوان سئو</label>
                             <small :class="form.meta_title.length > 60 ? 'text-red-600' : 'text-surface-500'">{{ form.meta_title.length }}/60</small>
                         </div>
                         <InputText v-model="form.meta_title" class="w-full" />
                     </div>
                     <div>
                         <div class="mb-2 flex justify-between">
-                            <label class="font-medium">Meta Description</label>
+                            <label class="font-medium">توضیحات سئو</label>
                             <small :class="form.meta_description.length > 160 ? 'text-red-600' : 'text-surface-500'">{{ form.meta_description.length }}/160</small>
                         </div>
                         <Textarea v-model="form.meta_description" rows="3" class="w-full" />
                     </div>
                     <div class="md:col-span-2">
-                        <label class="mb-2 block font-medium">Meta Keywords</label>
+                        <label class="mb-2 block font-medium">کلمات کلیدی</label>
                         <TagInput v-model="form.meta_keywords" />
                         <small v-if="errorFor('meta_keywords')" class="text-red-600">{{ errorFor('meta_keywords') }}</small>
                     </div>
                     <div class="flex items-center gap-3">
                         <ToggleSwitch v-model="form.seo_index" />
-                        <span>اجازه index</span>
+                        <span>اجازه نمایه‌سازی</span>
                     </div>
                     <div class="flex items-center gap-3">
                         <ToggleSwitch v-model="form.seo_follow" />
-                        <span>اجازه follow</span>
+                        <span>اجازه دنبال‌کردن لینک‌ها</span>
                     </div>
                 </div>
                 <div class="mt-5 rounded-md border border-surface-200 p-4">
@@ -216,13 +223,13 @@ const errorFor = (field) => form.errors[field];
             <div class="card">
                 <h2 class="mb-4 text-lg font-semibold">تصاویر</h2>
                 <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                    <ProductImageUploader
+                    <ImageUploader
                         v-model="form.main_image"
                         title="تصویر اصلی"
                         mode="single"
                         :error="errorFor('main_image')"
                     />
-                    <ProductImageUploader
+                    <ImageUploader
                         v-model="form.gallery_images"
                         title="گالری تصاویر"
                         mode="multiple"
@@ -241,12 +248,19 @@ const errorFor = (field) => form.errors[field];
                         <Button type="button" icon="pi pi-trash" rounded text severity="danger" @click="removeVariant(index)" />
                     </div>
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-                        <InputText v-model="variant.sku" placeholder="SKU" class="w-full" />
+                        <InputText v-model="variant.sku" placeholder="کد کالا" class="w-full" />
                         <InputNumber v-model="variant.price" placeholder="قیمت" class="w-full" inputClass="w-full" :min="0" />
                         <InputNumber v-model="variant.discount_price" placeholder="قیمت تخفیف" class="w-full" inputClass="w-full" :min="0" />
                         <InputNumber v-model="variant.stock" placeholder="موجودی" class="w-full" inputClass="w-full" :min="0" />
                         <MultiSelect v-model="variant.attribute_values" :options="attributeValueOptions" optionLabel="label" optionValue="value" filter display="chip" placeholder="ویژگی‌ها" class="w-full md:col-span-2" />
-                        <FileUpload mode="basic" customUpload auto chooseLabel="تصویر تنوع" accept="image/*" @select="variant.image = $event.files[0]" />
+                        <div class="md:col-span-3">
+                            <ImageUploader
+                                v-model="variant.image"
+                                title="تصویر تنوع"
+                                mode="single"
+                                :error="errorFor(`variants.${index}.image`)"
+                            />
+                        </div>
                     </div>
                     <Message v-if="Object.keys(form.errors).some((key) => key.startsWith(`variants.${index}.`))" severity="error" class="mt-3">
                         اطلاعات این تنوع را بررسی کنید.

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCategoryRequest;
+use App\Http\Services\CatalogService;
 use App\Models\Category;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -10,11 +11,15 @@ use Inertia\Response;
 
 class CategoryController extends Controller
 {
+    public function __construct(private readonly CatalogService $catalog)
+    {
+    }
+
     public function index(): Response
     {
         return Inertia::render('Categories/Index', [
-            'categories' => Category::query()->with('parent:id,name,slug')->orderBy('name')->get(),
-            'categoryOptions' => Category::query()->select(['id', 'name', 'slug'])->orderBy('name')->get(),
+            'categories' => $this->catalog->categories(),
+            'categoryOptions' => $this->catalog->categoryOptions(),
         ]);
     }
 
