@@ -108,15 +108,15 @@ const submit = () => {
 </script>
 
 <template>
-    <Head :title="`Edit ${order.order_number}`">
+    <Head :title="`ویرایش ${order.order_number}`">
         <meta name="robots" content="noindex,nofollow" />
     </Head>
 
     <AppLayout>
-        <TopNavTitle :title="`Edit ${order.order_number}`" :breadcrumb="[{ label: 'Orders', href: '/orders' }, { label: order.order_number }]">
+        <TopNavTitle :title="`ویرایش ${order.order_number}`" :breadcrumb="[{ label: 'سفارش‌ها', href: '/orders' }, { label: order.order_number }]">
             <template #pageAction>
                 <Link :href="`/orders/${order.id}`">
-                    <Button label="View" icon="pi pi-eye" severity="secondary" outlined />
+                    <Button label="مشاهده" icon="pi pi-eye" severity="secondary" outlined />
                 </Link>
             </template>
         </TopNavTitle>
@@ -124,10 +124,10 @@ const submit = () => {
         <form class="space-y-4" @submit.prevent="submit">
             <div class="card">
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
-                    <Select v-model="form.customer_id" :options="customers" optionLabel="phone" optionValue="id" filter placeholder="Select customer" class="w-full md:col-span-2">
+                    <Select v-model="form.customer_id" :options="customers" optionLabel="phone" optionValue="id" filter placeholder="انتخاب مشتری" class="w-full md:col-span-2">
                         <template #option="{ option }">{{ option.name || '-' }} - {{ option.phone }}</template>
                     </Select>
-                    <Select v-model="form.address_id" :options="addressOptions" optionLabel="label" optionValue="id" placeholder="Shipping address" class="w-full md:col-span-2" />
+                    <Select v-model="form.address_id" :options="addressOptions" optionLabel="label" optionValue="id" placeholder="آدرس ارسال" class="w-full md:col-span-2" />
                     <Select v-model="form.status" :options="statusOptions" optionLabel="label" optionValue="value" class="w-full" />
                     <Select v-model="form.payment_status" :options="paymentStatusOptions" optionLabel="label" optionValue="value" class="w-full" />
                 </div>
@@ -135,58 +135,58 @@ const submit = () => {
 
             <div class="card">
                 <div class="mb-4 flex items-center justify-between">
-                    <h2 class="text-lg font-semibold">Items</h2>
-                    <Button type="button" label="Add Item" icon="pi pi-plus" severity="secondary" @click="addItem" />
+                    <h2 class="text-lg font-semibold">اقلام</h2>
+                    <Button type="button" label="افزودن قلم" icon="pi pi-plus" severity="secondary" @click="addItem" />
                 </div>
                 <DataTable :value="form.items" showGridlines>
-                    <Column header="Product" style="min-width: 18rem">
+                    <Column header="محصول" style="min-width: 18rem">
                         <template #body="{ data, index }">
                             <AutoComplete v-model="data.product" :suggestions="productSuggestions" optionLabel="label" forceSelection dropdown class="w-full" @complete="searchProducts" @item-select="onProductSelect(data)" />
                             <small v-if="form.errors[`items.${index}.product_id`]" class="text-red-600">{{ form.errors[`items.${index}.product_id`] }}</small>
                         </template>
                     </Column>
-                    <Column header="Variant" style="min-width: 14rem">
+                    <Column header="متغیر" style="min-width: 14rem">
                         <template #body="{ data, index }">
                             <Select v-if="data.product?.type === 'variable'" v-model="data.variant_id" :options="data.product.variants" optionLabel="label" optionValue="id" class="w-full" @change="onVariantChange(data)" />
                             <span v-else>-</span>
                             <small v-if="form.errors[`items.${index}.product_variant_id`]" class="text-red-600">{{ form.errors[`items.${index}.product_variant_id`] }}</small>
                         </template>
                     </Column>
-                    <Column header="SKU"><template #body="{ data }">{{ data.sku || '-' }}</template></Column>
-                    <Column header="Stock"><template #body="{ data }"><Tag :value="data.stock" :severity="data.quantity > data.stock ? 'danger' : 'success'" /></template></Column>
-                    <Column header="Qty" style="width: 9rem">
+                    <Column header="شناسه کالا"><template #body="{ data }">{{ data.sku || '-' }}</template></Column>
+                    <Column header="موجودی"><template #body="{ data }"><Tag :value="data.stock" :severity="data.quantity > data.stock ? 'danger' : 'success'" /></template></Column>
+                    <Column header="تعداد" style="width: 9rem">
                         <template #body="{ data, index }">
                             <InputNumber v-model="data.quantity" inputClass="w-full" :min="1" />
                             <small v-if="form.errors[`items.${index}.quantity`]" class="text-red-600">{{ form.errors[`items.${index}.quantity`] }}</small>
                         </template>
                     </Column>
-                    <Column header="Unit Price"><template #body="{ data }"><InputNumber v-model="data.unit_price" inputClass="w-full" :min="0" /></template></Column>
-                    <Column header="Discount"><template #body="{ data }"><InputNumber v-model="data.discount_price" inputClass="w-full" :min="0" /></template></Column>
-                    <Column header="Total"><template #body="{ data }">{{ money(itemTotal(data)) }}</template></Column>
+                    <Column header="قیمت واحد"><template #body="{ data }"><InputNumber v-model="data.unit_price" inputClass="w-full" :min="0" /></template></Column>
+                    <Column header="تخفیف"><template #body="{ data }"><InputNumber v-model="data.discount_price" inputClass="w-full" :min="0" /></template></Column>
+                    <Column header="جمع"><template #body="{ data }">{{ money(itemTotal(data)) }}</template></Column>
                     <Column header=""><template #body="{ index }"><Button type="button" icon="pi pi-trash" rounded text severity="danger" @click="removeItem(index)" /></template></Column>
                 </DataTable>
             </div>
 
             <div class="card">
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
-                    <InputNumber :modelValue="subtotal" inputClass="w-full" disabled placeholder="Subtotal" />
-                    <InputNumber v-model="form.discount_total" inputClass="w-full" :min="0" placeholder="Discount total" />
-                    <InputNumber v-model="form.shipping_cost" inputClass="w-full" :min="0" placeholder="Shipping" />
-                    <InputNumber v-model="form.tax_total" inputClass="w-full" :min="0" placeholder="Tax" />
+                    <InputNumber :modelValue="subtotal" inputClass="w-full" disabled placeholder="جمع جزئی" />
+                    <InputNumber v-model="form.discount_total" inputClass="w-full" :min="0" placeholder="مبلغ تخفیف" />
+                    <InputNumber v-model="form.shipping_cost" inputClass="w-full" :min="0" placeholder="هزینه ارسال" />
+                    <InputNumber v-model="form.tax_total" inputClass="w-full" :min="0" placeholder="مالیات" />
                 </div>
-                <div class="mt-4 text-left text-xl font-semibold">Total: {{ money(total) }}</div>
+                <div class="mt-4 text-left text-xl font-semibold">جمع کل: {{ money(total) }}</div>
             </div>
 
             <div class="card">
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <Textarea v-model="form.customer_note" rows="4" placeholder="Customer note" class="w-full" />
-                    <Textarea v-model="form.admin_note" rows="4" placeholder="Admin note" class="w-full" />
+                    <Textarea v-model="form.customer_note" rows="4" placeholder="یادداشت مشتری" class="w-full" />
+                    <Textarea v-model="form.admin_note" rows="4" placeholder="یادداشت مدیریت" class="w-full" />
                 </div>
             </div>
 
             <div class="flex justify-end gap-2">
-                <Link href="/orders"><Button type="button" label="Cancel" severity="secondary" text /></Link>
-                <Button type="submit" label="Save Changes" icon="pi pi-check" :loading="form.processing" />
+                <Link href="/orders"><Button type="button" label="انصراف" severity="secondary" text /></Link>
+                <Button type="submit" label="ذخیره تغییرات" icon="pi pi-check" :loading="form.processing" />
             </div>
         </form>
     </AppLayout>

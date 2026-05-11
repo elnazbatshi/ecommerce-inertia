@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Services\CustomerService;
 use App\Models\Customer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -11,27 +12,14 @@ use Inertia\Response;
 
 class CustomerController extends Controller
 {
+    public function __construct(private readonly CustomerService $customers)
+    {
+    }
+
     public function index(Request $request): Response
     {
-        $perPage = max(1, min((int) $request->integer('rows', 10), 100));
-
-        $customers = Customer::query()
-            ->withCount('addresses')
-            ->when($request->string('search')->toString(), function ($query, string $search) {
-                $query->where(function ($query) use ($search) {
-                    $query->where('name', 'like', "%{$search}%")
-                        ->orWhere('phone', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                });
-            })
-            ->when($request->input('status'), fn ($query, string $status) => $query->where('status', $status))
-            ->latest()
-            ->paginate($perPage)
-            ->withQueryString()
-            ->through(fn (Customer $customer) => $this->formatCustomer($customer));
-
         return Inertia::render('Customers/Index', [
-            'customers' => $customers,
+            'customers' => $this->customers->paginated($request),
             'filters' => $request->only(['search', 'status', 'rows']),
             'statusOptions' => $this->statusOptions(),
         ]);
@@ -44,7 +32,7 @@ class CustomerController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        Customer::create($this->validatedCustomer($request));
+        $this->customers->create($this->validatedCustomer($request));
 
         return back()->with('success', 'Customer created successfully.');
     }
@@ -70,7 +58,7 @@ class CustomerController extends Controller
 
     public function update(Request $request, Customer $customer): RedirectResponse
     {
-        $customer->update($this->validatedCustomer($request, $customer));
+        $this->customers->update($customer, $this->validatedCustomer($request, $customer));
 
         return back()->with('success', 'Customer updated successfully.');
     }
@@ -92,10 +80,6 @@ class CustomerController extends Controller
             'status' => ['required', Rule::in(Customer::STATUSES)],
         ]);
 
-        if (blank($data['password'] ?? null)) {
-            unset($data['password']);
-        }
-
         return $data;
     }
 
@@ -110,16 +94,7 @@ class CustomerController extends Controller
 
     private function formatCustomer(Customer $customer): array
     {
-        return [
-            'id' => $customer->id,
-            'name' => $customer->name,
-            'phone' => $customer->phone,
-            'email' => $customer->email,
-            'status' => $customer->status,
-            'addresses_count' => $customer->addresses_count ?? 0,
-            'last_login_at' => $customer->last_login_at?->toDateTimeString(),
-            'created_at' => $customer->created_at?->toDateTimeString(),
-        ];
+        return $this->customers->format($customer);
     }
 
     private function formatAddress($address): array

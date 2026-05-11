@@ -26,28 +26,28 @@ const changePaymentStatus = () => router.patch(`/orders/${props.order.id}/paymen
     </Head>
 
     <AppLayout>
-        <TopNavTitle :title="order.order_number" :breadcrumb="[{ label: 'Orders', href: '/orders' }, { label: order.order_number }]">
+        <TopNavTitle :title="order.order_number" :breadcrumb="[{ label: 'سفارش‌ها', href: '/orders' }, { label: order.order_number }]">
             <template #pageAction>
                 <Link :href="`/orders/${order.id}/edit`">
-                    <Button label="Edit" icon="pi pi-pencil" severity="secondary" outlined />
+                    <Button label="ویرایش" icon="pi pi-pencil" severity="secondary" outlined />
                 </Link>
             </template>
         </TopNavTitle>
 
         <div class="grid grid-cols-1 gap-4 xl:grid-cols-3">
             <div class="card xl:col-span-1">
-                <h2 class="mb-4 text-lg font-semibold">Customer</h2>
+                <h2 class="mb-4 text-lg font-semibold">مشتری</h2>
                 <div class="space-y-2">
                     <div>{{ order.customer?.name || '-' }}</div>
                     <div>{{ order.customer?.phone || '-' }}</div>
                     <div>{{ order.customer?.email || '-' }}</div>
                 </div>
-                <h2 class="mb-4 mt-6 text-lg font-semibold">Shipping Address</h2>
+                <h2 class="mb-4 mt-6 text-lg font-semibold">آدرس ارسال</h2>
                 <div v-if="order.address" class="space-y-2 text-sm">
                     <div>{{ order.address.receiver_name }} - {{ order.address.receiver_phone }}</div>
                     <div>{{ order.address.province }} / {{ order.address.city }}</div>
                     <div>{{ order.address.address }}</div>
-                    <div>Postal: {{ order.address.postal_code || '-' }}</div>
+                    <div>کد پستی: {{ order.address.postal_code || '-' }}</div>
                 </div>
                 <div v-else>-</div>
             </div>
@@ -55,14 +55,14 @@ const changePaymentStatus = () => router.patch(`/orders/${props.order.id}/paymen
             <div class="card xl:col-span-2">
                 <div class="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2">
                     <div>
-                        <label class="mb-2 block font-medium">Order Status</label>
+                        <label class="mb-2 block font-medium">وضعیت سفارش</label>
                         <div class="flex gap-2">
                             <Select v-model="status" :options="statusOptions" optionLabel="label" optionValue="value" class="w-full" />
                             <Button icon="pi pi-check" @click="changeStatus" />
                         </div>
                     </div>
                     <div>
-                        <label class="mb-2 block font-medium">Payment Status</label>
+                        <label class="mb-2 block font-medium">وضعیت پرداخت</label>
                         <div class="flex gap-2">
                             <Select v-model="paymentStatus" :options="paymentStatusOptions" optionLabel="label" optionValue="value" class="w-full" />
                             <Button icon="pi pi-check" @click="changePaymentStatus" />
@@ -73,42 +73,42 @@ const changePaymentStatus = () => router.patch(`/orders/${props.order.id}/paymen
                 </div>
 
                 <DataTable :value="order.items" showGridlines>
-                    <Column field="product_name" header="Product" />
-                    <Column field="variant_name" header="Variant"><template #body="{ data }">{{ data.variant_name || '-' }}</template></Column>
-                    <Column field="sku" header="SKU"><template #body="{ data }">{{ data.sku || '-' }}</template></Column>
-                    <Column field="quantity" header="Qty" />
-                    <Column field="unit_price" header="Unit"><template #body="{ data }">{{ money(data.unit_price) }}</template></Column>
-                    <Column field="discount_price" header="Discount"><template #body="{ data }">{{ data.discount_price ? money(data.discount_price) : '-' }}</template></Column>
-                    <Column field="total_price" header="Total"><template #body="{ data }">{{ money(data.total_price) }}</template></Column>
+                    <Column field="product_name" header="محصول" />
+                    <Column field="variant_name" header="متغیر"><template #body="{ data }">{{ data.variant_name || '-' }}</template></Column>
+                    <Column field="sku" header="شناسه کالا"><template #body="{ data }">{{ data.sku || '-' }}</template></Column>
+                    <Column field="quantity" header="تعداد" />
+                    <Column field="unit_price" header="قیمت واحد"><template #body="{ data }">{{ money(data.unit_price) }}</template></Column>
+                    <Column field="discount_price" header="تخفیف"><template #body="{ data }">{{ data.discount_price ? money(data.discount_price) : '-' }}</template></Column>
+                    <Column field="total_price" header="جمع"><template #body="{ data }">{{ money(data.total_price) }}</template></Column>
                 </DataTable>
             </div>
         </div>
 
         <div class="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-3">
             <div class="card xl:col-span-2">
-                <h2 class="mb-4 text-lg font-semibold">Notes</h2>
+                <h2 class="mb-4 text-lg font-semibold">یادداشت‌ها</h2>
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div><div class="mb-2 font-medium">Customer note</div><p>{{ order.customer_note || '-' }}</p></div>
-                    <div><div class="mb-2 font-medium">Admin note</div><p>{{ order.admin_note || '-' }}</p></div>
+                    <div><div class="mb-2 font-medium">یادداشت مشتری</div><p>{{ order.customer_note || '-' }}</p></div>
+                    <div><div class="mb-2 font-medium">یادداشت مدیریت</div><p>{{ order.admin_note || '-' }}</p></div>
                 </div>
-                <h2 class="mb-4 mt-6 text-lg font-semibold">Dates</h2>
+                <h2 class="mb-4 mt-6 text-lg font-semibold">تاریخ‌ها</h2>
                 <div class="grid grid-cols-1 gap-2 text-sm md:grid-cols-2">
-                    <div>Created: {{ order.created_at || '-' }}</div>
-                    <div>Paid: {{ order.paid_at || '-' }}</div>
-                    <div>Shipped: {{ order.shipped_at || '-' }}</div>
-                    <div>Delivered: {{ order.delivered_at || '-' }}</div>
-                    <div>Cancelled: {{ order.cancelled_at || '-' }}</div>
+                    <div>ایجاد شده: {{ order.created_at || '-' }}</div>
+                    <div>پرداخت شده: {{ order.paid_at || '-' }}</div>
+                    <div>ارسال شده: {{ order.shipped_at || '-' }}</div>
+                    <div>تحویل شده: {{ order.delivered_at || '-' }}</div>
+                    <div>لغو شده: {{ order.cancelled_at || '-' }}</div>
                 </div>
             </div>
             <div class="card">
-                <h2 class="mb-4 text-lg font-semibold">Totals</h2>
+                <h2 class="mb-4 text-lg font-semibold">جمع کل</h2>
                 <div class="space-y-3">
-                    <div class="flex justify-between"><span>Subtotal</span><span>{{ money(order.subtotal) }}</span></div>
-                    <div class="flex justify-between"><span>Discount</span><span>{{ money(order.discount_total) }}</span></div>
-                    <div class="flex justify-between"><span>Shipping</span><span>{{ money(order.shipping_cost) }}</span></div>
-                    <div class="flex justify-between"><span>Tax</span><span>{{ money(order.tax_total) }}</span></div>
+                    <div class="flex justify-between"><span>جمع جزئی</span><span>{{ money(order.subtotal) }}</span></div>
+                    <div class="flex justify-between"><span>تخفیف</span><span>{{ money(order.discount_total) }}</span></div>
+                    <div class="flex justify-between"><span>ارسال</span><span>{{ money(order.shipping_cost) }}</span></div>
+                    <div class="flex justify-between"><span>مالیات</span><span>{{ money(order.tax_total) }}</span></div>
                     <Divider />
-                    <div class="flex justify-between text-xl font-semibold"><span>Total</span><span>{{ money(order.total) }}</span></div>
+                    <div class="flex justify-between text-xl font-semibold"><span>جمع کل</span><span>{{ money(order.total) }}</span></div>
                 </div>
             </div>
         </div>

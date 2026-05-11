@@ -10,12 +10,22 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\MediaController;
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\PostCategoryController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\PostTagController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PublicContentController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
     return redirect('/dashboard');
 });
+
+Route::get('/blog/{post:slug}', [PublicContentController::class, 'post'])->name('public.blog.show');
+Route::get('/brand/{brand:slug}', [PublicContentController::class, 'brand'])->name('public.brand.show');
+Route::get('/page/{page:slug}', [PublicContentController::class, 'page'])->name('public.page.show');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
@@ -52,4 +62,23 @@ Route::middleware('auth')->group(function () {
     Route::resource('categories', CategoryController::class)->except(['create', 'show', 'edit']);
     Route::resource('brands', BrandController::class)->except(['create', 'show', 'edit']);
     Route::resource('attributes', AttributeController::class)->except(['create', 'show', 'edit']);
+    Route::resource('posts', PostController::class);
+    Route::resource('post-categories', PostCategoryController::class)
+        ->parameters(['post-categories' => 'post_category'])
+        ->except(['create', 'show', 'edit']);
+    Route::resource('post-tags', PostTagController::class)
+        ->parameters(['post-tags' => 'post_tag'])
+        ->except(['create', 'show', 'edit']);
+    Route::resource('pages', PageController::class);
+
+    Route::prefix('media')->name('media.')->group(function () {
+        Route::get('/', [MediaController::class, 'index'])->name('index');
+        Route::post('/upload', [MediaController::class, 'upload'])->name('upload');
+        Route::put('/{media}', [MediaController::class, 'update'])->name('update');
+        Route::delete('/{media}', [MediaController::class, 'destroy'])->name('destroy');
+        Route::post('/attach', [MediaController::class, 'attach'])->name('attach');
+        Route::post('/detach', [MediaController::class, 'detach'])->name('detach');
+        Route::post('/reorder', [MediaController::class, 'reorder'])->name('reorder');
+        Route::post('/bulk-delete', [MediaController::class, 'bulkDelete'])->name('bulk-delete');
+    });
 });

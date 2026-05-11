@@ -23,8 +23,8 @@ const timeout = ref();
 
 const statusMap = computed(() => Object.fromEntries(props.statusOptions.map((item) => [item.value, item])));
 const paymentMap = computed(() => Object.fromEntries(props.paymentStatusOptions.map((item) => [item.value, item])));
-const statusFilters = computed(() => [{ label: 'All statuses', value: null }, ...props.statusOptions]);
-const paymentFilters = computed(() => [{ label: 'All payments', value: null }, ...props.paymentStatusOptions]);
+const statusFilters = computed(() => [{ label: 'تمام وضعیت‌ها', value: null }, ...props.statusOptions]);
+const paymentFilters = computed(() => [{ label: 'تمام پرداخت‌ها', value: null }, ...props.paymentStatusOptions]);
 
 const money = (value) => Number(value ?? 0).toLocaleString('fa-IR');
 
@@ -56,11 +56,11 @@ const onPage = (event) => {
 
 const destroyOrder = (order) => {
     confirm.require({
-        message: `Delete order ${order.order_number}?`,
-        header: 'Delete order',
+        message: `آیا سفارش ${order.order_number} حذف شود؟`,
+        header: 'حذف سفارش',
         icon: 'pi pi-exclamation-triangle',
-        acceptLabel: 'Delete',
-        rejectLabel: 'Cancel',
+        acceptLabel: 'حذف',
+        rejectLabel: 'انصراف',
         acceptClass: 'p-button-danger',
         accept: () => router.delete(`/orders/${order.id}`, { preserveScroll: true })
     });
@@ -68,16 +68,16 @@ const destroyOrder = (order) => {
 </script>
 
 <template>
-    <Head title="Orders">
+    <Head title="سفارش‌ها">
         <meta name="robots" content="noindex,nofollow" />
     </Head>
 
     <AppLayout>
         <ConfirmDialog />
-        <TopNavTitle title="Orders" :breadcrumb="[{ label: 'Orders' }]">
+        <TopNavTitle title="سفارش‌ها" :breadcrumb="[{ label: 'سفارش‌ها' }]">
             <template #pageAction>
                 <Link href="/orders/create">
-                    <Button label="New Order" icon="pi pi-plus" />
+                    <Button label="سفارش جدید" icon="pi pi-plus" />
                 </Link>
             </template>
         </TopNavTitle>
@@ -99,7 +99,7 @@ const destroyOrder = (order) => {
                     <div class="grid grid-cols-1 gap-3 md:grid-cols-5">
                         <IconField>
                             <InputIcon><i class="pi pi-search" /></InputIcon>
-                            <InputText v-model="search" class="w-full" placeholder="Order, customer, mobile" />
+                            <InputText v-model="search" class="w-full" placeholder="سفارش، مشتری، موبایل" />
                         </IconField>
                         <Select v-model="status" :options="statusFilters" optionLabel="label" optionValue="value" class="w-full" />
                         <Select v-model="paymentStatus" :options="paymentFilters" optionLabel="label" optionValue="value" class="w-full" />
@@ -108,40 +108,40 @@ const destroyOrder = (order) => {
                     </div>
                 </template>
 
-                <template #empty>No orders found.</template>
+                <template #empty>سفارشی یافت نشد.</template>
 
-                <Column field="order_number" header="Order #" style="min-width: 11rem" />
-                <Column header="Customer" style="min-width: 12rem">
+                <Column field="order_number" header="سفارش #" style="min-width: 11rem" />
+                <Column header="مشتری" style="min-width: 12rem">
                     <template #body="{ data }">{{ data.customer?.name || '-' }}</template>
                 </Column>
-                <Column header="Mobile" style="min-width: 10rem">
+                <Column header="موبایل" style="min-width: 10rem">
                     <template #body="{ data }">{{ data.customer?.phone || '-' }}</template>
                 </Column>
-                <Column field="status" header="Status" style="width: 9rem">
+                <Column field="status" header="وضعیت" style="width: 9rem">
                     <template #body="{ data }">
                         <Tag :value="statusMap[data.status]?.label ?? data.status" :severity="statusMap[data.status]?.severity ?? 'secondary'" />
                     </template>
                 </Column>
-                <Column field="payment_status" header="Payment" style="width: 9rem">
+                <Column field="payment_status" header="پرداخت" style="width: 9rem">
                     <template #body="{ data }">
                         <Tag :value="paymentMap[data.payment_status]?.label ?? data.payment_status" :severity="paymentMap[data.payment_status]?.severity ?? 'secondary'" />
                     </template>
                 </Column>
-                <Column field="total" header="Total" style="min-width: 9rem">
+                <Column field="total" header="جمع" style="min-width: 9rem">
                     <template #body="{ data }">{{ money(data.total) }}</template>
                 </Column>
-                <Column field="items_count" header="Items" style="width: 6rem" />
-                <Column field="created_at" header="Created At" style="min-width: 11rem" />
-                <Column header="Actions" style="width: 10rem">
+                <Column field="items_count" header="اقلام" style="width: 6rem" />
+                <Column field="created_at" header="تاریخ ایجاد" style="min-width: 11rem" />
+                <Column header="عملیات" style="width: 10rem">
                     <template #body="{ data }">
                         <div class="flex justify-center gap-1">
                             <Link :href="`/orders/${data.id}`">
-                                <Button icon="pi pi-eye" rounded text severity="info" aria-label="View" />
+                                <Button icon="pi pi-eye" rounded text severity="info" aria-label="مشاهده" />
                             </Link>
                             <Link :href="`/orders/${data.id}/edit`">
-                                <Button icon="pi pi-pencil" rounded text severity="secondary" aria-label="Edit" />
+                                <Button icon="pi pi-pencil" rounded text severity="secondary" aria-label="ویرایش" />
                             </Link>
-                            <Button icon="pi pi-trash" rounded text severity="danger" aria-label="Delete" @click="destroyOrder(data)" />
+                            <Button icon="pi pi-trash" rounded text severity="danger" aria-label="حذف" @click="destroyOrder(data)" />
                         </div>
                     </template>
                 </Column>

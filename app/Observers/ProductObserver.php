@@ -3,7 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Product;
-use App\Services\SlugService;
+use App\Http\Services\SlugService;
 
 class ProductObserver
 {
