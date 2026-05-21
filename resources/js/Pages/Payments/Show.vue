@@ -3,6 +3,7 @@ import TopNavTitle from '@/Components/Global/TopNavTitle.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
+import { formatJalaliDateTime } from '@/Utils/persianDate';
 
 const props = defineProps({
     payment: { type: Object, required: true },
@@ -77,7 +78,8 @@ const refund = () => router.patch(`/payments/${props.payment.id}/refund`, {}, { 
                     <div><div class="mb-1 font-medium">Amount</div><div>{{ money(payment.amount) }}</div></div>
                     <div><div class="mb-1 font-medium">Method</div><div>{{ methodMap[payment.method]?.label ?? payment.method }}</div></div>
                     <div><div class="mb-1 font-medium">Gateway</div><div>{{ payment.gateway || '-' }}</div></div>
-                    <div><div class="mb-1 font-medium">Paid At</div><div>{{ payment.paid_at || '-' }}</div></div>
+                    <div><div class="mb-1 font-medium">Paid At</div><div>{{ formatJalaliDateTime(payment.paid_at) }}</div></div>
+                    <div><div class="mb-1 font-medium">Created At</div><div>{{ formatJalaliDateTime(payment.created_at) }}</div></div>
                     <div><div class="mb-1 font-medium">Transaction ID</div><div>{{ payment.transaction_id || '-' }}</div></div>
                     <div><div class="mb-1 font-medium">Reference ID</div><div>{{ payment.reference_id || '-' }}</div></div>
                 </div>

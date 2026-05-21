@@ -20,7 +20,8 @@ class PageController extends Controller
     {
         return Inertia::render('CMS/Pages/Index', [
             'pages' => $this->pages->paginated($request),
-            'filters' => $request->only(['search', 'status', 'rows']),
+            'filters' => $request->only(['search', 'status', 'date_from', 'date_to', 'rows']),
+            'statusOptions' => $this->pages->formData()['statusOptions'],
         ]);
     }
 

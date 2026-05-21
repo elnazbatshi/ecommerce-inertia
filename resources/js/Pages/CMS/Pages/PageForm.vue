@@ -2,6 +2,7 @@
 import RichTextEditor from '@/Components/CMS/RichTextEditor.vue';
 import SeoFields from '@/Components/CMS/SeoFields.vue';
 import TopNavTitle from '@/Components/Global/TopNavTitle.vue';
+import PersianDateTimePicker from '@/Components/Date/PersianDateTimePicker.vue';
 import ImageUploader from '@/Components/ImageUploader.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -81,7 +82,8 @@ const removeFeaturedImage = () => {
                     </div>
                     <div>
                         <label class="mb-2 block font-medium">زمان انتشار</label>
-                        <InputText v-model="form.published_at" placeholder="YYYY-MM-DD HH:mm:ss" class="w-full" />
+                        <PersianDateTimePicker v-model="form.published_at" :invalid="Boolean(form.errors.published_at)" />
+                        <small v-if="form.errors.published_at" class="text-red-600">{{ form.errors.published_at }}</small>
                     </div>
                     <div class="md:col-span-2">
                         <label class="mb-2 block font-medium">متن صفحه</label>

@@ -8,9 +8,12 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\MenuController;
+use App\Http\Controllers\MenuItemController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostCategoryController;
 use App\Http\Controllers\PostController;
@@ -19,9 +22,11 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PublicContentController;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return redirect('/dashboard');
-});
+//Route::get('/', function () {
+//    return redirect('/dashboard');
+//});
+
+Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 
 Route::get('/blog/{post:slug}', [PublicContentController::class, 'post'])->name('public.blog.show');
 Route::get('/brand/{brand:slug}', [PublicContentController::class, 'brand'])->name('public.brand.show');
@@ -70,6 +75,19 @@ Route::middleware('auth')->group(function () {
         ->parameters(['post-tags' => 'post_tag'])
         ->except(['create', 'show', 'edit']);
     Route::resource('pages', PageController::class);
+
+    Route::get('/menus', [MenuController::class, 'builder'])->name('menus.index');
+    Route::get('/menus/{menu:slug}', [MenuController::class, 'builder'])->name('menus.builder');
+    Route::post('/menus', [MenuController::class, 'store'])->name('menus.store');
+    Route::put('/menus/{menu:slug}', [MenuController::class, 'update'])->name('menus.update');
+    Route::delete('/menus/{menu:slug}', [MenuController::class, 'destroy'])->name('menus.destroy');
+    Route::get('/menus/{menu:slug}/tree', [MenuController::class, 'show'])->name('menus.show');
+    Route::post('/menus/{menu:slug}/items', [MenuItemController::class, 'store'])->name('menus.items.store');
+    Route::put('/menus/{menu:slug}/items/{item}', [MenuItemController::class, 'update'])->name('menus.items.update');
+    Route::delete('/menus/{menu:slug}/items/{item}', [MenuItemController::class, 'destroy'])->name('menus.items.destroy');
+    Route::patch('/menus/{menu:slug}/items/{item}/toggle', [MenuItemController::class, 'toggleStatus'])->name('menus.items.toggle');
+    Route::post('/menus/{menu:slug}/items/reorder', [MenuItemController::class, 'reorder'])->name('menus.items.reorder');
+    Route::get('/api/menus/location/{location}', [MenuController::class, 'location'])->name('menus.location');
 
     Route::prefix('media')->name('media.')->group(function () {
         Route::get('/', [MediaController::class, 'index'])->name('index');

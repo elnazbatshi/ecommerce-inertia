@@ -5,6 +5,7 @@ import { router } from '@inertiajs/vue3';
 import { useMediaLibrary } from '@/Composables/useMediaLibrary';
 import MediaBrowser from '@/Components/Media/MediaBrowser.vue';
 import MediaUploader from '@/Components/Media/MediaUploader.vue';
+import { formatJalaliDateTime } from '@/Utils/persianDate';
 
 const props = defineProps({
     media: { type: Object, default: () => ({ data: [] }) },
@@ -66,6 +67,7 @@ const deleteMedia = async (media) => {
     if (confirm('آیا از حذف این رسانه اطمینان دارید؟')) {
         try {
             await deleteMediaRequest(media.id);
+            selectedMedia.value = selectedMedia.value.filter((item) => Number(item.id) !== Number(media.id));
             toast.add({
                 severity: 'success',
                 summary: 'موفقیت',
@@ -253,7 +255,7 @@ const onUploadSuccess = () => {
 
             <Column field="created_at" header="تاریخ آپلود" sortable style="width: 10rem">
                 <template #body="slotProps">
-                    {{ new Date(slotProps.data.created_at).toLocaleDateString('fa-IR') }}
+                    {{ formatJalaliDateTime(slotProps.data.created_at) }}
                 </template>
             </Column>
 

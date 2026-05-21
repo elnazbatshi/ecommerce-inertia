@@ -8,7 +8,7 @@ const model = ref([
         items: [{ label: 'داشبورد', icon: 'pi pi-fw pi-home', to: '/dashboard' }]
     },
     {
-        label: 'مدیریت',
+        label: 'مدیریت فروشگاه',
         items: [
             { label: 'محصولات', icon: 'pi pi-fw pi-box', to: '/products' },
             { label: 'دسته‌بندی‌ها', icon: 'pi pi-fw pi-sitemap', to: '/categories' },
@@ -21,13 +21,14 @@ const model = ref([
         ]
     },
     {
-        label: 'محتوا',
+        label: 'مدیریت محتوا',
         items: [
             { label: 'مقالات', icon: 'pi pi-fw pi-file-edit', to: '/posts' },
             { label: 'دسته‌بندی مقالات', icon: 'pi pi-fw pi-folder', to: '/post-categories' },
             { label: 'برچسب‌ها', icon: 'pi pi-fw pi-tags', to: '/post-tags' },
             { label: 'صفحات', icon: 'pi pi-fw pi-file', to: '/pages' },
-            { label: 'محتوای برندها', icon: 'pi pi-fw pi-bookmark', to: '/brands' }
+            { label: 'محتوای برندها', icon: 'pi pi-fw pi-bookmark', to: '/brands' },
+            { label: 'منوهای سایت', icon: 'pi pi-fw pi-list', to: '/menus' }
         ]
     }
 ]);

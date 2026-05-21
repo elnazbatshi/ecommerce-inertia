@@ -30,6 +30,8 @@ class PostService
                     ->where('title', 'like', "%{$search}%")
                     ->orWhere('slug', 'like', "%{$search}%")))
             ->when($request->input('status'), fn ($query, $status) => $query->where('status', $status))
+            ->when($request->input('date_from'), fn ($query, $date) => $query->whereDate('published_at', '>=', $date))
+            ->when($request->input('date_to'), fn ($query, $date) => $query->whereDate('published_at', '<=', $date))
             ->latest()
             ->paginate(Pagination::perPage($request))
             ->withQueryString()

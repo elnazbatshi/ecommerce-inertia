@@ -3,6 +3,7 @@ import TopNavTitle from '@/Components/Global/TopNavTitle.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
+import { formatJalaliDateTime } from '@/Utils/persianDate';
 
 const props = defineProps({
     order: { type: Object, required: true },
@@ -93,11 +94,11 @@ const changePaymentStatus = () => router.patch(`/orders/${props.order.id}/paymen
                 </div>
                 <h2 class="mb-4 mt-6 text-lg font-semibold">تاریخ‌ها</h2>
                 <div class="grid grid-cols-1 gap-2 text-sm md:grid-cols-2">
-                    <div>ایجاد شده: {{ order.created_at || '-' }}</div>
-                    <div>پرداخت شده: {{ order.paid_at || '-' }}</div>
-                    <div>ارسال شده: {{ order.shipped_at || '-' }}</div>
-                    <div>تحویل شده: {{ order.delivered_at || '-' }}</div>
-                    <div>لغو شده: {{ order.cancelled_at || '-' }}</div>
+                    <div>ایجاد شده: {{ formatJalaliDateTime(order.created_at) }}</div>
+                    <div>پرداخت شده: {{ formatJalaliDateTime(order.paid_at) }}</div>
+                    <div>ارسال شده: {{ formatJalaliDateTime(order.shipped_at) }}</div>
+                    <div>تحویل شده: {{ formatJalaliDateTime(order.delivered_at) }}</div>
+                    <div>لغو شده: {{ formatJalaliDateTime(order.cancelled_at) }}</div>
                 </div>
             </div>
             <div class="card">

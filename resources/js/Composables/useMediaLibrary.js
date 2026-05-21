@@ -190,6 +190,10 @@ export function useMediaLibrary() {
     const deleteMedia = async (mediaId) => {
         try {
             const response = await axios.delete(`/media/${mediaId}`);
+            const deletedId = Number(response.data?.deleted_id ?? mediaId);
+
+            mediaList.value = mediaList.value.filter((media) => Number(media.id) !== deletedId);
+            selectedMedia.value = selectedMedia.value.filter((media) => Number(media.id) !== deletedId);
 
             toast.add({
                 severity: 'success',
@@ -213,6 +217,11 @@ export function useMediaLibrary() {
     const bulkDeleteMedia = async (mediaIds) => {
         try {
             const response = await axios.post('/media/bulk-delete', { ids: mediaIds });
+            const deletedIds = (response.data?.deleted_ids ?? mediaIds).map((id) => Number(id));
+            const deletedIdSet = new Set(deletedIds);
+
+            mediaList.value = mediaList.value.filter((media) => !deletedIdSet.has(Number(media.id)));
+            selectedMedia.value = selectedMedia.value.filter((media) => !deletedIdSet.has(Number(media.id)));
 
             toast.add({
                 severity: 'success',

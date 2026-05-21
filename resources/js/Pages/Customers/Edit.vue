@@ -4,6 +4,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { useConfirm } from 'primevue/useconfirm';
 import { computed, ref } from 'vue';
+import { formatJalaliDateTime } from '@/Utils/persianDate';
 
 const props = defineProps({
     customer: { type: Object, required: true },
@@ -143,6 +144,10 @@ const setDefault = (address) => {
                     <h2 class="text-lg font-semibold">Customer Info</h2>
                     <Tag :value="statusMap[customer.status]?.label ?? customer.status" :severity="statusMap[customer.status]?.severity ?? 'secondary'" />
                 </div>
+                <div class="mb-4 space-y-1 text-sm text-surface-500">
+                    <div>Registered At: {{ formatJalaliDateTime(customer.created_at) }}</div>
+                    <div>Last Login: {{ formatJalaliDateTime(customer.last_login_at) }}</div>
+                </div>
                 <form class="space-y-4" @submit.prevent="saveCustomer">
                     <div>
                         <label class="mb-2 block font-medium">Name</label>
@@ -196,6 +201,9 @@ const setDefault = (address) => {
                     </Column>
                     <Column field="postal_code" header="Postal Code" style="min-width: 9rem">
                         <template #body="{ data }">{{ data.postal_code || '-' }}</template>
+                    </Column>
+                    <Column field="created_at" header="Created At" style="min-width: 11rem">
+                        <template #body="{ data }">{{ formatJalaliDateTime(data.created_at) }}</template>
                     </Column>
                     <Column field="address" header="Address" style="min-width: 16rem" />
                     <Column header="Actions" style="width: 11rem">

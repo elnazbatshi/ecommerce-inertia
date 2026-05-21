@@ -101,10 +101,15 @@ class MediaController extends Controller
             ], 422);
         }
 
+        $deletedId = $media->id;
+
         Storage::disk($media->disk)->delete($media->path);
         $media->delete();
 
-        return response()->json(['success' => true]);
+        return response()->json([
+            'success' => true,
+            'deleted_id' => $deletedId,
+        ]);
     }
 
     public function attach(AttachMediaRequest $request): JsonResponse
@@ -159,12 +164,18 @@ class MediaController extends Controller
             }
         }
 
+        $deletedIds = [];
+
         foreach ($mediaItems as $media) {
+            $deletedIds[] = $media->id;
             Storage::disk($media->disk)->delete($media->path);
             $media->delete();
         }
 
-        return response()->json(['success' => true]);
+        return response()->json([
+            'success' => true,
+            'deleted_ids' => $deletedIds,
+        ]);
     }
 
     private function hasAttachments(Media $media): bool

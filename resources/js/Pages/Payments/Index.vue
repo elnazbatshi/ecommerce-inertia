@@ -1,9 +1,11 @@
 <script setup>
 import TopNavTitle from '@/Components/Global/TopNavTitle.vue';
+import PersianDatePicker from '@/Components/Date/PersianDatePicker.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { useConfirm } from 'primevue/useconfirm';
 import { computed, ref, watch } from 'vue';
+import { formatJalaliDateTime } from '@/Utils/persianDate';
 
 const props = defineProps({
     payments: { type: Object, required: true },
@@ -202,8 +204,8 @@ const destroyPayment = (payment) => {
                         <Select v-model="status" :options="statusFilters" optionLabel="label" optionValue="value" class="w-full" />
                         <Select v-model="method" :options="methodFilters" optionLabel="label" optionValue="value" class="w-full" />
                         <Select v-model="gateway" :options="gatewayFilters" optionLabel="label" optionValue="value" class="w-full" />
-                        <InputText v-model="dateFrom" type="date" class="w-full" />
-                        <InputText v-model="dateTo" type="date" class="w-full" />
+                        <PersianDatePicker v-model="dateFrom" placeholder="از تاریخ" />
+                        <PersianDatePicker v-model="dateTo" placeholder="تا تاریخ" />
                     </div>
                 </template>
 
@@ -236,7 +238,10 @@ const destroyPayment = (payment) => {
                     </template>
                 </Column>
                 <Column field="paid_at" header="Paid At" style="min-width: 11rem">
-                    <template #body="{ data }">{{ data.paid_at || '-' }}</template>
+                    <template #body="{ data }">{{ formatJalaliDateTime(data.paid_at) }}</template>
+                </Column>
+                <Column field="created_at" header="Created At" style="min-width: 11rem">
+                    <template #body="{ data }">{{ formatJalaliDateTime(data.created_at) }}</template>
                 </Column>
                 <Column header="Actions" style="width: 12rem">
                     <template #body="{ data }">

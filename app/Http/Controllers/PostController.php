@@ -20,7 +20,8 @@ class PostController extends Controller
     {
         return Inertia::render('CMS/Blog/Index', [
             'posts' => $this->posts->paginated($request),
-            'filters' => $request->only(['search', 'status', 'rows']),
+            'filters' => $request->only(['search', 'status', 'date_from', 'date_to', 'rows']),
+            'statusOptions' => $this->posts->formData()['statusOptions'],
         ]);
     }
 

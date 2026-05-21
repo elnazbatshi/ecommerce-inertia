@@ -4,6 +4,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { useConfirm } from 'primevue/useconfirm';
 import { computed, ref, watch } from 'vue';
+import { formatJalaliDateTime } from '@/Utils/persianDate';
 
 const props = defineProps({
     customers: { type: Object, required: true },
@@ -134,9 +135,11 @@ const destroyCustomer = (customer) => {
                 </Column>
                 <Column field="addresses_count" header="Addresses" style="width: 8rem" />
                 <Column field="last_login_at" header="Last Login" style="min-width: 11rem">
-                    <template #body="{ data }">{{ data.last_login_at || '-' }}</template>
+                    <template #body="{ data }">{{ formatJalaliDateTime(data.last_login_at) }}</template>
                 </Column>
-                <Column field="created_at" header="Registered At" style="min-width: 11rem" />
+                <Column field="created_at" header="Registered At" style="min-width: 11rem">
+                    <template #body="{ data }">{{ formatJalaliDateTime(data.created_at) }}</template>
+                </Column>
                 <Column header="Actions" style="width: 10rem">
                     <template #body="{ data }">
                         <div class="flex justify-center gap-1">

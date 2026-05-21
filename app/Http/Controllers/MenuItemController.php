@@ -2,96 +2,122 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ReorderMenuItemsRequest;
+use App\Http\Requests\ReorderMenuRequest;
 use App\Http\Requests\StoreMenuItemRequest;
 use App\Http\Requests\UpdateMenuItemRequest;
 use App\Models\Menu;
 use App\Models\MenuItem;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Str;
 
 class MenuItemController extends Controller
 {
-    public function store(StoreMenuItemRequest $request, Menu $menu): RedirectResponse
+    public function store(StoreMenuItemRequest $request, Menu $menu): RedirectResponse|JsonResponse
     {
         $data = $this->preparePayload($request->validated());
         $data['menu_id'] = $menu->id;
-        $data['sort_order'] = $menu->items()->max('sort_order') + 1;
+        $data['sort_order'] = $menu->items()->where('parent_id', $data['parent_id'] ?? null)->max('sort_order') + 1;
+        $data['depth'] = $this->depthForParent($data['parent_id'] ?? null);
 
-        MenuItem::create($data);
+        $item = MenuItem::create($data);
 
-        return Redirect::route('menus.edit', $menu)->with('success', 'آیتم منو اضافه شد.');
+        if ($request->wantsJson()) {
+            return response()->json(['item' => $item], 201);
+        }
+
+        return Redirect::route('menus.builder', $menu)->with('success', 'آیتم به منو اضافه شد.');
     }
 
-    public function update(UpdateMenuItemRequest $request, Menu $menu, MenuItem $item): RedirectResponse
+    public function update(UpdateMenuItemRequest $request, Menu $menu, MenuItem $item): RedirectResponse|JsonResponse
     {
         $this->ensureMenuItemBelongsToMenu($menu, $item);
 
-        $item->update($this->preparePayload($request->validated()));
+        $data = $this->preparePayload($request->validated());
+        $data['depth'] = $this->depthForParent($data['parent_id'] ?? null);
+        $item->update($data);
 
-        return Redirect::route('menus.edit', $menu)->with('success', 'آیتم منو به‌روز شد.');
+        if ($request->wantsJson()) {
+            return response()->json(['item' => $item->fresh()]);
+        }
+
+        return Redirect::route('menus.builder', $menu)->with('success', 'آیتم منو به‌روزرسانی شد.');
     }
 
-    public function destroy(Menu $menu, MenuItem $item): RedirectResponse
+    public function destroy(Menu $menu, MenuItem $item): RedirectResponse|JsonResponse
     {
         $this->ensureMenuItemBelongsToMenu($menu, $item);
-
         $item->delete();
 
-        return Redirect::route('menus.edit', $menu)->with('success', 'آیتم منو حذف شد.');
+        if (request()->wantsJson()) {
+            return response()->json(['success' => true, 'deleted_id' => $item->id]);
+        }
+
+        return Redirect::route('menus.builder', $menu)->with('success', 'آیتم منو حذف شد.');
     }
 
     public function toggleStatus(Menu $menu, MenuItem $item): RedirectResponse
     {
         $this->ensureMenuItemBelongsToMenu($menu, $item);
-
         $item->update(['is_active' => ! $item->is_active]);
 
-        return Redirect::route('menus.edit', $menu)->with('success', 'وضعیت آیتم منو تغییر کرد.');
+        return Redirect::route('menus.builder', $menu)->with('success', 'وضعیت آیتم منو تغییر کرد.');
     }
 
-    public function reorder(ReorderMenuItemsRequest $request, Menu $menu): RedirectResponse
+    public function reorder(ReorderMenuRequest $request, Menu $menu): JsonResponse
     {
-        $this->syncOrder($request->all(), $menu->id);
+        DB::transaction(fn () => $this->syncOrder($request->input('items'), $menu->id));
 
-        return Redirect::route('menus.edit', $menu)->with('success', 'ترتیب آیتم‌های منو ذخیره شد.');
+        return response()->json(['success' => true]);
     }
 
     private function preparePayload(array $data): array
     {
-        if (isset($data['route_params']) && is_string($data['route_params'])) {
-            $data['route_params'] = $data['route_params'] !== '' ? json_decode($data['route_params'], true) : null;
-        }
-
-        if ($data['type'] === 'external') {
+        if (in_array($data['type'], ['custom', 'external'], true)) {
+            $data['reference_id'] = null;
             $data['route_name'] = null;
+            $data['route_params'] = null;
         }
 
-        if ($data['type'] === 'internal') {
-            $data['url'] = $data['url'] ? ltrim($data['url'], '/') : null;
+        if (in_array($data['type'], ['page', 'category', 'product', 'brand', 'post'], true)) {
+            $slug = $data['route_params']['slug'] ?? trim((string) ($data['url'] ?? ''), '/');
+            $data['url'] = $slug;
+            $data['route_params'] = $slug ? ['slug' => $slug] : null;
         }
 
         return array_merge($data, [
-            'is_active' => $data['is_active'] ?? false,
+            'is_active' => $data['is_active'] ?? true,
             'target' => $data['target'] ?? '_self',
             'sort_order' => $data['sort_order'] ?? 0,
+            'depth' => $data['depth'] ?? 0,
         ]);
     }
 
-    private function syncOrder(array $items, int $menuId, ?int $parentId = null): void
+    private function syncOrder(array $items, int $menuId, ?int $parentId = null, int $depth = 0): void
     {
-        foreach ($items as $item) {
-            $menuItem = MenuItem::where('menu_id', $menuId)->findOrFail($item['id']);
+        foreach (array_values($items) as $index => $item) {
+            $menuItem = MenuItem::query()
+                ->where('menu_id', $menuId)
+                ->findOrFail($item['id']);
+
             $menuItem->update([
                 'parent_id' => $parentId,
-                'sort_order' => $item['sort_order'],
+                'sort_order' => $index,
+                'depth' => $depth,
             ]);
 
-            if (! empty($item['children']) && is_array($item['children'])) {
-                $this->syncOrder($item['children'], $menuId, $menuItem->id);
-            }
+            $this->syncOrder($item['children'] ?? [], $menuId, $menuItem->id, $depth + 1);
         }
+    }
+
+    private function depthForParent(?int $parentId): int
+    {
+        if (! $parentId) {
+            return 0;
+        }
+
+        return ((int) MenuItem::query()->whereKey($parentId)->value('depth')) + 1;
     }
 
     private function ensureMenuItemBelongsToMenu(Menu $menu, MenuItem $item): void

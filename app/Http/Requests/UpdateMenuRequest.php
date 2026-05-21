@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Menu;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Models\Menu;
 
 class UpdateMenuRequest extends FormRequest
 {
@@ -20,9 +20,16 @@ class UpdateMenuRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', Rule::unique('menus', 'slug')->ignore($menu)],
-            'location' => ['required', Rule::in(array_keys(Menu::locations()))],
+            'location' => ['nullable', Rule::in(array_keys(Menu::locations()))],
             'description' => ['nullable', 'string'],
             'is_active' => ['boolean'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'is_active' => filter_var($this->input('is_active', true), FILTER_VALIDATE_BOOLEAN),
+        ]);
     }
 }
