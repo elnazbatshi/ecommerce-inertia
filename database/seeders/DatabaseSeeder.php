@@ -14,6 +14,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(PermissionSeeder::class);
+        $this->call(MenuSeeder::class);
+        $this->call(VehicleBrandSeeder::class);
 
         $admin = User::query()->updateOrCreate([
             'phone' => '09126860148',

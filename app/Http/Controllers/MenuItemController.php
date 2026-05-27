@@ -27,7 +27,7 @@ class MenuItemController extends Controller
             return response()->json(['item' => $item], 201);
         }
 
-        return Redirect::route('menus.builder', $menu)->with('success', 'آیتم به منو اضافه شد.');
+        return Redirect::route('admin.menus.builder', $menu)->with('success', 'آیتم به منو اضافه شد.');
     }
 
     public function update(UpdateMenuItemRequest $request, Menu $menu, MenuItem $item): RedirectResponse|JsonResponse
@@ -42,7 +42,7 @@ class MenuItemController extends Controller
             return response()->json(['item' => $item->fresh()]);
         }
 
-        return Redirect::route('menus.builder', $menu)->with('success', 'آیتم منو به‌روزرسانی شد.');
+        return Redirect::route('admin.menus.builder', $menu)->with('success', 'آیتم منو به‌روزرسانی شد.');
     }
 
     public function destroy(Menu $menu, MenuItem $item): RedirectResponse|JsonResponse
@@ -54,7 +54,7 @@ class MenuItemController extends Controller
             return response()->json(['success' => true, 'deleted_id' => $item->id]);
         }
 
-        return Redirect::route('menus.builder', $menu)->with('success', 'آیتم منو حذف شد.');
+        return Redirect::route('admin.menus.builder', $menu)->with('success', 'آیتم منو حذف شد.');
     }
 
     public function toggleStatus(Menu $menu, MenuItem $item): RedirectResponse
@@ -62,7 +62,7 @@ class MenuItemController extends Controller
         $this->ensureMenuItemBelongsToMenu($menu, $item);
         $item->update(['is_active' => ! $item->is_active]);
 
-        return Redirect::route('menus.builder', $menu)->with('success', 'وضعیت آیتم منو تغییر کرد.');
+        return Redirect::route('admin.menus.builder', $menu)->with('success', 'وضعیت آیتم منو تغییر کرد.');
     }
 
     public function reorder(ReorderMenuRequest $request, Menu $menu): JsonResponse
@@ -88,6 +88,8 @@ class MenuItemController extends Controller
 
         return array_merge($data, [
             'is_active' => $data['is_active'] ?? true,
+            'auto_children' => $data['auto_children'] ?? false,
+            'children_source' => ($data['auto_children'] ?? false) ? ($data['children_source'] ?? null) : null,
             'target' => $data['target'] ?? '_self',
             'sort_order' => $data['sort_order'] ?? 0,
             'depth' => $data['depth'] ?? 0,

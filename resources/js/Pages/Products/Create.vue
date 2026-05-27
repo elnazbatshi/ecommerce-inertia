@@ -11,6 +11,7 @@ const props = defineProps({
     brands: { type: Array, default: () => [] },
     posts: { type: Array, default: () => [] },
     attributes: { type: Array, default: () => [] },
+    vehicles: { type: Array, default: () => [] },
     statusOptions: { type: Array, default: () => [] },
     typeOptions: { type: Array, default: () => [] }
 });
@@ -40,6 +41,7 @@ const form = useForm({
     type: 'simple',
     stock: 0,
     related_post_ids: [],
+    vehicle_ids: [],
     variants: []
 });
 
@@ -49,6 +51,15 @@ const attributeValueOptions = computed(() => props.attributes.flatMap((attribute
         value: value.id
     }))
 ));
+const vehicleGroups = computed(() => {
+    const map = new Map();
+    props.vehicles.forEach((vehicle) => {
+        const brand = vehicle.brand?.name ?? 'سایر';
+        if (!map.has(brand)) map.set(brand, []);
+        map.get(brand).push({ label: vehicle.name, value: vehicle.id });
+    });
+    return Array.from(map.entries()).map(([label, items]) => ({ label, items }));
+});
 const seoTitle = computed(() => form.meta_title || form.name || 'عنوان محصول');
 const seoDescription = computed(() => form.meta_description || form.description || 'توضیحات کوتاه محصول در این قسمت نمایش داده می‌شود.');
 const seoUrl = computed(() => `${window.location.origin}/products/${form.slug || 'نامک-خودکار'}`);
@@ -70,7 +81,7 @@ const removeVariant = (index) => {
 };
 
 const submit = () => {
-    form.post('/products', { forceFormData: true });
+    form.post('/admin/products', { forceFormData: true });
 };
 
 const errorFor = (field) => form.errors[field];
@@ -80,9 +91,9 @@ const errorFor = (field) => form.errors[field];
     <Head title="ایجاد محصول" />
 
     <AppLayout>
-        <TopNavTitle title="ایجاد محصول" :breadcrumb="[{ label: 'محصولات', href: '/products' }, { label: 'ایجاد محصول' }]">
+        <TopNavTitle title="ایجاد محصول" :breadcrumb="[{ label: 'محصولات', href: '/admin/products' }, { label: 'ایجاد محصول' }]">
             <template #pageAction>
-                <Link href="/products">
+                <Link href="/admin/products">
                     <Button label="بازگشت" icon="pi pi-arrow-right" severity="secondary" outlined />
                 </Link>
             </template>
@@ -142,6 +153,21 @@ const errorFor = (field) => form.errors[field];
                     <div class="md:col-span-3">
                         <label class="mb-2 block font-medium">مقالات مرتبط سئو</label>
                         <MultiSelect v-model="form.related_post_ids" :options="posts" optionLabel="title" optionValue="id" filter display="chip" class="w-full" />
+                    </div>
+                    <div class="md:col-span-3">
+                        <label class="mb-2 block font-medium">سازگار با خودرو/موتور</label>
+                        <MultiSelect
+                            v-model="form.vehicle_ids"
+                            :options="vehicleGroups"
+                            optionGroupLabel="label"
+                            optionGroupChildren="items"
+                            optionLabel="label"
+                            optionValue="value"
+                            filter
+                            display="chip"
+                            :virtualScrollerOptions="{ itemSize: 40 }"
+                            class="w-full"
+                        />
                     </div>
                 </div>
             </div>
@@ -273,7 +299,7 @@ const errorFor = (field) => form.errors[field];
             </Message>
 
             <div class="flex justify-end gap-2">
-                <Link href="/products">
+                <Link href="/admin/products">
                     <Button type="button" label="انصراف" severity="secondary" text />
                 </Link>
                 <Button type="submit" label="ذخیره محصول" icon="pi pi-check" :loading="form.processing" />

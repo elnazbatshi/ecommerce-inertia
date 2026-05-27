@@ -13,6 +13,7 @@ class MenuItem extends Model
     use HasFactory, SoftDeletes;
 
     public const TYPES = ['custom', 'page', 'category', 'product', 'brand', 'post', 'external'];
+    public const CHILDREN_SOURCES = ['categories', 'brands', 'products', 'posts', 'pages'];
 
     protected $fillable = [
         'menu_id',
@@ -31,6 +32,8 @@ class MenuItem extends Model
         'depth',
         'sort_order',
         'is_active',
+        'auto_children',
+        'children_source',
     ];
 
     protected $casts = [
@@ -39,6 +42,7 @@ class MenuItem extends Model
         'depth' => 'integer',
         'sort_order' => 'integer',
         'is_active' => 'boolean',
+        'auto_children' => 'boolean',
     ];
 
     public static function types(): array
@@ -59,6 +63,17 @@ class MenuItem extends Model
         return [
             ['label' => 'همین پنجره', 'value' => '_self'],
             ['label' => 'تب جدید', 'value' => '_blank'],
+        ];
+    }
+
+    public static function childrenSources(): array
+    {
+        return [
+            ['label' => 'دسته‌بندی‌ها', 'value' => 'categories'],
+            ['label' => 'برندها', 'value' => 'brands'],
+            ['label' => 'محصولات', 'value' => 'products'],
+            ['label' => 'مقالات', 'value' => 'posts'],
+            ['label' => 'صفحات', 'value' => 'pages'],
         ];
     }
 

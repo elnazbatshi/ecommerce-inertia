@@ -31,7 +31,7 @@ const statuses = computed(() => [{ label: 'All statuses', value: null, severity:
 const statusMap = computed(() => Object.fromEntries(props.statusOptions.map((item) => [item.value, item])));
 
 const load = (extra = {}) => {
-    router.get('/customers', {
+    router.get('/admin/customers', {
         search: search.value || undefined,
         status: status.value || undefined,
         rows: rows.value,
@@ -61,7 +61,7 @@ const openCreate = () => {
 };
 
 const save = () => {
-    form.post('/customers', {
+    form.post('/admin/customers', {
         preserveScroll: true,
         onSuccess: () => {
             visible.value = false;
@@ -78,7 +78,7 @@ const destroyCustomer = (customer) => {
         acceptLabel: 'Delete',
         rejectLabel: 'Cancel',
         acceptClass: 'p-button-danger',
-        accept: () => router.delete(`/customers/${customer.id}`, { preserveScroll: true })
+        accept: () => router.delete(`/admin/customers/${customer.id}`, { preserveScroll: true })
     });
 };
 </script>
@@ -143,10 +143,10 @@ const destroyCustomer = (customer) => {
                 <Column header="Actions" style="width: 10rem">
                     <template #body="{ data }">
                         <div class="flex justify-center gap-1">
-                            <Link :href="`/customers/${data.id}`">
+                            <Link :href="`/admin/customers/${data.id}`">
                                 <Button icon="pi pi-eye" rounded text severity="info" aria-label="View" />
                             </Link>
-                            <Link :href="`/customers/${data.id}/edit`">
+                            <Link :href="`/admin/customers/${data.id}/edit`">
                                 <Button icon="pi pi-pencil" rounded text severity="secondary" aria-label="Edit" />
                             </Link>
                             <Button icon="pi pi-trash" rounded text severity="danger" aria-label="Delete" @click="destroyCustomer(data)" />

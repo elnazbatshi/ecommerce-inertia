@@ -34,7 +34,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    const url = isEdit.value ? `/pages/${props.page.slug}` : '/pages';
+    const url = isEdit.value ? `/admin/pages/${props.page.slug}` : '/admin/pages';
     form.post(url, { forceFormData: true });
 };
 
@@ -60,8 +60,8 @@ const removeFeaturedImage = () => {
 <template>
     <Head :title="isEdit ? `ویرایش ${page.title}` : 'ایجاد صفحه'" />
     <AppLayout>
-        <TopNavTitle :title="isEdit ? `ویرایش ${page.title}` : 'ایجاد صفحه'" :breadcrumb="[{ label: 'صفحات', href: '/pages' }, { label: isEdit ? 'ویرایش' : 'ایجاد' }]">
-            <template #pageAction><Link href="/pages"><Button label="بازگشت" icon="pi pi-arrow-right" severity="secondary" outlined /></Link></template>
+        <TopNavTitle :title="isEdit ? `ویرایش ${page.title}` : 'ایجاد صفحه'" :breadcrumb="[{ label: 'صفحات', href: '/admin/pages' }, { label: isEdit ? 'ویرایش' : 'ایجاد' }]">
+            <template #pageAction><Link href="/admin/pages"><Button label="بازگشت" icon="pi pi-arrow-right" severity="secondary" outlined /></Link></template>
         </TopNavTitle>
         <form class="space-y-4" @submit.prevent="submit">
             <div class="card">
@@ -105,7 +105,7 @@ const removeFeaturedImage = () => {
             <SeoFields :form="form" basePath="/page" :fallbackTitle="form.title || 'عنوان صفحه'" fallbackDescription="پیش‌نمایش توضیحات صفحه ثابت" />
             <Message v-if="Object.keys(form.errors).length" severity="error">لطفاً خطاهای فرم را بررسی کنید.</Message>
             <div class="flex justify-end gap-2">
-                <Link href="/pages"><Button type="button" label="انصراف" severity="secondary" text /></Link>
+                <Link href="/admin/pages"><Button type="button" label="انصراف" severity="secondary" text /></Link>
                 <Button type="submit" label="ذخیره صفحه" icon="pi pi-check" :loading="form.processing" />
             </div>
         </form>

@@ -39,7 +39,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    const url = isEdit.value ? `/posts/${props.post.slug}` : '/posts';
+    const url = isEdit.value ? `/admin/posts/${props.post.slug}` : '/admin/posts';
     form.post(url, { forceFormData: true });
 };
 
@@ -65,9 +65,9 @@ const removeFeaturedImage = () => {
 <template>
     <Head :title="isEdit ? `ویرایش ${post.title}` : 'ایجاد مقاله'" />
     <AppLayout>
-        <TopNavTitle :title="isEdit ? `ویرایش ${post.title}` : 'ایجاد مقاله'" :breadcrumb="[{ label: 'مقالات', href: '/posts' }, { label: isEdit ? 'ویرایش' : 'ایجاد' }]">
+        <TopNavTitle :title="isEdit ? `ویرایش ${post.title}` : 'ایجاد مقاله'" :breadcrumb="[{ label: 'مقالات', href: '/admin/posts' }, { label: isEdit ? 'ویرایش' : 'ایجاد' }]">
             <template #pageAction>
-                <Link href="/posts"><Button label="بازگشت" icon="pi pi-arrow-right" severity="secondary" outlined /></Link>
+                <Link href="/admin/posts"><Button label="بازگشت" icon="pi pi-arrow-right" severity="secondary" outlined /></Link>
             </template>
         </TopNavTitle>
         <form class="space-y-4" @submit.prevent="submit">
@@ -124,7 +124,7 @@ const removeFeaturedImage = () => {
             <SeoFields :form="form" basePath="/blog" :fallbackTitle="form.title || 'عنوان مقاله'" :fallbackDescription="form.excerpt || 'پیش‌نمایش خلاصه مقاله'" />
             <Message v-if="Object.keys(form.errors).length" severity="error">لطفاً خطاهای فرم را بررسی کنید.</Message>
             <div class="flex justify-end gap-2">
-                <Link href="/posts"><Button type="button" label="انصراف" severity="secondary" text /></Link>
+                <Link href="/admin/posts"><Button type="button" label="انصراف" severity="secondary" text /></Link>
                 <Button type="submit" label="ذخیره مقاله" icon="pi pi-check" :loading="form.processing" />
             </div>
         </form>

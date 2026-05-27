@@ -12,9 +12,7 @@ use Inertia\Response;
 
 class CustomerController extends Controller
 {
-    public function __construct(private readonly CustomerService $customers)
-    {
-    }
+    public function __construct(private readonly CustomerService $customers) {}
 
     public function index(Request $request): Response
     {
@@ -27,7 +25,7 @@ class CustomerController extends Controller
 
     public function create(): RedirectResponse
     {
-        return redirect()->route('customers.index');
+        return redirect()->route('admin.customers.index');
     }
 
     public function store(Request $request): RedirectResponse
@@ -39,7 +37,7 @@ class CustomerController extends Controller
 
     public function show(Customer $customer): RedirectResponse
     {
-        return redirect()->route('customers.edit', $customer);
+        return redirect()->route('admin.customers.edit', $customer);
     }
 
     public function edit(Customer $customer): Response
@@ -67,7 +65,7 @@ class CustomerController extends Controller
     {
         $customer->delete();
 
-        return redirect()->route('customers.index')->with('success', 'Customer deleted successfully.');
+        return redirect()->route('admin.customers.index')->with('success', 'Customer deleted successfully.');
     }
 
     private function validatedCustomer(Request $request, ?Customer $customer = null): array

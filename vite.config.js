@@ -62,7 +62,10 @@ export default defineConfig({
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.js'],
-            refresh: true,
+            refresh: [
+                'resources/views/**/*.blade.php',
+                'routes/**/*.php',
+            ],
         }),
         vue(),
         tailwindcss(),
@@ -83,6 +86,13 @@ export default defineConfig({
         cors: true,
         hmr: {
             host: '127.0.0.1',
+        },
+        watch: {
+            ignored: [
+                '**/storage/**',
+                '**/vendor/**',
+                '**/public/build/**',
+            ],
         },
     },
     optimizeDeps: {

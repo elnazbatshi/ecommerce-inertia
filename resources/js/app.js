@@ -11,6 +11,7 @@ import ConfirmationService from 'primevue/confirmationservice';
 import ToastService from 'primevue/toastservice';
 
 import '@/assets/tailwind.css';
+import '../css/frontend/main.css';
 import '@/assets/styles.scss';
 
 $t().preset(Aura).use({ useDefaultOptions: true });

@@ -71,6 +71,9 @@ class ProductResource extends JsonResource
         if ($this->relationLoaded('relatedPosts')) {
             $data['related_post_ids'] = $this->relatedPosts->pluck('id')->values();
         }
+        if ($this->relationLoaded('vehicles')) {
+            $data['vehicle_ids'] = $this->vehicles->pluck('id')->values();
+        }
 
         return $data;
     }

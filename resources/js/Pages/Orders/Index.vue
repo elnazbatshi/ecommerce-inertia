@@ -31,7 +31,7 @@ const paymentFilters = computed(() => [{ label: 'تمام پرداخت‌ها', 
 const money = (value) => Number(value ?? 0).toLocaleString('fa-IR');
 
 const load = (extra = {}) => {
-    router.get('/orders', {
+    router.get('/admin/orders', {
         search: search.value || undefined,
         status: status.value || undefined,
         payment_status: paymentStatus.value || undefined,
@@ -64,7 +64,7 @@ const destroyOrder = (order) => {
         acceptLabel: 'حذف',
         rejectLabel: 'انصراف',
         acceptClass: 'p-button-danger',
-        accept: () => router.delete(`/orders/${order.id}`, { preserveScroll: true })
+        accept: () => router.delete(`/admin/orders/${order.id}`, { preserveScroll: true })
     });
 };
 </script>
@@ -78,7 +78,7 @@ const destroyOrder = (order) => {
         <ConfirmDialog />
         <TopNavTitle title="سفارش‌ها" :breadcrumb="[{ label: 'سفارش‌ها' }]">
             <template #pageAction>
-                <Link href="/orders/create">
+                <Link href="/admin/orders/create">
                     <Button label="سفارش جدید" icon="pi pi-plus" />
                 </Link>
             </template>
@@ -139,10 +139,10 @@ const destroyOrder = (order) => {
                 <Column header="عملیات" style="width: 10rem">
                     <template #body="{ data }">
                         <div class="flex justify-center gap-1">
-                            <Link :href="`/orders/${data.id}`">
+                            <Link :href="`/admin/orders/${data.id}`">
                                 <Button icon="pi pi-eye" rounded text severity="info" aria-label="مشاهده" />
                             </Link>
-                            <Link :href="`/orders/${data.id}/edit`">
+                            <Link :href="`/admin/orders/${data.id}/edit`">
                                 <Button icon="pi pi-pencil" rounded text severity="secondary" aria-label="ویرایش" />
                             </Link>
                             <Button icon="pi pi-trash" rounded text severity="danger" aria-label="حذف" @click="destroyOrder(data)" />

@@ -37,6 +37,7 @@ class MenuController extends Controller
             'locationOptions' => Menu::locationOptions(),
             'typeOptions' => MenuItem::types(),
             'targetOptions' => MenuItem::targets(),
+            'childrenSourceOptions' => MenuItem::childrenSources(),
             'linkOptions' => $this->linkOptions(),
         ]);
     }
@@ -50,7 +51,7 @@ class MenuController extends Controller
 
         $menu = Menu::create($data);
 
-        return Redirect::route('menus.builder', $menu)->with('success', 'منو با موفقیت ساخته شد.');
+        return Redirect::route('admin.menus.builder', $menu)->with('success', 'منو با موفقیت ساخته شد.');
     }
 
     public function update(UpdateMenuRequest $request, Menu $menu): RedirectResponse
@@ -62,14 +63,14 @@ class MenuController extends Controller
 
         $menu->update($data);
 
-        return Redirect::route('menus.builder', $menu)->with('success', 'منو با موفقیت به‌روزرسانی شد.');
+        return Redirect::route('admin.menus.builder', $menu)->with('success', 'منو با موفقیت به‌روزرسانی شد.');
     }
 
     public function destroy(Menu $menu): RedirectResponse
     {
         $menu->delete();
 
-        return Redirect::route('menus.index')->with('success', 'منو حذف شد.');
+        return Redirect::route('admin.menus.index')->with('success', 'منو حذف شد.');
     }
 
     public function show(Menu $menu, MenuService $menuService): JsonResponse
@@ -119,6 +120,8 @@ class MenuController extends Controller
             'depth' => $item->depth,
             'sort_order' => $item->sort_order,
             'is_active' => $item->is_active,
+            'auto_children' => $item->auto_children,
+            'children_source' => $item->children_source,
             'children' => $this->mapItems($item->childrenRecursive),
         ])->values()->all();
     }
@@ -129,7 +132,7 @@ class MenuController extends Controller
             'pages' => Page::query()->orderBy('title')->limit(100)->get(['id', 'title', 'slug'])
                 ->map(fn (Page $page) => $this->option($page->id, $page->title, $page->slug, '/page/'.$page->slug))->values()->all(),
             'categories' => Category::query()->orderBy('name')->limit(100)->get(['id', 'name', 'slug'])
-                ->map(fn (Category $category) => $this->option($category->id, $category->name, $category->slug, '/categories/'.$category->slug))->values()->all(),
+                ->map(fn (Category $category) => $this->option($category->id, $category->name, $category->slug, '/category/'.$category->slug))->values()->all(),
             'products' => Product::query()->orderBy('name')->limit(100)->get(['id', 'name', 'slug'])
                 ->map(fn (Product $product) => $this->option($product->id, $product->name, $product->slug, '/products/'.$product->slug))->values()->all(),
             'brands' => Brand::query()->orderBy('name')->limit(100)->get(['id', 'name', 'slug'])

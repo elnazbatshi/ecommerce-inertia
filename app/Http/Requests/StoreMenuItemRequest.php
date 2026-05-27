@@ -40,6 +40,8 @@ class StoreMenuItemRequest extends FormRequest
             'depth' => ['nullable', 'integer', 'min:0'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_active' => ['boolean'],
+            'auto_children' => ['boolean'],
+            'children_source' => ['nullable', Rule::in(MenuItem::CHILDREN_SOURCES), 'required_if:auto_children,true'],
         ];
     }
 
@@ -47,6 +49,7 @@ class StoreMenuItemRequest extends FormRequest
     {
         $this->merge([
             'is_active' => filter_var($this->input('is_active', true), FILTER_VALIDATE_BOOLEAN),
+            'auto_children' => filter_var($this->input('auto_children', false), FILTER_VALIDATE_BOOLEAN),
             'route_params' => is_string($this->input('route_params'))
                 ? json_decode($this->input('route_params'), true)
                 : $this->input('route_params'),

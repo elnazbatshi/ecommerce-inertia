@@ -190,7 +190,11 @@ class MediaController extends Controller
                 ->orWhere('cover_image', $media->path)
                 ->exists()
             || DB::table('posts')->where('featured_image', $media->path)->exists()
-            || DB::table('pages')->where('featured_image', $media->path)->exists();
+            || DB::table('pages')->where('featured_image', $media->path)->exists()
+            || DB::table('hero_sliders')
+                ->where('background_media_id', $media->id)
+                ->orWhere('foreground_media_id', $media->id)
+                ->exists();
     }
 
     private function resolveModelClass(string $type): string

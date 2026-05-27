@@ -60,7 +60,7 @@ const viewMedia = (media) => {
 };
 
 const editMedia = (media) => {
-    router.visit(`/media/${media.id}/edit`);
+    router.visit(`/admin/media/${media.id}/edit`);
 };
 
 const deleteMedia = async (media) => {

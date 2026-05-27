@@ -12,9 +12,7 @@ use Inertia\Response;
 
 class PostController extends Controller
 {
-    public function __construct(private readonly PostService $posts)
-    {
-    }
+    public function __construct(private readonly PostService $posts) {}
 
     public function index(Request $request): Response
     {
@@ -34,7 +32,7 @@ class PostController extends Controller
     {
         $this->posts->create($request);
 
-        return redirect()->route('posts.index')->with('success', 'مقاله ایجاد شد.');
+        return redirect()->route('admin.posts.index')->with('success', 'مقاله ایجاد شد.');
     }
 
     public function edit(Post $post): Response
@@ -49,14 +47,14 @@ class PostController extends Controller
 
     public function show(Post $post): RedirectResponse
     {
-        return redirect()->route('posts.edit', $post);
+        return redirect()->route('admin.posts.edit', $post);
     }
 
     public function update(StorePostRequest $request, Post $post): RedirectResponse
     {
         $this->posts->update($request, $post);
 
-        return redirect()->route('posts.index')->with('success', 'مقاله ویرایش شد.');
+        return redirect()->route('admin.posts.index')->with('success', 'مقاله ویرایش شد.');
     }
 
     public function destroy(Post $post): RedirectResponse

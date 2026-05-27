@@ -22,7 +22,7 @@ const timeout = ref();
 const statusFilters = computed(() => [{ label: 'همه وضعیت‌ها', value: null }, ...props.statusOptions]);
 
 const load = (extra = {}) => {
-    router.get('/posts', {
+    router.get('/admin/posts', {
         search: search.value || undefined,
         status: status.value || undefined,
         date_from: dateFrom.value || undefined,
@@ -46,7 +46,7 @@ const destroyItem = (post) => {
         header: 'حذف مقاله',
         icon: 'pi pi-exclamation-triangle',
         acceptClass: 'p-button-danger',
-        accept: () => router.delete(`/posts/${post.slug}`, { preserveScroll: true })
+        accept: () => router.delete(`/admin/posts/${post.slug}`, { preserveScroll: true })
     });
 };
 </script>
@@ -56,7 +56,7 @@ const destroyItem = (post) => {
     <AppLayout>
         <ConfirmDialog />
         <TopNavTitle title="مقالات" :breadcrumb="[{ label: 'محتوا' }, { label: 'مقالات' }]">
-            <template #pageAction><Link href="/posts/create"><Button label="مقاله جدید" icon="pi pi-plus" /></Link></template>
+            <template #pageAction><Link href="/admin/posts/create"><Button label="مقاله جدید" icon="pi pi-plus" /></Link></template>
         </TopNavTitle>
         <div class="card">
             <DataTable :value="posts.data" dataKey="id" showGridlines>
@@ -82,7 +82,7 @@ const destroyItem = (post) => {
                 <Column header="سئو"><template #body="{ data }"><Tag :value="data.seo_index ? 'قابل نمایه‌سازی' : 'غیرقابل نمایه‌سازی'" :severity="data.seo_index ? 'success' : 'danger'" /></template></Column>
                 <Column header="عملیات" style="width: 9rem">
                     <template #body="{ data }">
-                        <Link :href="`/posts/${data.slug}/edit`"><Button icon="pi pi-pencil" rounded text severity="secondary" /></Link>
+                        <Link :href="`/admin/posts/${data.slug}/edit`"><Button icon="pi pi-pencil" rounded text severity="secondary" /></Link>
                         <Button icon="pi pi-trash" rounded text severity="danger" @click="destroyItem(data)" />
                     </template>
                 </Column>

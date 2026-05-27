@@ -131,11 +131,11 @@ const save = () => {
     };
 
     if (editingRole.value) {
-        form.put(`/accesses/${editingRole.value.id}`, options);
+        form.put(`/admin/accesses/${editingRole.value.id}`, options);
         return;
     }
 
-    form.post('/accesses', options);
+    form.post('/admin/accesses', options);
 };
 
 onMounted(() => {

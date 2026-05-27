@@ -55,6 +55,13 @@
 
 @theme {
   --font-sans: 'IRANSans', ui-sans-serif, system-ui, sans-serif;
+  --color-site-white: #ffffff;
+  --color-site-black: #111111;
+  --color-site-ink: #1a1a1a;
+  --color-site-muted: #666666;
+  --color-site-line: #e5e5e5;
+  --color-site-gold: #d4a017;
+  --color-site-gold-hover: #b88a00;
   --breakpoint-*: initial;
   --breakpoint-sm: 576px;
   --breakpoint-md: 768px;

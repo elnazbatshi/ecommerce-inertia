@@ -14,7 +14,11 @@ class Category extends Model
     protected $fillable = [
         'name',
         'slug',
+        'icon',
+        'image',
         'parent_id',
+        'sort_order',
+        'is_active',
         'meta_title',
         'meta_description',
         'meta_keywords',
@@ -26,6 +30,8 @@ class Category extends Model
     protected $casts = [
         'seo_index' => 'boolean',
         'seo_follow' => 'boolean',
+        'is_active' => 'boolean',
+        'sort_order' => 'integer',
     ];
 
     public function getRouteKeyName(): string

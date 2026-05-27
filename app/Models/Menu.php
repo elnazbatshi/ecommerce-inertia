@@ -30,6 +30,7 @@ class Menu extends Model
             'footer' => 'فوتر',
             'mobile' => 'موبایل',
             'sidebar' => 'سایدبار',
+            'topbar' => 'نوار بالا',
             'mega' => 'مگامنو',
         ];
     }

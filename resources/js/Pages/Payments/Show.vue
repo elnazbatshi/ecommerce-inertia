@@ -17,8 +17,8 @@ const methodMap = computed(() => Object.fromEntries(props.methodOptions.map((ite
 const money = (value) => Number(value ?? 0).toLocaleString('fa-IR');
 const rawResponse = computed(() => props.payment.raw_response ? JSON.stringify(props.payment.raw_response, null, 2) : '-');
 
-const changeStatus = () => router.patch(`/payments/${props.payment.id}/status`, { status: status.value }, { preserveScroll: true });
-const refund = () => router.patch(`/payments/${props.payment.id}/refund`, {}, { preserveScroll: true });
+const changeStatus = () => router.patch(`/admin/payments/${props.payment.id}/status`, { status: status.value }, { preserveScroll: true });
+const refund = () => router.patch(`/admin/payments/${props.payment.id}/refund`, {}, { preserveScroll: true });
 </script>
 
 <template>
@@ -27,9 +27,9 @@ const refund = () => router.patch(`/payments/${props.payment.id}/refund`, {}, { 
     </Head>
 
     <AppLayout>
-        <TopNavTitle :title="`Payment ${payment.transaction_id || payment.id}`" :breadcrumb="[{ label: 'Payments', href: '/payments' }, { label: 'Details' }]">
+        <TopNavTitle :title="`Payment ${payment.transaction_id || payment.id}`" :breadcrumb="[{ label: 'Payments', href: '/admin/payments' }, { label: 'Details' }]">
             <template #pageAction>
-                <Link href="/payments">
+                <Link href="/admin/payments">
                     <Button label="Back" icon="pi pi-arrow-right" severity="secondary" outlined />
                 </Link>
             </template>
@@ -43,7 +43,7 @@ const refund = () => router.patch(`/payments/${props.payment.id}/refund`, {}, { 
                     <div>Order total: {{ money(payment.order?.total) }}</div>
                     <div>Order status: {{ payment.order?.status || '-' }}</div>
                     <div>Payment status: {{ payment.order?.payment_status || '-' }}</div>
-                    <Link v-if="payment.order" :href="`/orders/${payment.order.id}`">
+                    <Link v-if="payment.order" :href="`/admin/orders/${payment.order.id}`">
                         <Button label="View Order" icon="pi pi-eye" text />
                     </Link>
                 </div>

@@ -43,7 +43,7 @@ const addressForm = useForm({
 const statusMap = computed(() => Object.fromEntries(props.statusOptions.map((item) => [item.value, item])));
 
 const saveCustomer = () => {
-    customerForm.post(`/customers/${props.customer.id}`, {
+    customerForm.post(`/admin/customers/${props.customer.id}`, {
         preserveScroll: true,
         onSuccess: () => {
             customerForm.password = '';
@@ -95,8 +95,8 @@ const openEditAddress = (address) => {
 
 const saveAddress = () => {
     const url = editingAddress.value
-        ? `/customers/${props.customer.id}/addresses/${editingAddress.value.id}`
-        : `/customers/${props.customer.id}/addresses`;
+        ? `/admin/customers/${props.customer.id}/addresses/${editingAddress.value.id}`
+        : `/admin/customers/${props.customer.id}/addresses`;
 
     addressForm.post(url, {
         preserveScroll: true,
@@ -114,12 +114,12 @@ const deleteAddress = (address) => {
         acceptLabel: 'Delete',
         rejectLabel: 'Cancel',
         acceptClass: 'p-button-danger',
-        accept: () => router.delete(`/customers/${props.customer.id}/addresses/${address.id}`, { preserveScroll: true })
+        accept: () => router.delete(`/admin/customers/${props.customer.id}/addresses/${address.id}`, { preserveScroll: true })
     });
 };
 
 const setDefault = (address) => {
-    router.patch(`/customers/${props.customer.id}/addresses/${address.id}/default`, {}, { preserveScroll: true });
+    router.patch(`/admin/customers/${props.customer.id}/addresses/${address.id}/default`, {}, { preserveScroll: true });
 };
 </script>
 
@@ -130,9 +130,9 @@ const setDefault = (address) => {
 
     <AppLayout>
         <ConfirmDialog />
-        <TopNavTitle :title="`Customer ${customer.phone}`" :breadcrumb="[{ label: 'Customers', href: '/customers' }, { label: 'Edit' }]">
+        <TopNavTitle :title="`Customer ${customer.phone}`" :breadcrumb="[{ label: 'Customers', href: '/admin/customers' }, { label: 'Edit' }]">
             <template #pageAction>
-                <Link href="/customers">
+                <Link href="/admin/customers">
                     <Button label="Back" icon="pi pi-arrow-right" severity="secondary" outlined />
                 </Link>
             </template>

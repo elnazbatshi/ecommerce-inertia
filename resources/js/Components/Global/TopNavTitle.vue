@@ -12,7 +12,7 @@ const props = defineProps({
     },
     homeHref: {
         type: String,
-        default: '/dashboard'
+        default: '/admin/dashboard'
     }
 });
 </script>

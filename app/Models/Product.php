@@ -36,6 +36,8 @@ class Product extends Model
         'main_image',
         'status',
         'type',
+        'is_original',
+        'is_featured',
         'stock',
     ];
 
@@ -43,6 +45,8 @@ class Product extends Model
         'price' => 'decimal:2',
         'discount_price' => 'decimal:2',
         'stock' => 'integer',
+        'is_original' => 'boolean',
+        'is_featured' => 'boolean',
         'seo_index' => 'boolean',
         'seo_follow' => 'boolean',
         'meta_keywords' => 'array',
@@ -86,6 +90,10 @@ class Product extends Model
     public function relatedPosts(): BelongsToMany
     {
         return $this->belongsToMany(Post::class);
+    }
+    public function vehicles(): BelongsToMany
+    {
+        return $this->belongsToMany(Vehicle::class, 'product_vehicle')->withTimestamps();
     }
 
     public function media(): MorphToMany

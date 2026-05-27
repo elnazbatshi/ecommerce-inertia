@@ -103,7 +103,7 @@ const submit = () => {
                 discount_price: item.discount_price
             }))
         }))
-        .post(`/orders/${props.order.id}`);
+        .post(`/admin/orders/${props.order.id}`);
 };
 </script>
 
@@ -113,9 +113,9 @@ const submit = () => {
     </Head>
 
     <AppLayout>
-        <TopNavTitle :title="`ویرایش ${order.order_number}`" :breadcrumb="[{ label: 'سفارش‌ها', href: '/orders' }, { label: order.order_number }]">
+        <TopNavTitle :title="`ویرایش ${order.order_number}`" :breadcrumb="[{ label: 'سفارش‌ها', href: '/admin/orders' }, { label: order.order_number }]">
             <template #pageAction>
-                <Link :href="`/orders/${order.id}`">
+                <Link :href="`/admin/orders/${order.id}`">
                     <Button label="مشاهده" icon="pi pi-eye" severity="secondary" outlined />
                 </Link>
             </template>
@@ -185,7 +185,7 @@ const submit = () => {
             </div>
 
             <div class="flex justify-end gap-2">
-                <Link href="/orders"><Button type="button" label="انصراف" severity="secondary" text /></Link>
+                <Link href="/admin/orders"><Button type="button" label="انصراف" severity="secondary" text /></Link>
                 <Button type="submit" label="ذخیره تغییرات" icon="pi pi-check" :loading="form.processing" />
             </div>
         </form>

@@ -61,7 +61,7 @@ const parseRawResponse = () => {
 };
 
 const load = (extra = {}) => {
-    router.get('/payments', {
+    router.get('/admin/payments', {
         search: search.value || undefined,
         status: status.value || undefined,
         method: method.value || undefined,
@@ -121,7 +121,7 @@ const onOrderChange = () => {
 };
 
 const save = () => {
-    const url = editing.value ? `/payments/${editing.value.id}` : '/payments';
+    const url = editing.value ? `/admin/payments/${editing.value.id}` : '/admin/payments';
 
     form
         .transform((data) => ({
@@ -152,7 +152,7 @@ const refund = (payment) => {
         acceptLabel: 'Refund',
         rejectLabel: 'Cancel',
         acceptClass: 'p-button-warning',
-        accept: () => router.patch(`/payments/${payment.id}/refund`, {}, { preserveScroll: true })
+        accept: () => router.patch(`/admin/payments/${payment.id}/refund`, {}, { preserveScroll: true })
     });
 };
 
@@ -164,7 +164,7 @@ const destroyPayment = (payment) => {
         acceptLabel: 'Delete',
         rejectLabel: 'Cancel',
         acceptClass: 'p-button-danger',
-        accept: () => router.delete(`/payments/${payment.id}`, { preserveScroll: true })
+        accept: () => router.delete(`/admin/payments/${payment.id}`, { preserveScroll: true })
     });
 };
 </script>
@@ -246,7 +246,7 @@ const destroyPayment = (payment) => {
                 <Column header="Actions" style="width: 12rem">
                     <template #body="{ data }">
                         <div class="flex justify-center gap-1">
-                            <Link :href="`/payments/${data.id}`">
+                            <Link :href="`/admin/payments/${data.id}`">
                                 <Button icon="pi pi-eye" rounded text severity="info" aria-label="View" />
                             </Link>
                             <Button icon="pi pi-pencil" rounded text severity="secondary" aria-label="Edit" @click="openEdit(data)" />

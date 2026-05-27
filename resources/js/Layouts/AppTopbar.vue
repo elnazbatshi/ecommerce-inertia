@@ -1,6 +1,6 @@
 <template>
     <div class="layout-topbar flex justify-between" dir="ltr">
-        <Link href="/dashboard" class="layout-topbar-logo">
+        <Link href="/admin/dashboard" class="layout-topbar-logo">
             <button class="mr-10! p-link layout-menu-button layout-topbar-button" @click.prevent="onMenuToggle()">
                 <i class="pi pi-bars"></i>
             </button>

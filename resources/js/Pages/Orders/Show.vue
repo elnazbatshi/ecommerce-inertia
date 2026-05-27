@@ -17,8 +17,8 @@ const statusMap = computed(() => Object.fromEntries(props.statusOptions.map((ite
 const paymentMap = computed(() => Object.fromEntries(props.paymentStatusOptions.map((item) => [item.value, item])));
 const money = (value) => Number(value ?? 0).toLocaleString('fa-IR');
 
-const changeStatus = () => router.patch(`/orders/${props.order.id}/status`, { status: status.value }, { preserveScroll: true });
-const changePaymentStatus = () => router.patch(`/orders/${props.order.id}/payment-status`, { payment_status: paymentStatus.value }, { preserveScroll: true });
+const changeStatus = () => router.patch(`/admin/orders/${props.order.id}/status`, { status: status.value }, { preserveScroll: true });
+const changePaymentStatus = () => router.patch(`/admin/orders/${props.order.id}/payment-status`, { payment_status: paymentStatus.value }, { preserveScroll: true });
 </script>
 
 <template>
@@ -27,9 +27,9 @@ const changePaymentStatus = () => router.patch(`/orders/${props.order.id}/paymen
     </Head>
 
     <AppLayout>
-        <TopNavTitle :title="order.order_number" :breadcrumb="[{ label: 'سفارش‌ها', href: '/orders' }, { label: order.order_number }]">
+        <TopNavTitle :title="order.order_number" :breadcrumb="[{ label: 'سفارش‌ها', href: '/admin/orders' }, { label: order.order_number }]">
             <template #pageAction>
-                <Link :href="`/orders/${order.id}/edit`">
+                <Link :href="`/admin/orders/${order.id}/edit`">
                     <Button label="ویرایش" icon="pi pi-pencil" severity="secondary" outlined />
                 </Link>
             </template>
