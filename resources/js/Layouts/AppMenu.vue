@@ -17,7 +17,7 @@ const model = ref([
                 label: 'مدیریت خودرو',
                 icon: 'pi pi-fw pi-car',
                 items: [
-                    { label: 'برندها', icon: 'pi pi-fw pi-tag', to: '/admin/vehicle-brands' },
+                    { label: 'برند خودرو', icon: 'pi pi-fw pi-tag', to: '/admin/vehicle-brands' },
                     { label: 'خودروها', icon: 'pi pi-fw pi-car', to: '/admin/vehicles' }
                 ]
             },
@@ -35,6 +35,7 @@ const model = ref([
             { label: 'دسته‌بندی مقالات', icon: 'pi pi-fw pi-folder', to: '/admin/post-categories' },
             { label: 'برچسب‌ها', icon: 'pi pi-fw pi-tags', to: '/admin/post-tags' },
             { label: 'صفحات', icon: 'pi pi-fw pi-file', to: '/admin/pages' },
+            { label: 'رسانه‌ها', icon: 'pi pi-fw pi-images', to: '/admin/media' },
             { label: 'محتوای برندها', icon: 'pi pi-fw pi-bookmark', to: '/admin/brands' },
             { label: 'منوهای سایت', icon: 'pi pi-fw pi-list', to: '/admin/menus' }
         ]

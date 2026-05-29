@@ -22,6 +22,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PublicContentController;
 use App\Http\Controllers\SearchLogController;
 use App\Http\Controllers\SearchSuggestionController;
+use App\Http\Controllers\Admin\VehicleBrandController as AdminVehicleBrandController;
+use App\Http\Controllers\Admin\VehicleController as AdminVehicleController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -72,6 +74,13 @@ Route::middleware(['auth'])
         Route::resource('categories', CategoryController::class)->except(['create', 'show', 'edit']);
         Route::resource('brands', BrandController::class)->except(['create', 'show', 'edit']);
         Route::resource('attributes', AttributeController::class)->except(['create', 'show', 'edit']);
+        Route::patch('/vehicle-brands/{vehicleBrand}/toggle-status', [AdminVehicleBrandController::class, 'toggleStatus'])->name('vehicle-brands.toggle-status');
+        Route::resource('vehicle-brands', AdminVehicleBrandController::class)
+            ->parameters(['vehicle-brands' => 'vehicleBrand'])
+            ->except(['show']);
+        Route::patch('/vehicles/{vehicle}/toggle-status', [AdminVehicleController::class, 'toggleStatus'])->name('vehicles.toggle-status');
+        Route::resource('vehicles', AdminVehicleController::class)->except(['show']);
+        Route::get('/api/vehicles/options', [AdminVehicleController::class, 'options'])->name('vehicles.options');
         Route::resource('posts', PostController::class);
         Route::resource('post-categories', PostCategoryController::class)
             ->parameters(['post-categories' => 'post_category'])

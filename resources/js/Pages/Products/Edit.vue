@@ -4,7 +4,7 @@ import TagInput from '@/Components/TagInput.vue';
 import ImageUploader from '@/Components/ImageUploader.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const props = defineProps({
     product: { type: Object, required: true },
@@ -89,6 +89,35 @@ const vehicleGroups = computed(() => {
         map.get(brand).push({ label: vehicle.name, value: vehicle.id });
     });
     return Array.from(map.entries()).map(([label, items]) => ({ label, items }));
+});
+const remoteVehicleGroups = ref([]);
+const vehicleLoading = ref(false);
+const vehicleGroupsResolved = computed(() => remoteVehicleGroups.value.length ? remoteVehicleGroups.value : vehicleGroups.value);
+
+const loadVehicleOptions = async (query = '') => {
+    vehicleLoading.value = true;
+    try {
+        const { data } = await axios.get('/admin/api/vehicles/options', {
+            params: { q: query || undefined, limit: 100 },
+        });
+        const map = new Map();
+        (Array.isArray(data) ? data : []).forEach((vehicle) => {
+            const brandName = vehicle.brand ?? 'سایر';
+            if (!map.has(brandName)) map.set(brandName, []);
+            map.get(brandName).push({ label: vehicle.label ?? '', value: vehicle.id });
+        });
+        remoteVehicleGroups.value = Array.from(map.entries()).map(([label, items]) => ({ label, items }));
+    } finally {
+        vehicleLoading.value = false;
+    }
+};
+
+const onVehicleFilter = (event) => {
+    loadVehicleOptions(event.value ?? '');
+};
+
+onMounted(() => {
+    loadVehicleOptions();
 });
 
 const addVariant = () => {
@@ -188,15 +217,17 @@ const errorFor = (field) => form.errors[field];
                         <label class="mb-2 block font-medium">سازگار با خودرو/موتور</label>
                         <MultiSelect
                             v-model="form.vehicle_ids"
-                            :options="vehicleGroups"
+                            :options="vehicleGroupsResolved"
                             optionGroupLabel="label"
                             optionGroupChildren="items"
                             optionLabel="label"
                             optionValue="value"
                             filter
+                            :loading="vehicleLoading"
                             display="chip"
                             :virtualScrollerOptions="{ itemSize: 40 }"
                             class="w-full"
+                            @filter="onVehicleFilter"
                         />
                     </div>
                 </div>

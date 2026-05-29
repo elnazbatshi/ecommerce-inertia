@@ -49,7 +49,7 @@ class MediaController extends Controller
 
         $media = $query->latest()->paginate($request->integer('rows', 24))->withQueryString();
 
-        if ($request->wantsJson() || $request->ajax()) {
+        if (($request->wantsJson() || $request->ajax()) && ! $request->header('X-Inertia')) {
             return response()->json(['media' => $media]);
         }
 
