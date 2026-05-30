@@ -3,6 +3,7 @@
 namespace App\Http\Services;
 
 use App\Http\Resources\OrderResource;
+use App\Models\Address;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Product;
@@ -34,7 +35,7 @@ class OrderService
     public function customerOptions()
     {
         return Customer::query()
-            ->with('addresses')
+            ->with(['addresses.province:id,name', 'addresses.city:id,name'])
             ->orderBy('name')
             ->get()
             ->map(fn (Customer $customer) => [
@@ -47,11 +48,19 @@ class OrderService
                     'title' => $address->title,
                     'receiver_name' => $address->receiver_name,
                     'receiver_phone' => $address->receiver_phone,
+                    'province_id' => $address->province_id,
+                    'city_id' => $address->city_id,
+                    'province_name' => $address->province?->name ?? $address->province,
+                    'city_name' => $address->city?->name ?? $address->city,
                     'province' => $address->province,
                     'city' => $address->city,
                     'address' => $address->address,
                     'is_default' => $address->is_default,
-                    'label' => trim(($address->title ?: $address->city) . ' - ' . $address->address),
+                    'label' => trim(implode(' | ', array_filter([
+                        $address->title ?: 'آدرس',
+                        trim(($address->province?->name ?? $address->province ?? '-') . ' / ' . ($address->city?->name ?? $address->city ?? '-')),
+                        $address->address,
+                    ]))),
                 ])->values(),
             ]);
     }
@@ -149,6 +158,8 @@ class OrderService
 
     public function payload(array $data): array
     {
+        $shippingSnapshot = $this->buildShippingSnapshot($data);
+
         $items = collect($data['items'])->map(function (array $item) {
             $product = Product::query()->with('variants.attributeValues.attribute')->findOrFail($item['product_id']);
             $variant = filled($item['product_variant_id'] ?? null)
@@ -183,6 +194,7 @@ class OrderService
             'order' => $this->statusTimestamps(null, [
                 'customer_id' => $data['customer_id'],
                 'address_id' => $data['address_id'] ?? null,
+                ...$shippingSnapshot,
                 'status' => $data['status'],
                 'payment_status' => $data['payment_status'],
                 'subtotal' => $subtotal,
@@ -194,6 +206,37 @@ class OrderService
                 'admin_note' => $data['admin_note'] ?? null,
             ]),
             'items' => $items,
+        ];
+    }
+
+    private function buildShippingSnapshot(array $data): array
+    {
+        if (blank($data['address_id'] ?? null)) {
+            return [
+                'shipping_receiver_name' => null,
+                'shipping_receiver_phone' => null,
+                'shipping_province_name' => null,
+                'shipping_city_name' => null,
+                'shipping_address' => null,
+                'shipping_postal_code' => null,
+                'shipping_plaque' => null,
+                'shipping_unit' => null,
+            ];
+        }
+
+        $address = Address::query()
+            ->with(['province:id,name', 'city:id,name'])
+            ->findOrFail($data['address_id']);
+
+        return [
+            'shipping_receiver_name' => $address->receiver_name,
+            'shipping_receiver_phone' => $address->receiver_phone,
+            'shipping_province_name' => $address->province?->name ?? $address->province,
+            'shipping_city_name' => $address->city?->name ?? $address->city,
+            'shipping_address' => $address->address,
+            'shipping_postal_code' => $address->postal_code,
+            'shipping_plaque' => $address->plaque,
+            'shipping_unit' => $address->unit,
         ];
     }
 

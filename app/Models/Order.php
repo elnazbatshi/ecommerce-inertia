@@ -19,6 +19,18 @@ class Order extends Model
         'order_number',
         'customer_id',
         'address_id',
+        'shipping_method_id',
+        'payment_method_id',
+        'shipping_receiver_name',
+        'shipping_receiver_phone',
+        'shipping_province_name',
+        'shipping_city_name',
+        'shipping_address',
+        'shipping_postal_code',
+        'shipping_plaque',
+        'shipping_unit',
+        'shipping_method_name',
+        'payment_method_name',
         'status',
         'payment_status',
         'subtotal',
@@ -57,7 +69,17 @@ class Order extends Model
 
     public function address(): BelongsTo
     {
-        return $this->belongsTo(Address::class);
+        return $this->belongsTo(Address::class)->withTrashed();
+    }
+
+    public function shippingMethod(): BelongsTo
+    {
+        return $this->belongsTo(ShippingMethod::class);
+    }
+
+    public function paymentMethod(): BelongsTo
+    {
+        return $this->belongsTo(PaymentMethod::class);
     }
 
     public function items(): HasMany

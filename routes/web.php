@@ -24,6 +24,10 @@ use App\Http\Controllers\SearchLogController;
 use App\Http\Controllers\SearchSuggestionController;
 use App\Http\Controllers\Admin\VehicleBrandController as AdminVehicleBrandController;
 use App\Http\Controllers\Admin\VehicleController as AdminVehicleController;
+use App\Http\Controllers\Admin\ShippingMethodController as AdminShippingMethodController;
+use App\Http\Controllers\Admin\PaymentMethodController as AdminPaymentMethodController;
+use App\Http\Controllers\Admin\ProvinceController as AdminProvinceController;
+use App\Http\Controllers\Admin\CityController as AdminCityController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -81,6 +85,22 @@ Route::middleware(['auth'])
         Route::patch('/vehicles/{vehicle}/toggle-status', [AdminVehicleController::class, 'toggleStatus'])->name('vehicles.toggle-status');
         Route::resource('vehicles', AdminVehicleController::class)->except(['show']);
         Route::get('/api/vehicles/options', [AdminVehicleController::class, 'options'])->name('vehicles.options');
+        Route::patch('/shipping-methods/{shippingMethod}/toggle-status', [AdminShippingMethodController::class, 'toggleStatus'])->name('shipping-methods.toggle-status');
+        Route::resource('shipping-methods', AdminShippingMethodController::class)
+            ->parameters(['shipping-methods' => 'shippingMethod'])
+            ->except(['show']);
+        Route::get('/api/shipping-methods/options', [AdminShippingMethodController::class, 'options'])->name('shipping-methods.options');
+        Route::patch('/payment-methods/{paymentMethod}/toggle-status', [AdminPaymentMethodController::class, 'toggleStatus'])->name('payment-methods.toggle-status');
+        Route::resource('payment-methods', AdminPaymentMethodController::class)
+            ->parameters(['payment-methods' => 'paymentMethod'])
+            ->except(['show']);
+        Route::get('/api/payment-methods/options', [AdminPaymentMethodController::class, 'options'])->name('payment-methods.options');
+        Route::patch('/provinces/{province}/toggle-status', [AdminProvinceController::class, 'toggleStatus'])->name('provinces.toggle-status');
+        Route::resource('provinces', AdminProvinceController::class)->except(['show']);
+        Route::get('/api/provinces/options', [AdminProvinceController::class, 'options'])->name('provinces.options');
+        Route::patch('/cities/{city}/toggle-status', [AdminCityController::class, 'toggleStatus'])->name('cities.toggle-status');
+        Route::resource('cities', AdminCityController::class)->except(['show']);
+        Route::get('/api/cities/options', [AdminCityController::class, 'options'])->name('cities.options');
         Route::resource('posts', PostController::class);
         Route::resource('post-categories', PostCategoryController::class)
             ->parameters(['post-categories' => 'post_category'])

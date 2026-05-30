@@ -13,6 +13,16 @@ const model = ref([
             { label: 'محصولات', icon: 'pi pi-fw pi-box', to: '/admin/products' },
             { label: 'دسته‌بندی‌ها', icon: 'pi pi-fw pi-sitemap', to: '/admin/categories' },
             { label: 'برندها', icon: 'pi pi-fw pi-tags', to: '/admin/brands' },
+            { label: 'روش‌های ارسال', icon: 'pi pi-fw pi-send', to: '/admin/shipping-methods' },
+            { label: 'روش‌های پرداخت', icon: 'pi pi-fw pi-credit-card', to: '/admin/payment-methods' },
+            {
+                label: 'مدیریت آدرس‌ها',
+                icon: 'pi pi-fw pi-map-marker',
+                items: [
+                    { label: 'استان‌ها', icon: 'pi pi-fw pi-map', to: '/admin/provinces' },
+                    { label: 'شهرها', icon: 'pi pi-fw pi-building', to: '/admin/cities' }
+                ]
+            },
             {
                 label: 'مدیریت خودرو',
                 icon: 'pi pi-fw pi-car',
@@ -24,7 +34,7 @@ const model = ref([
             { label: 'ویژگی‌ها', icon: 'pi pi-fw pi-sliders-h', to: '/admin/attributes' },
             { label: 'نقش‌ها و دسترسی‌ها', icon: 'pi pi-fw pi-lock', to: '/admin/accesses' },
             { label: 'سفارش‌ها', icon: 'pi pi-fw pi-shopping-cart', to: '/admin/orders' },
-            { label: 'پرداخت‌ها', icon: 'pi pi-fw pi-credit-card', to: '/admin/payments' },
+            { label: 'پرداخت‌ها', icon: 'pi pi-fw pi-wallet', to: '/admin/payments' },
             { label: 'مشتریان', icon: 'pi pi-fw pi-users', to: '/admin/customers' }
         ]
     },
@@ -57,8 +67,8 @@ const model = ref([
 <template>
     <ul class="layout-menu">
         <template v-for="(item, i) in model" :key="item.label">
-            <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
-            <li v-if="item.separator" class="menu-separator"></li>
+            <app-menu-item v-if="!item.separator" :item="item" :index="i" />
+            <li v-if="item.separator" class="menu-separator" />
         </template>
     </ul>
 </template>

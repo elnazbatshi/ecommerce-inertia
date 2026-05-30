@@ -44,11 +44,11 @@ const changePaymentStatus = () => router.patch(`/admin/orders/${props.order.id}/
                     <div>{{ order.customer?.email || '-' }}</div>
                 </div>
                 <h2 class="mb-4 mt-6 text-lg font-semibold">آدرس ارسال</h2>
-                <div v-if="order.address" class="space-y-2 text-sm">
-                    <div>{{ order.address.receiver_name }} - {{ order.address.receiver_phone }}</div>
-                    <div>{{ order.address.province }} / {{ order.address.city }}</div>
-                    <div>{{ order.address.address }}</div>
-                    <div>کد پستی: {{ order.address.postal_code || '-' }}</div>
+                <div v-if="order.shipping_address || order.address" class="space-y-2 text-sm">
+                    <div>{{ order.shipping_receiver_name || '-' }} - {{ order.shipping_receiver_phone || '-' }}</div>
+                    <div>{{ order.shipping_province_name || '-' }} / {{ order.shipping_city_name || '-' }}</div>
+                    <div>{{ order.shipping_address || '-' }}</div>
+                    <div>کد پستی: {{ order.shipping_postal_code || '-' }}</div>
                 </div>
                 <div v-else>-</div>
             </div>
@@ -115,3 +115,4 @@ const changePaymentStatus = () => router.patch(`/admin/orders/${props.order.id}/
         </div>
     </AppLayout>
 </template>
+

@@ -29,18 +29,21 @@ class VehicleBrandSeeder extends Seeder
         ];
 
         foreach ($brands as $index => $brand) {
-            VehicleBrand::query()->updateOrCreate(
-                ['slug' => $brand['slug']],
-                [
-                    'name' => $brand['name'],
-                    'type' => $brand['type'],
-                    'country' => $brand['country'],
-                    'logo_media_id' => null,
-                    'is_active' => true,
-                    'sort_order' => $index + 1,
-                ],
-            );
+            $record = VehicleBrand::query()
+                ->withTrashed()
+                ->firstOrNew(['slug' => $brand['slug']]);
+
+            $record->fill([
+                'name' => $brand['name'],
+                'type' => $brand['type'],
+                'country' => $brand['country'],
+                'logo_media_id' => null,
+                'is_active' => true,
+                'sort_order' => $index + 1,
+            ]);
+
+            $record->deleted_at = null;
+            $record->save();
         }
     }
 }
-

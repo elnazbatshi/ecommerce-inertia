@@ -10,6 +10,15 @@ class OrderResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $shippingReceiverName = $this->shipping_receiver_name ?: $this->address?->receiver_name;
+        $shippingReceiverPhone = $this->shipping_receiver_phone ?: $this->address?->receiver_phone;
+        $shippingProvinceName = $this->shipping_province_name ?: $this->address?->province;
+        $shippingCityName = $this->shipping_city_name ?: $this->address?->city;
+        $shippingAddress = $this->shipping_address ?: $this->address?->address;
+        $shippingPostalCode = $this->shipping_postal_code ?: $this->address?->postal_code;
+        $shippingPlaque = $this->shipping_plaque ?: $this->address?->plaque;
+        $shippingUnit = $this->shipping_unit ?: $this->address?->unit;
+
         $data = [
             'id' => $this->id,
             'order_number' => $this->order_number,
@@ -26,6 +35,14 @@ class OrderResource extends JsonResource
                 'customer_id' => $this->customer_id,
                 'address_id' => $this->address_id,
                 'address' => $this->whenLoaded('address'),
+                'shipping_receiver_name' => $shippingReceiverName,
+                'shipping_receiver_phone' => $shippingReceiverPhone,
+                'shipping_province_name' => $shippingProvinceName,
+                'shipping_city_name' => $shippingCityName,
+                'shipping_address' => $shippingAddress,
+                'shipping_postal_code' => $shippingPostalCode,
+                'shipping_plaque' => $shippingPlaque,
+                'shipping_unit' => $shippingUnit,
                 'subtotal' => $this->subtotal,
                 'discount_total' => $this->discount_total,
                 'shipping_cost' => $this->shipping_cost,
