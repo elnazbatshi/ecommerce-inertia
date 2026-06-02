@@ -1,9 +1,11 @@
 <script setup>
 import TopNavTitle from '@/Components/Global/TopNavTitle.vue';
+import PersianDatePicker from '@/Components/Date/PersianDatePicker.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { useConfirm } from 'primevue/useconfirm';
 import { computed, ref, watch } from 'vue';
+import { formatJalaliDateTime } from '@/Utils/persianDate';
 
 const props = defineProps({
     payments: { type: Object, required: true },
@@ -59,7 +61,7 @@ const parseRawResponse = () => {
 };
 
 const load = (extra = {}) => {
-    router.get('/payments', {
+    router.get('/admin/payments', {
         search: search.value || undefined,
         status: status.value || undefined,
         method: method.value || undefined,
@@ -119,7 +121,7 @@ const onOrderChange = () => {
 };
 
 const save = () => {
-    const url = editing.value ? `/payments/${editing.value.id}` : '/payments';
+    const url = editing.value ? `/admin/payments/${editing.value.id}` : '/admin/payments';
 
     form
         .transform((data) => ({
@@ -150,7 +152,7 @@ const refund = (payment) => {
         acceptLabel: 'Refund',
         rejectLabel: 'Cancel',
         acceptClass: 'p-button-warning',
-        accept: () => router.patch(`/payments/${payment.id}/refund`, {}, { preserveScroll: true })
+        accept: () => router.patch(`/admin/payments/${payment.id}/refund`, {}, { preserveScroll: true })
     });
 };
 
@@ -162,7 +164,7 @@ const destroyPayment = (payment) => {
         acceptLabel: 'Delete',
         rejectLabel: 'Cancel',
         acceptClass: 'p-button-danger',
-        accept: () => router.delete(`/payments/${payment.id}`, { preserveScroll: true })
+        accept: () => router.delete(`/admin/payments/${payment.id}`, { preserveScroll: true })
     });
 };
 </script>
@@ -202,8 +204,8 @@ const destroyPayment = (payment) => {
                         <Select v-model="status" :options="statusFilters" optionLabel="label" optionValue="value" class="w-full" />
                         <Select v-model="method" :options="methodFilters" optionLabel="label" optionValue="value" class="w-full" />
                         <Select v-model="gateway" :options="gatewayFilters" optionLabel="label" optionValue="value" class="w-full" />
-                        <InputText v-model="dateFrom" type="date" class="w-full" />
-                        <InputText v-model="dateTo" type="date" class="w-full" />
+                        <PersianDatePicker v-model="dateFrom" placeholder="از تاریخ" />
+                        <PersianDatePicker v-model="dateTo" placeholder="تا تاریخ" />
                     </div>
                 </template>
 
@@ -236,12 +238,15 @@ const destroyPayment = (payment) => {
                     </template>
                 </Column>
                 <Column field="paid_at" header="Paid At" style="min-width: 11rem">
-                    <template #body="{ data }">{{ data.paid_at || '-' }}</template>
+                    <template #body="{ data }">{{ formatJalaliDateTime(data.paid_at) }}</template>
+                </Column>
+                <Column field="created_at" header="Created At" style="min-width: 11rem">
+                    <template #body="{ data }">{{ formatJalaliDateTime(data.created_at) }}</template>
                 </Column>
                 <Column header="Actions" style="width: 12rem">
                     <template #body="{ data }">
                         <div class="flex justify-center gap-1">
-                            <Link :href="`/payments/${data.id}`">
+                            <Link :href="`/admin/payments/${data.id}`">
                                 <Button icon="pi pi-eye" rounded text severity="info" aria-label="View" />
                             </Link>
                             <Button icon="pi pi-pencil" rounded text severity="secondary" aria-label="Edit" @click="openEdit(data)" />

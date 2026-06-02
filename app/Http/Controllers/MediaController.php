@@ -49,7 +49,7 @@ class MediaController extends Controller
 
         $media = $query->latest()->paginate($request->integer('rows', 24))->withQueryString();
 
-        if ($request->wantsJson() || $request->ajax()) {
+        if (($request->wantsJson() || $request->ajax()) && ! $request->header('X-Inertia')) {
             return response()->json(['media' => $media]);
         }
 
@@ -101,10 +101,15 @@ class MediaController extends Controller
             ], 422);
         }
 
+        $deletedId = $media->id;
+
         Storage::disk($media->disk)->delete($media->path);
         $media->delete();
 
-        return response()->json(['success' => true]);
+        return response()->json([
+            'success' => true,
+            'deleted_id' => $deletedId,
+        ]);
     }
 
     public function attach(AttachMediaRequest $request): JsonResponse
@@ -159,12 +164,18 @@ class MediaController extends Controller
             }
         }
 
+        $deletedIds = [];
+
         foreach ($mediaItems as $media) {
+            $deletedIds[] = $media->id;
             Storage::disk($media->disk)->delete($media->path);
             $media->delete();
         }
 
-        return response()->json(['success' => true]);
+        return response()->json([
+            'success' => true,
+            'deleted_ids' => $deletedIds,
+        ]);
     }
 
     private function hasAttachments(Media $media): bool
@@ -179,7 +190,11 @@ class MediaController extends Controller
                 ->orWhere('cover_image', $media->path)
                 ->exists()
             || DB::table('posts')->where('featured_image', $media->path)->exists()
-            || DB::table('pages')->where('featured_image', $media->path)->exists();
+            || DB::table('pages')->where('featured_image', $media->path)->exists()
+            || DB::table('hero_sliders')
+                ->where('background_media_id', $media->id)
+                ->orWhere('foreground_media_id', $media->id)
+                ->exists();
     }
 
     private function resolveModelClass(string $type): string

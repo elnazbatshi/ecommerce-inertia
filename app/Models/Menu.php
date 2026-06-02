@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Menu extends Model
@@ -25,39 +26,43 @@ class Menu extends Model
     public static function locations(): array
     {
         return [
-            'header' => 'Header',
-            'footer' => 'Footer',
-            'mobile' => 'Mobile',
-            'sidebar' => 'Sidebar',
-            'topbar' => 'Top Bar',
+            'header' => 'هدر',
+            'footer' => 'فوتر',
+            'mobile' => 'موبایل',
+            'sidebar' => 'سایدبار',
+            'topbar' => 'نوار بالا',
+            'mega' => 'مگامنو',
         ];
     }
 
     public static function locationOptions(): array
     {
-        return collect(self::locations())->map(fn ($label, $value) => ['label' => $label, 'value' => $value])->values()->all();
+        return collect(self::locations())
+            ->map(fn ($label, $value) => ['label' => $label, 'value' => $value])
+            ->values()
+            ->all();
     }
 
-    public function items()
+    public function items(): HasMany
     {
         return $this->hasMany(MenuItem::class)->orderBy('sort_order');
     }
 
-    public function activeItems()
+    public function activeItems(): HasMany
     {
         return $this->hasMany(MenuItem::class)
             ->where('is_active', true)
             ->orderBy('sort_order');
     }
 
-    public function rootItems()
+    public function rootItems(): HasMany
     {
         return $this->hasMany(MenuItem::class)
             ->whereNull('parent_id')
             ->orderBy('sort_order');
     }
 
-    public function getRouteKeyName()
+    public function getRouteKeyName(): string
     {
         return 'slug';
     }

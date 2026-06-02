@@ -19,6 +19,7 @@ const {
     mediaList,
     searchMedia: fetchMedia,
     uploadMedia,
+    deleteMedia: deleteMediaRequest,
 } = mediaLibrary;
 const searchTerm = ref('');
 const isLoading = ref(false);
@@ -42,6 +43,18 @@ const toggleSelection = (media) => {
 
 const isSelected = (media) => {
     return selectedMedia.value.some(item => item.id === media.id);
+};
+
+const deleteMedia = async (media) => {
+    if (!confirm('آیا از حذف این رسانه اطمینان دارید؟')) {
+        return;
+    }
+
+    try {
+        await deleteMediaRequest(media.id);
+    } catch (error) {
+        // Error handled in composable
+    }
 };
 
 const searchMedia = async () => {
@@ -167,7 +180,19 @@ watch(() => props.visible, (visible) => {
                     </div>
                     <div class="media-item__info">
                         <div class="truncate text-sm font-medium">{{ media.original_name }}</div>
-                        <div class="text-xs text-surface-500">{{ Math.round(media.size / 1024) }}KB</div>
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="text-xs text-surface-500">{{ Math.round(media.size / 1024) }}KB</div>
+                            <Button
+                                type="button"
+                                icon="pi pi-trash"
+                                rounded
+                                text
+                                severity="danger"
+                                size="small"
+                                aria-label="حذف رسانه"
+                                @click.stop="deleteMedia(media)"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

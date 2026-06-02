@@ -94,7 +94,7 @@ const submit = () => {
                 discount_price: item.discount_price
             }))
         }))
-        .post('/orders');
+        .post('/admin/orders');
 };
 </script>
 
@@ -104,9 +104,9 @@ const submit = () => {
     </Head>
 
     <AppLayout>
-        <TopNavTitle title="ایجاد سفارش" :breadcrumb="[{ label: 'سفارش‌ها', href: '/orders' }, { label: 'ایجاد' }]">
+        <TopNavTitle title="ایجاد سفارش" :breadcrumb="[{ label: 'سفارش‌ها', href: '/admin/orders' }, { label: 'ایجاد' }]">
             <template #pageAction>
-                <Link href="/orders">
+                <Link href="/admin/orders">
                     <Button label="بازگشت" icon="pi pi-arrow-right" severity="secondary" outlined />
                 </Link>
             </template>
@@ -202,7 +202,7 @@ const submit = () => {
             </div>
 
             <div class="flex justify-end gap-2">
-                <Link href="/orders"><Button type="button" label="انصراف" severity="secondary" text /></Link>
+                <Link href="/admin/orders"><Button type="button" label="انصراف" severity="secondary" text /></Link>
                 <Button type="submit" label="ثبت سفارش" icon="pi pi-check" :loading="form.processing" />
             </div>
         </form>

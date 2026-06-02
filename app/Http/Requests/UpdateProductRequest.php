@@ -45,6 +45,8 @@ class UpdateProductRequest extends FormRequest
             'stock' => ['nullable', 'integer', 'min:0', 'required_if:type,simple'],
             'related_post_ids' => ['nullable', 'array'],
             'related_post_ids.*' => ['integer', 'exists:posts,id'],
+            'vehicle_ids' => ['nullable', 'array'],
+            'vehicle_ids.*' => ['integer', 'exists:vehicles,id'],
             'variants' => ['nullable', 'array', 'required_if:type,variable'],
             'variants.*.id' => ['nullable', 'integer'],
             'variants.*.sku' => ['nullable', 'string', 'max:255', 'distinct'],

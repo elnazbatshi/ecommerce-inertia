@@ -4,7 +4,7 @@ import TagInput from '@/Components/TagInput.vue';
 import ImageUploader from '@/Components/ImageUploader.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const props = defineProps({
     product: { type: Object, required: true },
@@ -12,6 +12,7 @@ const props = defineProps({
     brands: { type: Array, default: () => [] },
     posts: { type: Array, default: () => [] },
     attributes: { type: Array, default: () => [] },
+    vehicles: { type: Array, default: () => [] },
     statusOptions: { type: Array, default: () => [] },
     typeOptions: { type: Array, default: () => [] }
 });
@@ -43,6 +44,7 @@ const form = useForm({
     type: props.product.type,
     stock: props.product.stock ?? 0,
     related_post_ids: props.product.related_post_ids ?? [],
+    vehicle_ids: props.product.vehicle_ids ?? [],
     variants: props.product.variants?.map((variant) => ({
         id: variant.id,
         sku: variant.sku,
@@ -79,6 +81,44 @@ const attributeValueOptions = computed(() => props.attributes.flatMap((attribute
         value: value.id
     }))
 ));
+const vehicleGroups = computed(() => {
+    const map = new Map();
+    props.vehicles.forEach((vehicle) => {
+        const brand = vehicle.brand?.name ?? 'سایر';
+        if (!map.has(brand)) map.set(brand, []);
+        map.get(brand).push({ label: vehicle.name, value: vehicle.id });
+    });
+    return Array.from(map.entries()).map(([label, items]) => ({ label, items }));
+});
+const remoteVehicleGroups = ref([]);
+const vehicleLoading = ref(false);
+const vehicleGroupsResolved = computed(() => remoteVehicleGroups.value.length ? remoteVehicleGroups.value : vehicleGroups.value);
+
+const loadVehicleOptions = async (query = '') => {
+    vehicleLoading.value = true;
+    try {
+        const { data } = await axios.get('/admin/api/vehicles/options', {
+            params: { q: query || undefined, limit: 100 },
+        });
+        const map = new Map();
+        (Array.isArray(data) ? data : []).forEach((vehicle) => {
+            const brandName = vehicle.brand ?? 'سایر';
+            if (!map.has(brandName)) map.set(brandName, []);
+            map.get(brandName).push({ label: vehicle.label ?? '', value: vehicle.id });
+        });
+        remoteVehicleGroups.value = Array.from(map.entries()).map(([label, items]) => ({ label, items }));
+    } finally {
+        vehicleLoading.value = false;
+    }
+};
+
+const onVehicleFilter = (event) => {
+    loadVehicleOptions(event.value ?? '');
+};
+
+onMounted(() => {
+    loadVehicleOptions();
+});
 
 const addVariant = () => {
     form.variants.push({ sku: '', price: null, discount_price: null, stock: 0, image: null, remove_image: false, attribute_values: [] });
@@ -125,7 +165,7 @@ const removeVariantImage = (variant) => {
 };
 
 const submit = () => {
-    form.post(`/products/${props.product.slug}`, { forceFormData: true });
+    form.post(`/admin/products/${props.product.slug}`, { forceFormData: true });
 };
 
 const errorFor = (field) => form.errors[field];
@@ -135,9 +175,9 @@ const errorFor = (field) => form.errors[field];
     <Head :title="`ویرایش ${product.name}`" />
 
     <AppLayout>
-        <TopNavTitle :title="`ویرایش ${product.name}`" :breadcrumb="[{ label: 'محصولات', href: '/products' }, { label: 'ویرایش محصول' }]">
+        <TopNavTitle :title="`ویرایش ${product.name}`" :breadcrumb="[{ label: 'محصولات', href: '/admin/products' }, { label: 'ویرایش محصول' }]">
             <template #pageAction>
-                <Link href="/products">
+                <Link href="/admin/products">
                     <Button label="بازگشت" icon="pi pi-arrow-right" severity="secondary" outlined />
                 </Link>
             </template>
@@ -172,6 +212,23 @@ const errorFor = (field) => form.errors[field];
                     <div class="md:col-span-3">
                         <label class="mb-2 block font-medium">مقالات مرتبط سئو</label>
                         <MultiSelect v-model="form.related_post_ids" :options="posts" optionLabel="title" optionValue="id" filter display="chip" class="w-full" />
+                    </div>
+                    <div class="md:col-span-3">
+                        <label class="mb-2 block font-medium">سازگار با خودرو/موتور</label>
+                        <MultiSelect
+                            v-model="form.vehicle_ids"
+                            :options="vehicleGroupsResolved"
+                            optionGroupLabel="label"
+                            optionGroupChildren="items"
+                            optionLabel="label"
+                            optionValue="value"
+                            filter
+                            :loading="vehicleLoading"
+                            display="chip"
+                            :virtualScrollerOptions="{ itemSize: 40 }"
+                            class="w-full"
+                            @filter="onVehicleFilter"
+                        />
                     </div>
                 </div>
             </div>
@@ -303,7 +360,7 @@ const errorFor = (field) => form.errors[field];
             </Message>
 
             <div class="flex justify-end gap-2">
-                <Link href="/products">
+                <Link href="/admin/products">
                     <Button type="button" label="انصراف" severity="secondary" text />
                 </Link>
                 <Button type="submit" label="ذخیره تغییرات" icon="pi pi-check" :loading="form.processing" />

@@ -1,7 +1,12 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\FrontendCatalogController;
+use App\Http\Controllers\Api\HeroSliderController;
 use App\Http\Controllers\Api\RolePermissionController;
+use App\Http\Controllers\Api\SiteSearchController;
+use App\Models\Menu;
+use App\Services\MenuService;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -29,3 +34,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('permissions', [RolePermissionController::class, 'getPermissions']);
     Route::get('roles', [RolePermissionController::class, 'getRoles']);
 });
+
+Route::get('menus/{location}', fn (string $location, MenuService $menus) => response()->json($menus->getByLocation($location)))
+    ->whereIn('location', array_keys(Menu::locations()));
+
+Route::get('hero-sliders', [HeroSliderController::class, 'index'])->name('hero-sliders.index');
+
+Route::prefix('frontend')->name('frontend.')->group(function () {
+    Route::get('menu', [FrontendCatalogController::class, 'menu'])->name('menu');
+    Route::get('categories', [FrontendCatalogController::class, 'categories'])->name('categories');
+    Route::get('brands', [FrontendCatalogController::class, 'brands'])->name('brands');
+    Route::get('vehicles/popular', [FrontendCatalogController::class, 'popularVehicles'])->name('vehicles.popular');
+    Route::get('search/suggestions', [FrontendCatalogController::class, 'searchSuggestions'])->name('search.suggestions');
+});
+
+Route::get('search/suggestions', [SiteSearchController::class, 'suggestions'])->name('site.search.suggestions');
+Route::get('search', [SiteSearchController::class, 'search'])->name('site.search');

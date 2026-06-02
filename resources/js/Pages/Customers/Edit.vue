@@ -3,7 +3,8 @@ import TopNavTitle from '@/Components/Global/TopNavTitle.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { useConfirm } from 'primevue/useconfirm';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { formatJalaliDateTime } from '@/Utils/persianDate';
 
 const props = defineProps({
     customer: { type: Object, required: true },
@@ -13,6 +14,8 @@ const props = defineProps({
 const confirm = useConfirm();
 const addressVisible = ref(false);
 const editingAddress = ref(null);
+const provinceOptions = ref([]);
+const cityOptions = ref([]);
 
 const customerForm = useForm({
     _method: 'put',
@@ -28,6 +31,8 @@ const addressForm = useForm({
     title: '',
     receiver_name: '',
     receiver_phone: '',
+    province_id: null,
+    city_id: null,
     province: '',
     city: '',
     postal_code: '',
@@ -42,7 +47,7 @@ const addressForm = useForm({
 const statusMap = computed(() => Object.fromEntries(props.statusOptions.map((item) => [item.value, item])));
 
 const saveCustomer = () => {
-    customerForm.post(`/customers/${props.customer.id}`, {
+    customerForm.post(`/admin/customers/${props.customer.id}`, {
         preserveScroll: true,
         onSuccess: () => {
             customerForm.password = '';
@@ -55,6 +60,8 @@ const emptyAddressForm = () => ({
     title: '',
     receiver_name: props.customer.name ?? '',
     receiver_phone: props.customer.phone ?? '',
+    province_id: null,
+    city_id: null,
     province: '',
     city: '',
     postal_code: '',
@@ -79,6 +86,8 @@ const openEditAddress = (address) => {
     addressForm.title = address.title ?? '';
     addressForm.receiver_name = address.receiver_name ?? '';
     addressForm.receiver_phone = address.receiver_phone ?? '';
+    addressForm.province_id = address.province_id ?? null;
+    addressForm.city_id = address.city_id ?? null;
     addressForm.province = address.province ?? '';
     addressForm.city = address.city ?? '';
     addressForm.postal_code = address.postal_code ?? '';
@@ -89,13 +98,44 @@ const openEditAddress = (address) => {
     addressForm.longitude = address.longitude ? Number(address.longitude) : null;
     addressForm.is_default = Boolean(address.is_default);
     addressForm.clearErrors();
+    loadCities(addressForm.province_id);
     addressVisible.value = true;
 };
 
+const loadProvinces = async () => {
+    const response = await fetch('/admin/api/provinces/options');
+    if (!response.ok) return;
+    provinceOptions.value = await response.json();
+};
+
+const loadCities = async (provinceId) => {
+    if (!provinceId) {
+        cityOptions.value = [];
+        return;
+    }
+
+    const response = await fetch(`/admin/api/cities/options?province_id=${provinceId}`);
+    if (!response.ok) return;
+    cityOptions.value = await response.json();
+};
+
+watch(() => addressForm.province_id, (provinceId) => {
+    if (editingAddress.value?.province_id !== provinceId) {
+        addressForm.city_id = null;
+    }
+    loadCities(provinceId);
+});
+
+watch(addressVisible, (visible) => {
+    if (visible && provinceOptions.value.length === 0) {
+        loadProvinces();
+    }
+});
+
 const saveAddress = () => {
     const url = editingAddress.value
-        ? `/customers/${props.customer.id}/addresses/${editingAddress.value.id}`
-        : `/customers/${props.customer.id}/addresses`;
+        ? `/admin/customers/${props.customer.id}/addresses/${editingAddress.value.id}`
+        : `/admin/customers/${props.customer.id}/addresses`;
 
     addressForm.post(url, {
         preserveScroll: true,
@@ -113,12 +153,12 @@ const deleteAddress = (address) => {
         acceptLabel: 'Delete',
         rejectLabel: 'Cancel',
         acceptClass: 'p-button-danger',
-        accept: () => router.delete(`/customers/${props.customer.id}/addresses/${address.id}`, { preserveScroll: true })
+        accept: () => router.delete(`/admin/customers/${props.customer.id}/addresses/${address.id}`, { preserveScroll: true })
     });
 };
 
 const setDefault = (address) => {
-    router.patch(`/customers/${props.customer.id}/addresses/${address.id}/default`, {}, { preserveScroll: true });
+    router.patch(`/admin/customers/${props.customer.id}/addresses/${address.id}/default`, {}, { preserveScroll: true });
 };
 </script>
 
@@ -129,9 +169,9 @@ const setDefault = (address) => {
 
     <AppLayout>
         <ConfirmDialog />
-        <TopNavTitle :title="`Customer ${customer.phone}`" :breadcrumb="[{ label: 'Customers', href: '/customers' }, { label: 'Edit' }]">
+        <TopNavTitle :title="`Customer ${customer.phone}`" :breadcrumb="[{ label: 'Customers', href: '/admin/customers' }, { label: 'Edit' }]">
             <template #pageAction>
-                <Link href="/customers">
+                <Link href="/admin/customers">
                     <Button label="Back" icon="pi pi-arrow-right" severity="secondary" outlined />
                 </Link>
             </template>
@@ -142,6 +182,10 @@ const setDefault = (address) => {
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-lg font-semibold">Customer Info</h2>
                     <Tag :value="statusMap[customer.status]?.label ?? customer.status" :severity="statusMap[customer.status]?.severity ?? 'secondary'" />
+                </div>
+                <div class="mb-4 space-y-1 text-sm text-surface-500">
+                    <div>Registered At: {{ formatJalaliDateTime(customer.created_at) }}</div>
+                    <div>Last Login: {{ formatJalaliDateTime(customer.last_login_at) }}</div>
                 </div>
                 <form class="space-y-4" @submit.prevent="saveCustomer">
                     <div>
@@ -197,6 +241,9 @@ const setDefault = (address) => {
                     <Column field="postal_code" header="Postal Code" style="min-width: 9rem">
                         <template #body="{ data }">{{ data.postal_code || '-' }}</template>
                     </Column>
+                    <Column field="created_at" header="Created At" style="min-width: 11rem">
+                        <template #body="{ data }">{{ formatJalaliDateTime(data.created_at) }}</template>
+                    </Column>
                     <Column field="address" header="Address" style="min-width: 16rem" />
                     <Column header="Actions" style="width: 11rem">
                         <template #body="{ data }">
@@ -229,13 +276,13 @@ const setDefault = (address) => {
                 </div>
                 <div>
                     <label class="mb-2 block font-medium">Province</label>
-                    <InputText v-model="addressForm.province" class="w-full" />
-                    <small v-if="addressForm.errors.province" class="text-red-600">{{ addressForm.errors.province }}</small>
+                    <Dropdown v-model="addressForm.province_id" :options="provinceOptions" optionLabel="label" optionValue="id" class="w-full" filter showClear />
+                    <small v-if="addressForm.errors.province_id" class="text-red-600">{{ addressForm.errors.province_id }}</small>
                 </div>
                 <div>
                     <label class="mb-2 block font-medium">City</label>
-                    <InputText v-model="addressForm.city" class="w-full" />
-                    <small v-if="addressForm.errors.city" class="text-red-600">{{ addressForm.errors.city }}</small>
+                    <Dropdown v-model="addressForm.city_id" :options="cityOptions" optionLabel="label" optionValue="id" class="w-full" filter showClear />
+                    <small v-if="addressForm.errors.city_id" class="text-red-600">{{ addressForm.errors.city_id }}</small>
                 </div>
                 <div>
                     <label class="mb-2 block font-medium">Postal Code</label>

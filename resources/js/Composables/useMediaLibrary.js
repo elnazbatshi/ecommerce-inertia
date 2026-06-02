@@ -44,7 +44,7 @@ export function useMediaLibrary() {
             if (filters.uploaded_by) params.uploaded_by = filters.uploaded_by;
             if (filters.rows) params.rows = filters.rows;
 
-            const response = await axios.get('/media', {
+            const response = await axios.get('/admin/media', {
                 params,
                 headers: { Accept: 'application/json' },
             });
@@ -64,7 +64,7 @@ export function useMediaLibrary() {
 
     const attachMedia = async (mediaId, options = {}) => {
         try {
-            const response = await axios.post('/media/attach', {
+            const response = await axios.post('/admin/media/attach', {
                 media_id: mediaId,
                 mediable_type: options.mediableType || mediableType.value,
                 mediable_id: options.mediableId || mediableId.value,
@@ -95,7 +95,7 @@ export function useMediaLibrary() {
 
     const detachMedia = async (mediaId, options = {}) => {
         try {
-            const response = await axios.post('/media/detach', {
+            const response = await axios.post('/admin/media/detach', {
                 media_id: mediaId,
                 mediable_type: options.mediableType || mediableType.value,
                 mediable_id: options.mediableId || mediableId.value,
@@ -123,7 +123,7 @@ export function useMediaLibrary() {
 
     const reorderMedia = async (items) => {
         try {
-            const response = await axios.post('/media/reorder', { items });
+            const response = await axios.post('/admin/media/reorder', { items });
 
             toast.add({
                 severity: 'success',
@@ -161,7 +161,7 @@ export function useMediaLibrary() {
                 if (metadata.caption) formData.append('caption', metadata.caption);
                 if (metadata.description) formData.append('description', metadata.description);
 
-                const response = await axios.post('/media/upload', formData, {
+                const response = await axios.post('/admin/media/upload', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
 
@@ -189,7 +189,11 @@ export function useMediaLibrary() {
 
     const deleteMedia = async (mediaId) => {
         try {
-            const response = await axios.delete(`/media/${mediaId}`);
+            const response = await axios.delete(`/admin/media/${mediaId}`);
+            const deletedId = Number(response.data?.deleted_id ?? mediaId);
+
+            mediaList.value = mediaList.value.filter((media) => Number(media.id) !== deletedId);
+            selectedMedia.value = selectedMedia.value.filter((media) => Number(media.id) !== deletedId);
 
             toast.add({
                 severity: 'success',
@@ -212,7 +216,12 @@ export function useMediaLibrary() {
 
     const bulkDeleteMedia = async (mediaIds) => {
         try {
-            const response = await axios.post('/media/bulk-delete', { ids: mediaIds });
+            const response = await axios.post('/admin/media/bulk-delete', { ids: mediaIds });
+            const deletedIds = (response.data?.deleted_ids ?? mediaIds).map((id) => Number(id));
+            const deletedIdSet = new Set(deletedIds);
+
+            mediaList.value = mediaList.value.filter((media) => !deletedIdSet.has(Number(media.id)));
+            selectedMedia.value = selectedMedia.value.filter((media) => !deletedIdSet.has(Number(media.id)));
 
             toast.add({
                 severity: 'success',
@@ -235,7 +244,7 @@ export function useMediaLibrary() {
 
     const updateMedia = async (mediaId, data) => {
         try {
-            const response = await axios.put(`/media/${mediaId}`, data);
+            const response = await axios.put(`/admin/media/${mediaId}`, data);
 
             toast.add({
                 severity: 'success',

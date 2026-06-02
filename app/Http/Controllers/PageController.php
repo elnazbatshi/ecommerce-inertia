@@ -12,15 +12,14 @@ use Inertia\Response;
 
 class PageController extends Controller
 {
-    public function __construct(private readonly PageService $pages)
-    {
-    }
+    public function __construct(private readonly PageService $pages) {}
 
     public function index(Request $request): Response
     {
         return Inertia::render('CMS/Pages/Index', [
             'pages' => $this->pages->paginated($request),
-            'filters' => $request->only(['search', 'status', 'rows']),
+            'filters' => $request->only(['search', 'status', 'date_from', 'date_to', 'rows']),
+            'statusOptions' => $this->pages->formData()['statusOptions'],
         ]);
     }
 
@@ -33,7 +32,7 @@ class PageController extends Controller
     {
         $this->pages->create($request);
 
-        return redirect()->route('pages.index')->with('success', 'صفحه ایجاد شد.');
+        return redirect()->route('admin.pages.index')->with('success', 'صفحه ایجاد شد.');
     }
 
     public function edit(Page $page): Response
@@ -46,14 +45,14 @@ class PageController extends Controller
 
     public function show(Page $page): RedirectResponse
     {
-        return redirect()->route('pages.edit', $page);
+        return redirect()->route('admin.pages.edit', $page);
     }
 
     public function update(StorePageRequest $request, Page $page): RedirectResponse
     {
         $this->pages->update($request, $page);
 
-        return redirect()->route('pages.index')->with('success', 'صفحه ویرایش شد.');
+        return redirect()->route('admin.pages.index')->with('success', 'صفحه ویرایش شد.');
     }
 
     public function destroy(Page $page): RedirectResponse

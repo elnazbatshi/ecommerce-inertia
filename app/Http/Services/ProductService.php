@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Models\Post;
+use App\Models\Vehicle;
 use App\Support\Pagination;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -54,12 +55,21 @@ class ProductService
     {
         return Post::query()->select(['id', 'title', 'slug'])->where('status', 'published')->latest('published_at')->get();
     }
+    public function vehicleOptions()
+    {
+        return Vehicle::query()
+            ->with('brand:id,name')
+            ->active()
+            ->ordered()
+            ->get(['id', 'vehicle_brand_id', 'name', 'type']);
+    }
 
     public function create(Request $request): Product
     {
         return DB::transaction(function () use ($request) {
             $product = Product::create($this->payload($request));
             $product->relatedPosts()->sync($request->input('related_post_ids', []));
+            $product->vehicles()->sync($request->input('vehicle_ids', []));
             $this->storeGalleryImages($request, $product);
             $this->syncVariants($request, $product);
 
@@ -72,6 +82,7 @@ class ProductService
         return DB::transaction(function () use ($request, $product) {
             $product->update($this->payload($request, $product));
             $product->relatedPosts()->sync($request->input('related_post_ids', []));
+            $product->vehicles()->sync($request->input('vehicle_ids', []));
             $this->deleteImages($request, $product);
             $this->storeGalleryImages($request, $product);
             $this->deleteVariants($request, $product);

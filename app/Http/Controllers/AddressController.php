@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Services\AddressService;
 use App\Models\Address;
+use App\Models\City;
 use App\Models\Customer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class AddressController extends Controller
 {
@@ -44,12 +46,14 @@ class AddressController extends Controller
 
     private function validatedAddress(Request $request): array
     {
-        return $request->validate([
+        $validated = $request->validate([
             'title' => ['nullable', 'string', 'max:255'],
             'receiver_name' => ['required', 'string', 'max:255'],
             'receiver_phone' => ['required', 'string', 'max:32'],
-            'province' => ['required', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:255'],
+            'province_id' => ['required', 'integer', 'exists:provinces,id'],
+            'city_id' => ['required', 'integer', 'exists:cities,id'],
+            'province' => ['nullable', 'string', 'max:255'],
+            'city' => ['nullable', 'string', 'max:255'],
             'postal_code' => ['nullable', 'string', 'max:32'],
             'address' => ['required', 'string'],
             'plaque' => ['nullable', 'string', 'max:32'],
@@ -58,6 +62,19 @@ class AddressController extends Controller
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'is_default' => ['boolean'],
         ]);
+
+        $cityBelongsToProvince = City::query()
+            ->whereKey($validated['city_id'])
+            ->where('province_id', $validated['province_id'])
+            ->exists();
+
+        if (! $cityBelongsToProvince) {
+            throw ValidationException::withMessages([
+                'city_id' => 'شهر انتخاب‌شده متعلق به استان انتخاب‌شده نیست.',
+            ]);
+        }
+
+        return $validated;
     }
 
 }

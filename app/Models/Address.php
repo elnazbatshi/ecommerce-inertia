@@ -16,6 +16,8 @@ class Address extends Model
         'title',
         'receiver_name',
         'receiver_phone',
+        'province_id',
+        'city_id',
         'province',
         'city',
         'postal_code',
@@ -36,6 +38,16 @@ class Address extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function province(): BelongsTo
+    {
+        return $this->belongsTo(Province::class);
+    }
+
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class);
     }
 
     public function orders(): HasMany

@@ -1,9 +1,11 @@
 <script setup>
 import TopNavTitle from '@/Components/Global/TopNavTitle.vue';
+import PersianDatePicker from '@/Components/Date/PersianDatePicker.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { useConfirm } from 'primevue/useconfirm';
 import { computed, ref, watch } from 'vue';
+import { formatJalaliDateTime } from '@/Utils/persianDate';
 
 const props = defineProps({
     orders: { type: Object, required: true },
@@ -29,7 +31,7 @@ const paymentFilters = computed(() => [{ label: 'تمام پرداخت‌ها', 
 const money = (value) => Number(value ?? 0).toLocaleString('fa-IR');
 
 const load = (extra = {}) => {
-    router.get('/orders', {
+    router.get('/admin/orders', {
         search: search.value || undefined,
         status: status.value || undefined,
         payment_status: paymentStatus.value || undefined,
@@ -62,7 +64,7 @@ const destroyOrder = (order) => {
         acceptLabel: 'حذف',
         rejectLabel: 'انصراف',
         acceptClass: 'p-button-danger',
-        accept: () => router.delete(`/orders/${order.id}`, { preserveScroll: true })
+        accept: () => router.delete(`/admin/orders/${order.id}`, { preserveScroll: true })
     });
 };
 </script>
@@ -76,7 +78,7 @@ const destroyOrder = (order) => {
         <ConfirmDialog />
         <TopNavTitle title="سفارش‌ها" :breadcrumb="[{ label: 'سفارش‌ها' }]">
             <template #pageAction>
-                <Link href="/orders/create">
+                <Link href="/admin/orders/create">
                     <Button label="سفارش جدید" icon="pi pi-plus" />
                 </Link>
             </template>
@@ -103,8 +105,8 @@ const destroyOrder = (order) => {
                         </IconField>
                         <Select v-model="status" :options="statusFilters" optionLabel="label" optionValue="value" class="w-full" />
                         <Select v-model="paymentStatus" :options="paymentFilters" optionLabel="label" optionValue="value" class="w-full" />
-                        <InputText v-model="dateFrom" type="date" class="w-full" />
-                        <InputText v-model="dateTo" type="date" class="w-full" />
+                        <PersianDatePicker v-model="dateFrom" placeholder="از تاریخ" />
+                        <PersianDatePicker v-model="dateTo" placeholder="تا تاریخ" />
                     </div>
                 </template>
 
@@ -131,14 +133,16 @@ const destroyOrder = (order) => {
                     <template #body="{ data }">{{ money(data.total) }}</template>
                 </Column>
                 <Column field="items_count" header="اقلام" style="width: 6rem" />
-                <Column field="created_at" header="تاریخ ایجاد" style="min-width: 11rem" />
+                <Column field="created_at" header="تاریخ ایجاد" style="min-width: 11rem">
+                    <template #body="{ data }">{{ formatJalaliDateTime(data.created_at) }}</template>
+                </Column>
                 <Column header="عملیات" style="width: 10rem">
                     <template #body="{ data }">
                         <div class="flex justify-center gap-1">
-                            <Link :href="`/orders/${data.id}`">
+                            <Link :href="`/admin/orders/${data.id}`">
                                 <Button icon="pi pi-eye" rounded text severity="info" aria-label="مشاهده" />
                             </Link>
-                            <Link :href="`/orders/${data.id}/edit`">
+                            <Link :href="`/admin/orders/${data.id}/edit`">
                                 <Button icon="pi pi-pencil" rounded text severity="secondary" aria-label="ویرایش" />
                             </Link>
                             <Button icon="pi pi-trash" rounded text severity="danger" aria-label="حذف" @click="destroyOrder(data)" />

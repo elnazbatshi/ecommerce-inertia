@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
+use App\Http\Services\ProductService;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
-use App\Http\Services\ProductService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,9 +16,7 @@ use Inertia\Response;
 
 class ProductController extends Controller
 {
-    public function __construct(private readonly ProductService $products)
-    {
-    }
+    public function __construct(private readonly ProductService $products) {}
 
     public function index(Request $request): Response
     {
@@ -39,12 +37,13 @@ class ProductController extends Controller
     {
         $this->products->create($request);
 
-        return redirect()->route('products.index')->with('success', 'محصول ایجاد شد.');
+        return redirect()->route('admin.products.index')->with('success', 'محصول ایجاد شد.');
     }
 
     public function edit(Product $product): Response
     {
         $product->load(['images', 'variants.attributeValues.attribute', 'category:id,name', 'brand:id,name,slug,description,content', 'relatedPosts:id,title,slug']);
+        $product->load(['vehicles.brand:id,name']);
 
         return Inertia::render('Products/Edit', [
             ...$this->formData(),
@@ -54,14 +53,14 @@ class ProductController extends Controller
 
     public function show(Product $product): RedirectResponse
     {
-        return redirect()->route('products.edit', $product);
+        return redirect()->route('admin.products.edit', $product);
     }
 
     public function update(UpdateProductRequest $request, Product $product): RedirectResponse
     {
         $this->products->update($request, $product);
 
-        return redirect()->route('products.index')->with('success', 'محصول ویرایش شد.');
+        return redirect()->route('admin.products.index')->with('success', 'محصول ویرایش شد.');
     }
 
     public function destroy(Product $product): RedirectResponse
@@ -94,7 +93,7 @@ class ProductController extends Controller
             'posts' => $this->products->publishedPostOptions(),
             'statusOptions' => config('shop.products.status_options'),
             'typeOptions' => config('shop.products.type_options'),
+            'vehicles' => $this->products->vehicleOptions(),
         ];
     }
-
 }

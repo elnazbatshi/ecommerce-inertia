@@ -28,7 +28,7 @@ const openEdit = (tag) => {
 };
 
 const save = () => {
-    const url = editing.value ? `/post-tags/${editing.value.slug}` : '/post-tags';
+    const url = editing.value ? `/admin/post-tags/${editing.value.slug}` : '/admin/post-tags';
     form.post(url, { preserveScroll: true, onSuccess: () => visible.value = false });
 };
 
@@ -37,7 +37,7 @@ const destroyItem = (tag) => confirm.require({
     header: 'حذف برچسب',
     icon: 'pi pi-exclamation-triangle',
     acceptClass: 'p-button-danger',
-    accept: () => router.delete(`/post-tags/${tag.slug}`, { preserveScroll: true })
+    accept: () => router.delete(`/admin/post-tags/${tag.slug}`, { preserveScroll: true })
 });
 </script>
 

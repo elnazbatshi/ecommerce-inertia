@@ -15,7 +15,7 @@ const seoUrl = computed(() => `${window.location.origin}${props.basePath}/${prop
 
 <template>
     <div class="card">
-        <h2 class="mb-4 text-lg font-semibold">سئو</h2>
+        <h5 class="mb-4 text-lg font-semibold">سئو</h5>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
                 <label class="mb-2 block font-medium">نامک</label>

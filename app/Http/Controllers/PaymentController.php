@@ -15,9 +15,7 @@ use Inertia\Response;
 
 class PaymentController extends Controller
 {
-    public function __construct(private readonly PaymentService $payments)
-    {
-    }
+    public function __construct(private readonly PaymentService $payments) {}
 
     public function index(Request $request): Response
     {
@@ -44,21 +42,21 @@ class PaymentController extends Controller
     {
         $payment = $this->payments->create($request->validated(), $request->user()?->id);
 
-        return redirect()->route('payments.show', $payment)->with('success', 'Payment created successfully.');
+        return redirect()->route('admin.payments.show', $payment)->with('success', 'Payment created successfully.');
     }
 
     public function update(UpdatePaymentRequest $request, Payment $payment): RedirectResponse
     {
         $this->payments->update($payment, $request->validated(), $request->user()?->id);
 
-        return redirect()->route('payments.show', $payment)->with('success', 'Payment updated successfully.');
+        return redirect()->route('admin.payments.show', $payment)->with('success', 'Payment updated successfully.');
     }
 
     public function destroy(Payment $payment): RedirectResponse
     {
         $payment->delete();
 
-        return redirect()->route('payments.index')->with('success', 'Payment deleted successfully.');
+        return redirect()->route('admin.payments.index')->with('success', 'Payment deleted successfully.');
     }
 
     public function changeStatus(ChangePaymentStatusRequest $request, Payment $payment): RedirectResponse

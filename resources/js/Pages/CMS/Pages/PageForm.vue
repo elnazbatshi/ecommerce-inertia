@@ -2,6 +2,7 @@
 import RichTextEditor from '@/Components/CMS/RichTextEditor.vue';
 import SeoFields from '@/Components/CMS/SeoFields.vue';
 import TopNavTitle from '@/Components/Global/TopNavTitle.vue';
+import PersianDateTimePicker from '@/Components/Date/PersianDateTimePicker.vue';
 import ImageUploader from '@/Components/ImageUploader.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -33,7 +34,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    const url = isEdit.value ? `/pages/${props.page.slug}` : '/pages';
+    const url = isEdit.value ? `/admin/pages/${props.page.slug}` : '/admin/pages';
     form.post(url, { forceFormData: true });
 };
 
@@ -59,8 +60,8 @@ const removeFeaturedImage = () => {
 <template>
     <Head :title="isEdit ? `ویرایش ${page.title}` : 'ایجاد صفحه'" />
     <AppLayout>
-        <TopNavTitle :title="isEdit ? `ویرایش ${page.title}` : 'ایجاد صفحه'" :breadcrumb="[{ label: 'صفحات', href: '/pages' }, { label: isEdit ? 'ویرایش' : 'ایجاد' }]">
-            <template #pageAction><Link href="/pages"><Button label="بازگشت" icon="pi pi-arrow-right" severity="secondary" outlined /></Link></template>
+        <TopNavTitle :title="isEdit ? `ویرایش ${page.title}` : 'ایجاد صفحه'" :breadcrumb="[{ label: 'صفحات', href: '/admin/pages' }, { label: isEdit ? 'ویرایش' : 'ایجاد' }]">
+            <template #pageAction><Link href="/admin/pages"><Button label="بازگشت" icon="pi pi-arrow-right" severity="secondary" outlined /></Link></template>
         </TopNavTitle>
         <form class="space-y-4" @submit.prevent="submit">
             <div class="card">
@@ -81,11 +82,18 @@ const removeFeaturedImage = () => {
                     </div>
                     <div>
                         <label class="mb-2 block font-medium">زمان انتشار</label>
-                        <InputText v-model="form.published_at" placeholder="YYYY-MM-DD HH:mm:ss" class="w-full" />
+                        <PersianDateTimePicker v-model="form.published_at" :invalid="Boolean(form.errors.published_at)" />
+                        <small v-if="form.errors.published_at" class="text-red-600">{{ form.errors.published_at }}</small>
                     </div>
                     <div class="md:col-span-2">
                         <label class="mb-2 block font-medium">متن صفحه</label>
-                        <RichTextEditor v-model="form.content" :error="form.errors.content" />
+                        <RichTextEditor
+                            v-model="form.content"
+                            :error="form.errors.content"
+                            allow-html-source
+                            allow-media-browser
+                            media-collection="page_content"
+                        />
                     </div>
                     <div class="md:col-span-2">
                         <ImageUploader
@@ -103,7 +111,7 @@ const removeFeaturedImage = () => {
             <SeoFields :form="form" basePath="/page" :fallbackTitle="form.title || 'عنوان صفحه'" fallbackDescription="پیش‌نمایش توضیحات صفحه ثابت" />
             <Message v-if="Object.keys(form.errors).length" severity="error">لطفاً خطاهای فرم را بررسی کنید.</Message>
             <div class="flex justify-end gap-2">
-                <Link href="/pages"><Button type="button" label="انصراف" severity="secondary" text /></Link>
+                <Link href="/admin/pages"><Button type="button" label="انصراف" severity="secondary" text /></Link>
                 <Button type="submit" label="ذخیره صفحه" icon="pi pi-check" :loading="form.processing" />
             </div>
         </form>

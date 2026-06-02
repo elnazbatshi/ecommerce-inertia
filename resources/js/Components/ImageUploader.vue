@@ -160,7 +160,7 @@ watch(() => props.modelValue, (value) => {
     <div class="image-uploader">
         <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
             <div>
-                <h3 class="text-base font-semibold">{{ title }}</h3>
+                <h5 class="text-base font-semibold">{{ title }}</h5>
                 <p class="text-sm text-surface-500">{{ subtitle }}</p>
             </div>
             <Tag :value="isMultiple ? 'چند تصویر' : 'یک تصویر'" severity="secondary" />

@@ -13,7 +13,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(PermissionSeeder::class);
+        $this->call([
+            PermissionSeeder::class,
+            MenuSeeder::class,
+            VehicleBrandSeeder::class,
+            ShippingMethodSeeder::class,
+            PaymentMethodSeeder::class,
+            ProvinceSeeder::class,
+            CitySeeder::class,
+        ]);
 
         $admin = User::query()->updateOrCreate([
             'phone' => '09126860148',

@@ -15,6 +15,7 @@ class Brand extends Model
         'name',
         'slug',
         'logo',
+        'is_active',
         'description',
         'content',
         'featured_image',
@@ -30,6 +31,7 @@ class Brand extends Model
     protected $casts = [
         'seo_index' => 'boolean',
         'seo_follow' => 'boolean',
+        'is_active' => 'boolean',
         'meta_keywords' => 'array',
     ];
 

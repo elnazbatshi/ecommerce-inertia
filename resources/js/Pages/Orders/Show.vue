@@ -3,6 +3,7 @@ import TopNavTitle from '@/Components/Global/TopNavTitle.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
+import { formatJalaliDateTime } from '@/Utils/persianDate';
 
 const props = defineProps({
     order: { type: Object, required: true },
@@ -16,8 +17,8 @@ const statusMap = computed(() => Object.fromEntries(props.statusOptions.map((ite
 const paymentMap = computed(() => Object.fromEntries(props.paymentStatusOptions.map((item) => [item.value, item])));
 const money = (value) => Number(value ?? 0).toLocaleString('fa-IR');
 
-const changeStatus = () => router.patch(`/orders/${props.order.id}/status`, { status: status.value }, { preserveScroll: true });
-const changePaymentStatus = () => router.patch(`/orders/${props.order.id}/payment-status`, { payment_status: paymentStatus.value }, { preserveScroll: true });
+const changeStatus = () => router.patch(`/admin/orders/${props.order.id}/status`, { status: status.value }, { preserveScroll: true });
+const changePaymentStatus = () => router.patch(`/admin/orders/${props.order.id}/payment-status`, { payment_status: paymentStatus.value }, { preserveScroll: true });
 </script>
 
 <template>
@@ -26,9 +27,9 @@ const changePaymentStatus = () => router.patch(`/orders/${props.order.id}/paymen
     </Head>
 
     <AppLayout>
-        <TopNavTitle :title="order.order_number" :breadcrumb="[{ label: 'سفارش‌ها', href: '/orders' }, { label: order.order_number }]">
+        <TopNavTitle :title="order.order_number" :breadcrumb="[{ label: 'سفارش‌ها', href: '/admin/orders' }, { label: order.order_number }]">
             <template #pageAction>
-                <Link :href="`/orders/${order.id}/edit`">
+                <Link :href="`/admin/orders/${order.id}/edit`">
                     <Button label="ویرایش" icon="pi pi-pencil" severity="secondary" outlined />
                 </Link>
             </template>
@@ -43,11 +44,11 @@ const changePaymentStatus = () => router.patch(`/orders/${props.order.id}/paymen
                     <div>{{ order.customer?.email || '-' }}</div>
                 </div>
                 <h2 class="mb-4 mt-6 text-lg font-semibold">آدرس ارسال</h2>
-                <div v-if="order.address" class="space-y-2 text-sm">
-                    <div>{{ order.address.receiver_name }} - {{ order.address.receiver_phone }}</div>
-                    <div>{{ order.address.province }} / {{ order.address.city }}</div>
-                    <div>{{ order.address.address }}</div>
-                    <div>کد پستی: {{ order.address.postal_code || '-' }}</div>
+                <div v-if="order.shipping_address || order.address" class="space-y-2 text-sm">
+                    <div>{{ order.shipping_receiver_name || '-' }} - {{ order.shipping_receiver_phone || '-' }}</div>
+                    <div>{{ order.shipping_province_name || '-' }} / {{ order.shipping_city_name || '-' }}</div>
+                    <div>{{ order.shipping_address || '-' }}</div>
+                    <div>کد پستی: {{ order.shipping_postal_code || '-' }}</div>
                 </div>
                 <div v-else>-</div>
             </div>
@@ -93,11 +94,11 @@ const changePaymentStatus = () => router.patch(`/orders/${props.order.id}/paymen
                 </div>
                 <h2 class="mb-4 mt-6 text-lg font-semibold">تاریخ‌ها</h2>
                 <div class="grid grid-cols-1 gap-2 text-sm md:grid-cols-2">
-                    <div>ایجاد شده: {{ order.created_at || '-' }}</div>
-                    <div>پرداخت شده: {{ order.paid_at || '-' }}</div>
-                    <div>ارسال شده: {{ order.shipped_at || '-' }}</div>
-                    <div>تحویل شده: {{ order.delivered_at || '-' }}</div>
-                    <div>لغو شده: {{ order.cancelled_at || '-' }}</div>
+                    <div>ایجاد شده: {{ formatJalaliDateTime(order.created_at) }}</div>
+                    <div>پرداخت شده: {{ formatJalaliDateTime(order.paid_at) }}</div>
+                    <div>ارسال شده: {{ formatJalaliDateTime(order.shipped_at) }}</div>
+                    <div>تحویل شده: {{ formatJalaliDateTime(order.delivered_at) }}</div>
+                    <div>لغو شده: {{ formatJalaliDateTime(order.cancelled_at) }}</div>
                 </div>
             </div>
             <div class="card">
@@ -114,3 +115,4 @@ const changePaymentStatus = () => router.patch(`/orders/${props.order.id}/paymen
         </div>
     </AppLayout>
 </template>
+

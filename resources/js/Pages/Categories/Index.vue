@@ -61,7 +61,7 @@ const openEdit = (category) => {
 
 const save = () => {
     const options = { preserveScroll: true, onSuccess: () => (visible.value = false) };
-    editing.value ? form.put(`/categories/${editing.value.slug}`, options) : form.post('/categories', options);
+    editing.value ? form.put(`/admin/categories/${editing.value.slug}`, options) : form.post('/admin/categories', options);
 };
 
 const destroyItem = (category) => {
@@ -72,7 +72,7 @@ const destroyItem = (category) => {
         acceptLabel: 'حذف',
         rejectLabel: 'انصراف',
         acceptClass: 'p-button-danger',
-        accept: () => router.delete(`/categories/${category.slug}`, { preserveScroll: true })
+        accept: () => router.delete(`/admin/categories/${category.slug}`, { preserveScroll: true })
     });
 };
 </script>

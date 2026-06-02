@@ -29,7 +29,7 @@ const openEdit = (attribute) => {
 };
 const save = () => {
     const options = { preserveScroll: true, onSuccess: () => (visible.value = false) };
-    editing.value ? form.put(`/attributes/${editing.value.id}`, options) : form.post('/attributes', options);
+    editing.value ? form.put(`/admin/attributes/${editing.value.id}`, options) : form.post('/admin/attributes', options);
 };
 const destroyItem = (attribute) => {
     confirm.require({
@@ -39,7 +39,7 @@ const destroyItem = (attribute) => {
         acceptLabel: 'حذف',
         rejectLabel: 'انصراف',
         acceptClass: 'p-button-danger',
-        accept: () => router.delete(`/attributes/${attribute.id}`, { preserveScroll: true })
+        accept: () => router.delete(`/admin/attributes/${attribute.id}`, { preserveScroll: true })
     });
 };
 const addValue = () => form.values.push({ value: '', slug: '' });

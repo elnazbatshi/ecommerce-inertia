@@ -92,7 +92,7 @@ const setImage = (field, file) => {
 
 const save = () => {
     const options = { preserveScroll: true, forceFormData: true, onSuccess: () => (visible.value = false) };
-    editing.value ? form.post(`/brands/${editing.value.slug}`, options) : form.post('/brands', options);
+    editing.value ? form.post(`/admin/brands/${editing.value.slug}`, options) : form.post('/admin/brands', options);
 };
 
 const destroyItem = (brand) => {
@@ -103,7 +103,7 @@ const destroyItem = (brand) => {
         acceptLabel: 'حذف',
         rejectLabel: 'انصراف',
         acceptClass: 'p-button-danger',
-        accept: () => router.delete(`/brands/${brand.slug}`, { preserveScroll: true })
+        accept: () => router.delete(`/admin/brands/${brand.slug}`, { preserveScroll: true })
     });
 };
 </script>

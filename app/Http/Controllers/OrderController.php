@@ -16,9 +16,7 @@ use Inertia\Response;
 
 class OrderController extends Controller
 {
-    public function __construct(private readonly OrderService $orders)
-    {
-    }
+    public function __construct(private readonly OrderService $orders) {}
 
     public function index(Request $request): Response
     {
@@ -39,7 +37,7 @@ class OrderController extends Controller
     {
         $order = $this->orders->create($request->validated(), $request->user()?->id);
 
-        return redirect()->route('orders.show', $order)->with('success', 'Order created successfully.');
+        return redirect()->route('admin.orders.show', $order)->with('success', 'Order created successfully.');
     }
 
     public function show(Order $order): Response
@@ -63,14 +61,14 @@ class OrderController extends Controller
     {
         $this->orders->update($order, $request->validated(), $request->user()?->id);
 
-        return redirect()->route('orders.show', $order)->with('success', 'Order updated successfully.');
+        return redirect()->route('admin.orders.show', $order)->with('success', 'Order updated successfully.');
     }
 
     public function destroy(Request $request, Order $order): RedirectResponse
     {
         $this->orders->delete($order, $request->user()?->id);
 
-        return redirect()->route('orders.index')->with('success', 'Order deleted successfully.');
+        return redirect()->route('admin.orders.index')->with('success', 'Order deleted successfully.');
     }
 
     public function changeStatus(ChangeOrderStatusRequest $request, Order $order): RedirectResponse

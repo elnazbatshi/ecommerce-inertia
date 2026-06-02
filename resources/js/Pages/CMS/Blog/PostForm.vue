@@ -2,6 +2,7 @@
 import RichTextEditor from '@/Components/CMS/RichTextEditor.vue';
 import SeoFields from '@/Components/CMS/SeoFields.vue';
 import TopNavTitle from '@/Components/Global/TopNavTitle.vue';
+import PersianDateTimePicker from '@/Components/Date/PersianDateTimePicker.vue';
 import ImageUploader from '@/Components/ImageUploader.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -38,7 +39,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    const url = isEdit.value ? `/posts/${props.post.slug}` : '/posts';
+    const url = isEdit.value ? `/admin/posts/${props.post.slug}` : '/admin/posts';
     form.post(url, { forceFormData: true });
 };
 
@@ -64,14 +65,14 @@ const removeFeaturedImage = () => {
 <template>
     <Head :title="isEdit ? `ویرایش ${post.title}` : 'ایجاد مقاله'" />
     <AppLayout>
-        <TopNavTitle :title="isEdit ? `ویرایش ${post.title}` : 'ایجاد مقاله'" :breadcrumb="[{ label: 'مقالات', href: '/posts' }, { label: isEdit ? 'ویرایش' : 'ایجاد' }]">
+        <TopNavTitle :title="isEdit ? `ویرایش ${post.title}` : 'ایجاد مقاله'" :breadcrumb="[{ label: 'مقالات', href: '/admin/posts' }, { label: isEdit ? 'ویرایش' : 'ایجاد' }]">
             <template #pageAction>
-                <Link href="/posts"><Button label="بازگشت" icon="pi pi-arrow-right" severity="secondary" outlined /></Link>
+                <Link href="/admin/posts"><Button label="بازگشت" icon="pi pi-arrow-right" severity="secondary" outlined /></Link>
             </template>
         </TopNavTitle>
         <form class="space-y-4" @submit.prevent="submit">
             <div class="card">
-                <h2 class="mb-4 text-lg font-semibold">محتوای مقاله</h2>
+                <h5 class="mb-4 text-lg font-semibold">محتوای مقاله</h5>
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
                         <label class="mb-2 block font-medium">عنوان</label>
@@ -88,7 +89,8 @@ const removeFeaturedImage = () => {
                     </div>
                     <div>
                         <label class="mb-2 block font-medium">زمان انتشار</label>
-                        <InputText v-model="form.published_at" placeholder="YYYY-MM-DD HH:mm:ss" class="w-full" />
+                        <PersianDateTimePicker v-model="form.published_at" :invalid="Boolean(form.errors.published_at)" />
+                        <small v-if="form.errors.published_at" class="text-red-600">{{ form.errors.published_at }}</small>
                     </div>
                     <div class="md:col-span-2">
                         <label class="mb-2 block font-medium">خلاصه</label>
@@ -122,7 +124,7 @@ const removeFeaturedImage = () => {
             <SeoFields :form="form" basePath="/blog" :fallbackTitle="form.title || 'عنوان مقاله'" :fallbackDescription="form.excerpt || 'پیش‌نمایش خلاصه مقاله'" />
             <Message v-if="Object.keys(form.errors).length" severity="error">لطفاً خطاهای فرم را بررسی کنید.</Message>
             <div class="flex justify-end gap-2">
-                <Link href="/posts"><Button type="button" label="انصراف" severity="secondary" text /></Link>
+                <Link href="/admin/posts"><Button type="button" label="انصراف" severity="secondary" text /></Link>
                 <Button type="submit" label="ذخیره مقاله" icon="pi pi-check" :loading="form.processing" />
             </div>
         </form>

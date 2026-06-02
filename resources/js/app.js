@@ -11,15 +11,30 @@ import ConfirmationService from 'primevue/confirmationservice';
 import ToastService from 'primevue/toastservice';
 
 import '@/assets/tailwind.css';
+import '../css/frontend/main.css';
 import '@/assets/styles.scss';
 
 $t().preset(Aura).use({ useDefaultOptions: true });
 document.documentElement.setAttribute('dir', 'rtl');
 
-const pages = import.meta.glob('./Pages/**/*.vue');
+const pages = import.meta.env.DEV
+    ? {
+        ...import.meta.glob('./Pages/**/*.vue', { eager: true }),
+        ...import.meta.glob('./Frontend/Pages/**/*.vue', { eager: true })
+    }
+    : {
+        ...import.meta.glob('./Pages/**/*.vue'),
+        ...import.meta.glob('./Frontend/Pages/**/*.vue')
+    };
 
 createInertiaApp({
-    resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, pages),
+    resolve: (name) => {
+        const pagePath = name.startsWith('Frontend/')
+            ? `./Frontend/Pages/${name.replace('Frontend/', '')}.vue`
+            : `./Pages/${name}.vue`;
+
+        return resolvePageComponent(pagePath, pages);
+    },
     setup({ el, App, props, plugin }) {
         createApp({ render: () => h(App, props) })
             .use(plugin)

@@ -4,6 +4,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { useConfirm } from 'primevue/useconfirm';
 import { computed, ref, watch } from 'vue';
+import { formatJalaliDateTime } from '@/Utils/persianDate';
 
 const props = defineProps({
     customers: { type: Object, required: true },
@@ -30,7 +31,7 @@ const statuses = computed(() => [{ label: 'All statuses', value: null, severity:
 const statusMap = computed(() => Object.fromEntries(props.statusOptions.map((item) => [item.value, item])));
 
 const load = (extra = {}) => {
-    router.get('/customers', {
+    router.get('/admin/customers', {
         search: search.value || undefined,
         status: status.value || undefined,
         rows: rows.value,
@@ -60,7 +61,7 @@ const openCreate = () => {
 };
 
 const save = () => {
-    form.post('/customers', {
+    form.post('/admin/customers', {
         preserveScroll: true,
         onSuccess: () => {
             visible.value = false;
@@ -77,7 +78,7 @@ const destroyCustomer = (customer) => {
         acceptLabel: 'Delete',
         rejectLabel: 'Cancel',
         acceptClass: 'p-button-danger',
-        accept: () => router.delete(`/customers/${customer.id}`, { preserveScroll: true })
+        accept: () => router.delete(`/admin/customers/${customer.id}`, { preserveScroll: true })
     });
 };
 </script>
@@ -134,16 +135,18 @@ const destroyCustomer = (customer) => {
                 </Column>
                 <Column field="addresses_count" header="Addresses" style="width: 8rem" />
                 <Column field="last_login_at" header="Last Login" style="min-width: 11rem">
-                    <template #body="{ data }">{{ data.last_login_at || '-' }}</template>
+                    <template #body="{ data }">{{ formatJalaliDateTime(data.last_login_at) }}</template>
                 </Column>
-                <Column field="created_at" header="Registered At" style="min-width: 11rem" />
+                <Column field="created_at" header="Registered At" style="min-width: 11rem">
+                    <template #body="{ data }">{{ formatJalaliDateTime(data.created_at) }}</template>
+                </Column>
                 <Column header="Actions" style="width: 10rem">
                     <template #body="{ data }">
                         <div class="flex justify-center gap-1">
-                            <Link :href="`/customers/${data.id}`">
+                            <Link :href="`/admin/customers/${data.id}`">
                                 <Button icon="pi pi-eye" rounded text severity="info" aria-label="View" />
                             </Link>
-                            <Link :href="`/customers/${data.id}/edit`">
+                            <Link :href="`/admin/customers/${data.id}/edit`">
                                 <Button icon="pi pi-pencil" rounded text severity="secondary" aria-label="Edit" />
                             </Link>
                             <Button icon="pi pi-trash" rounded text severity="danger" aria-label="Delete" @click="destroyCustomer(data)" />

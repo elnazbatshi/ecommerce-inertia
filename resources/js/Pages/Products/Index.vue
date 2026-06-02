@@ -46,7 +46,7 @@ const labels = {
 };
 
 const load = (extra = {}) => {
-    router.get('/products', {
+    router.get('/admin/products', {
         search: search.value || undefined,
         category_id: categoryId.value || undefined,
         brand_id: brandId.value || undefined,
@@ -87,7 +87,7 @@ const destroyProduct = (product) => {
         acceptLabel: 'حذف',
         rejectLabel: 'انصراف',
         acceptClass: 'p-button-danger',
-        accept: () => router.delete(`/products/${product.slug}`, { preserveScroll: true })
+        accept: () => router.delete(`/admin/products/${product.slug}`, { preserveScroll: true })
     });
 };
 </script>
@@ -99,7 +99,7 @@ const destroyProduct = (product) => {
         <ConfirmDialog />
         <TopNavTitle title="مدیریت محصولات" :breadcrumb="[{ label: 'محصولات' }]">
             <template #pageAction>
-                <Link href="/products/create">
+                <Link href="/admin/products/create">
                     <Button label="محصول جدید" icon="pi pi-plus" />
                 </Link>
             </template>
@@ -185,10 +185,10 @@ const destroyProduct = (product) => {
                 <Column header="عملیات" style="width: 9rem">
                     <template #body="{ data }">
                         <div class="flex justify-center gap-1">
-                            <Link :href="`/products/${data.slug}`">
+                            <Link :href="`/admin/products/${data.slug}`">
                                 <Button icon="pi pi-eye" rounded text severity="info" aria-label="مشاهده" />
                             </Link>
-                            <Link :href="`/products/${data.slug}/edit`">
+                            <Link :href="`/admin/products/${data.slug}/edit`">
                                 <Button icon="pi pi-pencil" rounded text severity="secondary" aria-label="ویرایش" />
                             </Link>
                             <Button icon="pi pi-trash" rounded text severity="danger" aria-label="حذف" @click="destroyProduct(data)" />

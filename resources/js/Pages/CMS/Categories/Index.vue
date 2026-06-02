@@ -29,7 +29,7 @@ const openEdit = (category) => {
 };
 
 const save = () => {
-    const url = editing.value ? `/post-categories/${editing.value.slug}` : '/post-categories';
+    const url = editing.value ? `/admin/post-categories/${editing.value.slug}` : '/admin/post-categories';
     form.post(url, { preserveScroll: true, onSuccess: () => visible.value = false });
 };
 
@@ -38,7 +38,7 @@ const destroyItem = (category) => confirm.require({
     header: 'حذف دسته‌بندی',
     icon: 'pi pi-exclamation-triangle',
     acceptClass: 'p-button-danger',
-    accept: () => router.delete(`/post-categories/${category.slug}`, { preserveScroll: true })
+        accept: () => router.delete(`/admin/post-categories/${category.slug}`, { preserveScroll: true })
 });
 </script>
 
