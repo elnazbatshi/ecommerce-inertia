@@ -87,7 +87,13 @@ const removeFeaturedImage = () => {
                     </div>
                     <div class="md:col-span-2">
                         <label class="mb-2 block font-medium">متن صفحه</label>
-                        <RichTextEditor v-model="form.content" :error="form.errors.content" />
+                        <RichTextEditor
+                            v-model="form.content"
+                            :error="form.errors.content"
+                            allow-html-source
+                            allow-media-browser
+                            media-collection="page_content"
+                        />
                     </div>
                     <div class="md:col-span-2">
                         <ImageUploader
