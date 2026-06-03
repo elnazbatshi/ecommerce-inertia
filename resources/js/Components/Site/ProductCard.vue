@@ -28,7 +28,7 @@ const onAddToCart = () => {
     });
 };
 
-const productUrl = computed(() => props.product.slug ? `/products/${props.product.slug}` : '/products');
+const productUrl = computed(() => props.product.url || (props.product.slug ? `/products/${props.product.slug}` : null));
 </script>
 
 <template>
@@ -37,7 +37,7 @@ const productUrl = computed(() => props.product.slug ? `/products/${props.produc
         :class="mode === 'list' ? 'flex flex-row gap-4 p-3' : 'flex h-full flex-col'"
     >
         <div class="relative" :class="mode === 'list' ? 'w-36 shrink-0' : ''">
-            <Link :href="productUrl" class="block">
+            <Link v-if="productUrl" :href="productUrl" class="block">
                 <img
                     :src="product.image"
                     :alt="product.name"
@@ -45,6 +45,13 @@ const productUrl = computed(() => props.product.slug ? `/products/${props.produc
                     :class="mode === 'list' ? 'h-32 rounded-lg' : 'h-48'"
                 />
             </Link>
+            <img
+                v-else
+                :src="product.image"
+                :alt="product.name"
+                class="w-full bg-surface-100 object-cover"
+                :class="mode === 'list' ? 'h-32 rounded-lg' : 'h-48'"
+            />
             <div class="absolute left-2 top-2 flex flex-col gap-1">
                 <Tag v-if="product.isNew" value="جدید" severity="info" />
                 <Tag v-if="product.inStock" value="موجود" severity="success" />
@@ -61,7 +68,8 @@ const productUrl = computed(() => props.product.slug ? `/products/${props.produc
 
         <div class="flex min-w-0 flex-1 flex-col p-4" :class="mode === 'list' ? 'p-1' : ''">
             <p class="text-xs font-semibold text-surface-500">{{ product.brand }}</p>
-            <Link :href="productUrl" class="mt-1 line-clamp-2 text-sm font-bold text-surface-900 hover:text-[#D4A017]">{{ product.name }}</Link>
+            <Link v-if="productUrl" :href="productUrl" class="mt-1 line-clamp-2 text-sm font-bold text-surface-900 hover:text-[#D4A017]">{{ product.name }}</Link>
+            <h3 v-else class="mt-1 line-clamp-2 text-sm font-bold text-surface-900">{{ product.name }}</h3>
             <p class="mt-2 line-clamp-2 text-xs text-surface-600">{{ product.feature }}</p>
 
             <div class="mt-auto pt-4">

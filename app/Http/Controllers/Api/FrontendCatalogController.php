@@ -46,9 +46,10 @@ class FrontendCatalogController extends Controller
             $vehicles = $this->fallbackVehicles();
         } else {
             $vehicles = Vehicle::query()
+                ->with('brand:id,name')
                 ->where('is_active', true)
                 ->orderBy('sort_order')
-                ->orderBy('brand')
+                ->orderBy('name')
                 ->limit(8)
                 ->get()
                 ->map(fn (Vehicle $vehicle) => $this->mapVehicle($vehicle))
@@ -204,8 +205,8 @@ class FrontendCatalogController extends Controller
     private function mapVehicle(Vehicle $vehicle): array
     {
         $title = trim(implode(' ', array_filter([
-            $vehicle->brand,
-            $vehicle->model,
+            $vehicle->brand?->name,
+            $vehicle->name,
             $vehicle->trim,
         ])));
 
@@ -213,8 +214,8 @@ class FrontendCatalogController extends Controller
             'id' => $vehicle->id,
             'title' => $title,
             'type' => $vehicle->type,
-            'brand' => $vehicle->brand,
-            'model' => $vehicle->model,
+            'brand' => $vehicle->brand?->name,
+            'model' => $vehicle->name,
             'trim' => $vehicle->trim,
             'engine' => $vehicle->engine,
             'slug' => $vehicle->slug,

@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductArchiveService
 {
@@ -56,7 +57,7 @@ class ProductArchiveService
                 'oldPrice' => $product->discount_price ? (float) $product->price : null,
                 'inStock' => (int) ($product->stock ?? 0) > 0,
                 'isNew' => $product->created_at?->gt(now()->subDays(10)) ?? false,
-                'image' => $product->main_image ?: 'https://picsum.photos/seed/product-' . $product->id . '/600/420',
+                'image' => $product->main_image ? Storage::url($product->main_image) : 'https://picsum.photos/seed/product-' . $product->id . '/600/420',
             ]);
 
         $brandOptions = Brand::query()
@@ -92,4 +93,3 @@ class ProductArchiveService
         };
     }
 }
-

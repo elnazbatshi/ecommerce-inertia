@@ -12,25 +12,36 @@ const props = defineProps({
     products: { type: Object, default: () => ({ data: [], total: 0, current_page: 1, per_page: 12 }) },
     brands: { type: Array, default: () => [] },
     categories: { type: Array, default: () => [] },
+    filters: { type: Object, default: () => ({}) },
 });
 
-const mode = ref('grid');
-const sort = ref('newest');
+const mode = ref(props.filters.mode || 'grid');
+const sort = ref(props.filters.sort || 'newest');
 
 const items = computed(() => props.products?.data ?? []);
 const total = computed(() => Number(props.products?.total ?? items.value.length ?? 0));
 
-const mockProducts = [
-    { id: 1, image: 'https://picsum.photos/seed/c1/600/420', brand: 'Total', name: 'روغن موتور 10W-40', feature: 'کارکرد پایدار در سفرهای طولانی', price: 780000, oldPrice: 910000, inStock: true, isNew: true },
-    { id: 2, image: 'https://picsum.photos/seed/c2/600/420', brand: 'Castrol', name: 'روغن موتور 5W-30 GTX', feature: 'شروع نرم موتور در هوای سرد', price: 1240000, oldPrice: null, inStock: true, isNew: false },
-    { id: 3, image: 'https://picsum.photos/seed/c3/600/420', brand: 'Motul', name: 'روغن موتور سیکلت 20W-50', feature: 'مناسب انجین‌های کارکرد بالا', price: 690000, oldPrice: 760000, inStock: false, isNew: false },
-];
+const visitArchive = (overrides = {}) => {
+    router.get(`/category/${props.category.slug}`, {
+        ...props.filters,
+        sort: sort.value,
+        mode: mode.value,
+        ...overrides,
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+    });
+};
 
-const displayItems = computed(() => (items.value.length ? items.value : mockProducts));
-
-const onPage = (event) => {
-    const page = event.page + 1;
-    router.get(`/category/${props.category.slug}`, { page }, { preserveState: true, preserveScroll: true, replace: true });
+const onPage = (event) => visitArchive({ page: event.page + 1 });
+const onSort = (value) => {
+    sort.value = value;
+    visitArchive({ sort: value, page: 1 });
+};
+const onMode = (value) => {
+    mode.value = value;
+    visitArchive({ mode: value });
 };
 </script>
 
@@ -53,8 +64,8 @@ const onPage = (event) => {
                     <p class="mt-1 text-sm text-surface-500">{{ total.toLocaleString('fa-IR') }} محصول</p>
                 </div>
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-                    <ProductGridToggle v-model="mode" />
-                    <ProductArchiveSort v-model="sort" />
+                    <ProductGridToggle :model-value="mode" @update:model-value="onMode" />
+                    <ProductArchiveSort :model-value="sort" @update:model-value="onSort" />
                 </div>
             </div>
 
@@ -65,22 +76,27 @@ const onPage = (event) => {
 
                 <div class="space-y-4 lg:order-2">
                     <div
+                        v-if="items.length"
                         class="grid gap-4"
                         :class="mode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'"
                     >
                         <ProductCard
-                            v-for="product in displayItems"
+                            v-for="product in items"
                             :key="product.id"
                             :product="product"
                             :mode="mode"
                         />
                     </div>
 
+                    <div v-else class="rounded-xl border border-dashed border-surface-300 bg-white p-8 text-center text-sm text-surface-500">
+                        محصولی برای این دسته‌بندی پیدا نشد.
+                    </div>
+
                     <Paginator
-                        v-if="props.products?.last_page > 1"
-                        :first="(props.products.current_page - 1) * props.products.per_page"
-                        :rows="props.products.per_page"
-                        :totalRecords="props.products.total"
+                        v-if="products?.last_page > 1"
+                        :first="(products.current_page - 1) * products.per_page"
+                        :rows="products.per_page"
+                        :totalRecords="products.total"
                         template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
                         @page="onPage"
                     />
