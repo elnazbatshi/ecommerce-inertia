@@ -2,6 +2,7 @@
 import { Link } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { computed } from 'vue';
+import { useCart } from '@/Composables/useCart';
 
 const props = defineProps({
     product: { type: Object, required: true },
@@ -9,6 +10,7 @@ const props = defineProps({
 });
 
 const toast = useToast();
+const { addItem } = useCart();
 
 const hasDiscount = computed(() =>
     props.product.oldPrice && Number(props.product.oldPrice) > Number(props.product.price)
@@ -19,16 +21,28 @@ const discountPercent = computed(() => {
     return Math.round((1 - Number(props.product.price) / Number(props.product.oldPrice)) * 100);
 });
 
+const productUrl = computed(() => props.product.url || (props.product.slug ? `/products/${props.product.slug}` : null));
+
 const onAddToCart = () => {
+    addItem({
+        id: props.product.id,
+        slug: props.product.slug,
+        name: props.product.name,
+        brand: props.product.brand,
+        sku: props.product.sku,
+        image: props.product.image,
+        price: props.product.price,
+        old_price: props.product.oldPrice,
+        stock: props.product.stock ?? (props.product.inStock ? 999 : 0),
+    });
+
     toast.add({
-        severity: 'info',
+        severity: 'success',
         summary: 'سبد خرید',
-        detail: 'اتصال سبد خرید در مرحله بعد فعال می‌شود.',
+        detail: 'محصول به سبد خرید اضافه شد.',
         life: 1800
     });
 };
-
-const productUrl = computed(() => props.product.url || (props.product.slug ? `/products/${props.product.slug}` : null));
 </script>
 
 <template>

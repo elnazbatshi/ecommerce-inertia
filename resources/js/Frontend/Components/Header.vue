@@ -1,18 +1,28 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { router, usePage } from '@inertiajs/vue3';
 import MegaMenu from './MegaMenu.vue';
 import Navbar from './Navbar.vue';
+import MiniCart from './MiniCart.vue';
+import CustomerAuthModal from './CustomerAuthModal.vue';
 import SearchBox from '@/Components/Site/SearchBox.vue';
 import { getMenu } from '../services/menuApi';
 
+const page = usePage();
 const isLoading = ref(true);
 const isMobileOpen = ref(false);
+const isAuthModalOpen = ref(false);
 const menu = ref({ location: 'header', items: [], popular_brands: [], popular_vehicles: [], quick_links: [] });
 const hoveredItem = ref(null);
 let menuController = null;
 
 const navItems = computed(() => menu.value.items || []);
 const activeMega = computed(() => hoveredItem.value && hoveredItem.value.children?.length);
+const customer = computed(() => page.props.customer || null);
+
+const reloadAuth = () => {
+    router.reload({ only: ['customer'] });
+};
 
 const loadMenu = async () => {
     menuController?.abort();
@@ -51,8 +61,10 @@ onBeforeUnmount(() => menuController?.abort());
                 </div>
 
                 <div class="order-1 flex items-center justify-end gap-2 lg:order-3">
-                    <a href="/login" class="site-icon-btn">ورود / ثبت نام</a>
-                    <a href="#" class="site-icon-btn">سبد خرید <span class="cart-badge">0</span></a>
+                    <button type="button" class="site-icon-btn" @click="isAuthModalOpen = true">
+                        {{ customer ? (customer.name || customer.phone) : 'ورود / ثبت نام' }}
+                    </button>
+                    <MiniCart />
                 </div>
             </div>
         </div>
@@ -77,5 +89,7 @@ onBeforeUnmount(() => menuController?.abort());
                 :quick-links="menu.quick_links || []"
             />
         </div>
+
+        <CustomerAuthModal v-model:visible="isAuthModalOpen" @authenticated="reloadAuth" />
     </header>
 </template>

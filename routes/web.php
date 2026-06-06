@@ -8,6 +8,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\CustomerAuthController;
 use App\Http\Controllers\HeroSliderController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\MenuController;
@@ -32,6 +33,9 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('site.home');
+Route::get('/cart', fn () => Inertia::render('Frontend/Cart/Index'))->name('site.cart');
+Route::post('/customer/auth/otp', [CustomerAuthController::class, 'requestOtp'])->name('site.customer-auth.otp');
+Route::post('/customer/auth/verify', [CustomerAuthController::class, 'verifyOtp'])->name('site.customer-auth.verify');
 Route::get('/products', [PublicContentController::class, 'products'])->name('site.products.index');
 Route::get('/products/{product:slug}', [PublicContentController::class, 'product'])->name('site.products.show');
 Route::get('/category/{category:slug}', [PublicContentController::class, 'category'])->name('site.categories.show');
