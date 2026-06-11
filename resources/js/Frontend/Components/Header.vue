@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
-import { router, usePage } from '@inertiajs/vue3';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import MegaMenu from './MegaMenu.vue';
 import Navbar from './Navbar.vue';
 import MiniCart from './MiniCart.vue';
@@ -41,7 +41,7 @@ onBeforeUnmount(() => menuController?.abort());
         <div class="topbar-dark">
             <div class="site-container topbar-items">
                 <span>ارسال سریع به سراسر کشور</span>
-                <span>۷ روز ضمانت بازگشت کالا</span>
+                <span>7 روز ضمانت بازگشت کالا</span>
                 <span>ضمانت اصالت کالا</span>
                 <span>خرید امن</span>
             </div>
@@ -51,10 +51,10 @@ onBeforeUnmount(() => menuController?.abort());
             <div class="site-container grid items-center gap-4 py-5 lg:grid-cols-[260px_1fr_280px]">
                 <button class="site-icon-btn lg:hidden" type="button" @click="isMobileOpen = !isMobileOpen">☰</button>
 
-                <div class="order-2 lg:order-1">
+                <Link href="/" class="order-2 block lg:order-1">
                     <h1 class="text-2xl font-black text-[var(--site-dark)]">MotoPart</h1>
                     <p class="text-xs text-[var(--site-text-secondary)]">فروشگاه آنلاین روغن موتور و قطعات</p>
-                </div>
+                </Link>
 
                 <div class="order-3 lg:order-2">
                     <SearchBox />

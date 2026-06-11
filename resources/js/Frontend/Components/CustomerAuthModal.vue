@@ -1,15 +1,22 @@
 <script setup>
 import axios from 'axios';
+import { router } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
+import { useCart } from '@/Composables/useCart';
 
 const props = defineProps({
     visible: {
         type: Boolean,
         default: false,
     },
+    redirectAfterLogin: {
+        type: String,
+        default: null,
+    },
 });
 
 const emit = defineEmits(['update:visible', 'authenticated']);
+const { items } = useCart();
 
 const step = ref('phone');
 const phone = ref('');
@@ -83,9 +90,17 @@ const verifyOtp = async () => {
             name: mode.value === 'register' ? name.value : null,
         });
 
+        if (items.value.length) {
+            await axios.post('/cart/sync', { items: items.value });
+        }
+
         emit('authenticated');
         close();
         reset();
+
+        if (props.redirectAfterLogin) {
+            router.visit(props.redirectAfterLogin);
+        }
     } catch (exception) {
         error.value = exception.response?.data?.message || exception.response?.data?.errors?.code?.[0] || 'تایید کد انجام نشد.';
     } finally {

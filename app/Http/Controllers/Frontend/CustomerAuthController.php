@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
 use App\Models\CustomerOtp;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class CustomerAuthController extends Controller
@@ -21,10 +20,7 @@ class CustomerAuthController extends Controller
         ]);
 
         $phone = $this->normalizePhone($data['phone']);
-        $existingUser = User::where('phone', $phone)->first();
-        $this->ensureCustomerCanUseOtp($existingUser);
-
-        $userExists = (bool) $existingUser;
+        $customerExists = Customer::where('phone', $phone)->exists();
         $code = (string) random_int(100000, 999999);
 
         CustomerOtp::where('phone', $phone)
@@ -40,12 +36,12 @@ class CustomerAuthController extends Controller
         Log::info('Customer OTP requested.', [
             'phone' => $phone,
             'code' => $code,
-            'mode' => $userExists ? 'login' : 'register',
+            'mode' => $customerExists ? 'login' : 'register',
         ]);
 
         return response()->json([
             'message' => 'کد تایید ارسال شد.',
-            'mode' => $userExists ? 'login' : 'register',
+            'mode' => $customerExists ? 'login' : 'register',
             'expires_in' => 120,
             'debug_code' => app()->isLocal() ? $code : null,
         ]);
@@ -60,8 +56,6 @@ class CustomerAuthController extends Controller
         ]);
 
         $phone = $this->normalizePhone($data['phone']);
-        $existingUser = User::where('phone', $phone)->first();
-        $this->ensureCustomerCanUseOtp($existingUser);
 
         $otp = CustomerOtp::where('phone', $phone)
             ->whereNull('verified_at')
@@ -82,29 +76,30 @@ class CustomerAuthController extends Controller
             ]);
         }
 
-        $user = User::firstOrCreate(
+        $customer = Customer::firstOrCreate(
             ['phone' => $phone],
             [
                 'name' => $data['name'] ?: "مشتری {$phone}",
                 'email' => "{$phone}@customers.motopart.local",
-                'password' => Str::password(32),
+                'status' => 'active',
             ],
         );
 
-        if (! $user->name && ! empty($data['name'])) {
-            $user->forceFill(['name' => $data['name']])->save();
+        if ((! $customer->name || str_starts_with($customer->name, 'مشتری ')) && ! empty($data['name'])) {
+            $customer->forceFill(['name' => $data['name']])->save();
         }
 
         $otp->forceFill(['verified_at' => now()])->save();
 
-        $request->session()->put('customer_user_id', $user->id);
+        $customer->forceFill(['last_login_at' => now()])->save();
+        $request->session()->put('customer_id', $customer->id);
 
         return response()->json([
             'message' => 'ورود با موفقیت انجام شد.',
             'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'phone' => $user->phone,
+                'id' => $customer->id,
+                'name' => $customer->name,
+                'phone' => $customer->phone,
             ],
         ]);
     }
@@ -115,16 +110,5 @@ class CustomerAuthController extends Controller
         $english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
         return preg_replace('/[^\d+]/', '', str_replace($persian, $english, trim($phone)));
-    }
-
-    private function ensureCustomerCanUseOtp(?User $user): void
-    {
-        if (! $user || $user->roles()->count() === 0) {
-            return;
-        }
-
-        throw ValidationException::withMessages([
-            'phone' => 'این شماره برای حساب مدیریتی ثبت شده و امکان ورود مشتری با آن وجود ندارد.',
-        ]);
     }
 }

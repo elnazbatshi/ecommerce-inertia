@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\User;
+use App\Models\Customer;
 use App\Services\MenuService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -56,12 +56,12 @@ class HandleInertiaRequests extends Middleware
             return null;
         }
 
-        $customerId = $request->session()->get('customer_user_id');
+        $customerId = $request->session()->get('customer_id');
         if (! $customerId) {
             return null;
         }
 
-        $customer = User::query()
+        $customer = Customer::query()
             ->select(['id', 'name', 'phone'])
             ->find($customerId);
 

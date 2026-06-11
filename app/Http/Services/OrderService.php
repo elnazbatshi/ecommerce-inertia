@@ -112,7 +112,10 @@ class OrderService
         DB::transaction(function () use ($order, $data, $userId) {
             $order = Order::query()->lockForUpdate()->findOrFail($order->id);
 
-            if ($order->inventory_reduced_at && ! $order->inventory_returned_at) {
+            if ($order->stock_reserved_at && ! $order->stock_released_at) {
+                $this->inventory->release($order, $userId, 'correction');
+                $order->forceFill(['stock_reserved_at' => null, 'stock_released_at' => null])->save();
+            } elseif ($order->inventory_reduced_at && ! $order->inventory_returned_at) {
                 $this->inventory->return($order, $userId, 'correction');
                 $order->forceFill(['inventory_reduced_at' => null])->save();
             }
@@ -130,7 +133,9 @@ class OrderService
         DB::transaction(function () use ($order, $userId) {
             $order = Order::query()->lockForUpdate()->findOrFail($order->id);
 
-            if ($order->inventory_reduced_at && ! $order->inventory_returned_at) {
+            if ($order->stock_reserved_at && ! $order->stock_released_at) {
+                $this->inventory->release($order, $userId, 'return');
+            } elseif ($order->inventory_reduced_at && ! $order->inventory_returned_at) {
                 $this->inventory->return($order, $userId, 'return');
             }
 

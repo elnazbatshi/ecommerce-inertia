@@ -46,6 +46,8 @@ class Order extends Model
         'cancelled_at',
         'inventory_reduced_at',
         'inventory_returned_at',
+        'stock_reserved_at',
+        'stock_released_at',
     ];
 
     protected $casts = [
@@ -60,6 +62,8 @@ class Order extends Model
         'cancelled_at' => 'datetime',
         'inventory_reduced_at' => 'datetime',
         'inventory_returned_at' => 'datetime',
+        'stock_reserved_at' => 'datetime',
+        'stock_released_at' => 'datetime',
     ];
 
     public function customer(): BelongsTo

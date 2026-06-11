@@ -1,12 +1,18 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import axios from 'axios';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import FrontLayout from '../../Layouts/FrontLayout.vue';
+import CustomerAuthModal from '../../Components/CustomerAuthModal.vue';
 import { useCart } from '@/Composables/useCart';
 
 const toast = useToast();
+const page = usePage();
 const { items, count, subtotal, updateQuantity, removeItem, clearCart } = useCart();
+const authModalVisible = ref(false);
+const checkoutLoading = ref(false);
+const customer = computed(() => page.props.customer || null);
 
 const shippingCost = computed(() => (subtotal.value > 0 && subtotal.value < 2500000 ? 120000 : 0));
 const total = computed(() => subtotal.value + shippingCost.value);
@@ -14,13 +20,31 @@ const total = computed(() => subtotal.value + shippingCost.value);
 const formatPrice = (value) => `${Number(value || 0).toLocaleString('fa-IR')} تومان`;
 const productUrl = (item) => item.slug ? `/products/${item.slug}` : '/products';
 
+const syncAndGoCheckout = async () => {
+    checkoutLoading.value = true;
+
+    try {
+        await axios.post('/cart/sync', { items: items.value });
+        router.visit('/checkout');
+    } catch (error) {
+        toast.add({
+            severity: 'error',
+            summary: 'تکمیل خرید',
+            detail: error.response?.data?.message || 'اتصال سبد خرید انجام نشد.',
+            life: 2200,
+        });
+    } finally {
+        checkoutLoading.value = false;
+    }
+};
+
 const checkout = () => {
-    toast.add({
-        severity: 'info',
-        summary: 'تسویه حساب',
-        detail: 'مرحله پرداخت هنوز به فرانت وصل نشده است.',
-        life: 2200,
-    });
+    if (!customer.value) {
+        authModalVisible.value = true;
+        return;
+    }
+
+    syncAndGoCheckout();
 };
 </script>
 
@@ -111,7 +135,7 @@ const checkout = () => {
                             </div>
                         </dl>
 
-                        <Button label="ادامه فرایند خرید" icon="pi pi-credit-card" class="mt-5 w-full" @click="checkout" />
+                        <Button label="ادامه فرایند خرید" icon="pi pi-credit-card" class="mt-5 w-full" :loading="checkoutLoading" @click="checkout" />
                         <Link href="/products" class="mt-3 block text-center text-sm font-bold text-[#D4A017]">ادامه خرید</Link>
                     </div>
 
@@ -140,8 +164,13 @@ const checkout = () => {
                     <div class="text-xs text-surface-500">مبلغ نهایی</div>
                     <div class="font-black text-surface-950">{{ formatPrice(total) }}</div>
                 </div>
-                <Button label="ادامه خرید" icon="pi pi-credit-card" @click="checkout" />
+                <Button label="ادامه خرید" icon="pi pi-credit-card" :loading="checkoutLoading" @click="checkout" />
             </div>
         </div>
+
+        <CustomerAuthModal
+            v-model:visible="authModalVisible"
+            redirect-after-login="/checkout"
+        />
     </FrontLayout>
 </template>
