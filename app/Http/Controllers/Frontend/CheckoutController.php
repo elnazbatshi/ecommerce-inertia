@@ -84,8 +84,8 @@ class CheckoutController extends Controller
                     'receiver_phone' => $address->receiver_phone,
                     'province_id' => $address->province_id,
                     'city_id' => $address->city_id,
-                    'province' => $address->province?->name ?: $address->province,
-                    'city' => $address->city?->name ?: $address->city,
+                    'province' => $this->addressRegionName($address, 'province'),
+                    'city' => $this->addressRegionName($address, 'city'),
                     'postal_code' => $address->postal_code,
                     'address' => $address->address,
                     'is_default' => $address->is_default,
@@ -210,6 +210,13 @@ class CheckoutController extends Controller
         $customerId = $request->session()->get('customer_id');
 
         return $customerId ? Customer::find($customerId) : null;
+    }
+
+    private function addressRegionName(Address $address, string $relation): ?string
+    {
+        $related = $address->relationLoaded($relation) ? $address->getRelation($relation) : null;
+
+        return $related?->name ?: $address->getAttribute($relation);
     }
 
     private function shippingCost(ShippingMethod $method, float $subtotal): float

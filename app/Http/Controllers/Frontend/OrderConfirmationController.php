@@ -47,8 +47,8 @@ class OrderConfirmationController extends Controller
                 'address' => $order->address ? [
                     'recipient_name' => $order->shipping_receiver_name,
                     'recipient_mobile' => $order->shipping_receiver_phone,
-                    'province' => $order->address->province?->name ?? $order->shipping_province_name,
-                    'city' => $order->address->city?->name ?? $order->shipping_city_name,
+                    'province' => $this->addressRegionName($order->address, 'province') ?? $order->shipping_province_name,
+                    'city' => $this->addressRegionName($order->address, 'city') ?? $order->shipping_city_name,
                     'address' => $order->shipping_address,
                     'postal_code' => $order->shipping_postal_code,
                 ] : [
@@ -72,5 +72,12 @@ class OrderConfirmationController extends Controller
                 ])->values(),
             ],
         ]);
+    }
+
+    private function addressRegionName($address, string $relation): ?string
+    {
+        $related = $address->relationLoaded($relation) ? $address->getRelation($relation) : null;
+
+        return $related?->name ?: $address->getAttribute($relation);
     }
 }
