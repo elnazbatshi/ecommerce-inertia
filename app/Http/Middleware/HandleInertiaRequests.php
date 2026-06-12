@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Customer;
 use App\Services\MenuService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -29,6 +30,7 @@ class HandleInertiaRequests extends Middleware
                     'permissions' => $request->user()->getAllPermissions()->pluck('name')->values(),
                 ] : null,
             ],
+            'customer' => fn () => $this->siteCustomer($request),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
@@ -46,5 +48,27 @@ class HandleInertiaRequests extends Middleware
         }
 
         return app(MenuService::class)->getByLocation($location)['items'] ?? [];
+    }
+
+    private function siteCustomer(Request $request): ?array
+    {
+        if ($request->is('admin', 'admin/*')) {
+            return null;
+        }
+
+        $customerId = $request->session()->get('customer_id');
+        if (! $customerId) {
+            return null;
+        }
+
+        $customer = Customer::query()
+            ->select(['id', 'name', 'phone'])
+            ->find($customerId);
+
+        return $customer ? [
+            'id' => $customer->id,
+            'name' => $customer->name,
+            'phone' => $customer->phone,
+        ] : null;
     }
 }

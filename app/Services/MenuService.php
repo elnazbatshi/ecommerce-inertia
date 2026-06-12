@@ -320,13 +320,18 @@ class MenuService
         }
 
         return Vehicle::query()
+            ->with('brand:id,name')
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->limit(8)
             ->get()
             ->map(fn (Vehicle $vehicle) => [
                 'id' => $vehicle->id,
-                'title' => trim(implode(' ', array_filter([$vehicle->brand, $vehicle->model, $vehicle->trim]))),
+                'title' => trim(implode(' ', array_filter([
+                    $vehicle->brand?->name,
+                    $vehicle->name,
+                    $vehicle->trim,
+                ]))),
                 'slug' => $vehicle->slug,
             ])
             ->values()

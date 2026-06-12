@@ -2,6 +2,7 @@
 import { Link } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { computed } from 'vue';
+import { useCart } from '@/Composables/useCart';
 
 const props = defineProps({
     product: { type: Object, required: true },
@@ -9,6 +10,7 @@ const props = defineProps({
 });
 
 const toast = useToast();
+const { addItem } = useCart();
 
 const hasDiscount = computed(() =>
     props.product.oldPrice && Number(props.product.oldPrice) > Number(props.product.price)
@@ -19,16 +21,28 @@ const discountPercent = computed(() => {
     return Math.round((1 - Number(props.product.price) / Number(props.product.oldPrice)) * 100);
 });
 
+const productUrl = computed(() => props.product.url || (props.product.slug ? `/products/${props.product.slug}` : null));
+
 const onAddToCart = () => {
+    addItem({
+        id: props.product.id,
+        slug: props.product.slug,
+        name: props.product.name,
+        brand: props.product.brand,
+        sku: props.product.sku,
+        image: props.product.image,
+        price: props.product.price,
+        old_price: props.product.oldPrice,
+        stock: props.product.stock ?? (props.product.inStock ? 999 : 0),
+    });
+
     toast.add({
-        severity: 'info',
+        severity: 'success',
         summary: 'سبد خرید',
-        detail: 'اتصال سبد خرید در مرحله بعد فعال می‌شود.',
+        detail: 'محصول به سبد خرید اضافه شد.',
         life: 1800
     });
 };
-
-const productUrl = computed(() => props.product.slug ? `/products/${props.product.slug}` : '/products');
 </script>
 
 <template>
@@ -37,7 +51,7 @@ const productUrl = computed(() => props.product.slug ? `/products/${props.produc
         :class="mode === 'list' ? 'flex flex-row gap-4 p-3' : 'flex h-full flex-col'"
     >
         <div class="relative" :class="mode === 'list' ? 'w-36 shrink-0' : ''">
-            <Link :href="productUrl" class="block">
+            <Link v-if="productUrl" :href="productUrl" class="block">
                 <img
                     :src="product.image"
                     :alt="product.name"
@@ -45,6 +59,13 @@ const productUrl = computed(() => props.product.slug ? `/products/${props.produc
                     :class="mode === 'list' ? 'h-32 rounded-lg' : 'h-48'"
                 />
             </Link>
+            <img
+                v-else
+                :src="product.image"
+                :alt="product.name"
+                class="w-full bg-surface-100 object-cover"
+                :class="mode === 'list' ? 'h-32 rounded-lg' : 'h-48'"
+            />
             <div class="absolute left-2 top-2 flex flex-col gap-1">
                 <Tag v-if="product.isNew" value="جدید" severity="info" />
                 <Tag v-if="product.inStock" value="موجود" severity="success" />
@@ -61,7 +82,8 @@ const productUrl = computed(() => props.product.slug ? `/products/${props.produc
 
         <div class="flex min-w-0 flex-1 flex-col p-4" :class="mode === 'list' ? 'p-1' : ''">
             <p class="text-xs font-semibold text-surface-500">{{ product.brand }}</p>
-            <Link :href="productUrl" class="mt-1 line-clamp-2 text-sm font-bold text-surface-900 hover:text-[#D4A017]">{{ product.name }}</Link>
+            <Link v-if="productUrl" :href="productUrl" class="mt-1 line-clamp-2 text-sm font-bold text-surface-900 hover:text-[#D4A017]">{{ product.name }}</Link>
+            <h3 v-else class="mt-1 line-clamp-2 text-sm font-bold text-surface-900">{{ product.name }}</h3>
             <p class="mt-2 line-clamp-2 text-xs text-surface-600">{{ product.feature }}</p>
 
             <div class="mt-auto pt-4">

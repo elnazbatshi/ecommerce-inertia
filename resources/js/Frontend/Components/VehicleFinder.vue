@@ -1,6 +1,6 @@
 <template>
     <section id="finder" class="mx-auto max-w-7xl px-6 py-12">
-        <div class="site-card grid gap-6 p-6 lg:grid-cols-[0.8fr_1.2fr]">
+        <div class="site-card block gap-6 p-6 lg:grid-cols-[0.8fr_1.2fr] rounded-xl">
             <div>
                 <p class="text-sm font-black text-[#D4A017]">انتخاب سریع قطعه</p>
                 <h2 class="mt-2 text-2xl font-black text-[#1A1A1A]">وسیله نقلیه خود را پیدا کنید</h2>

@@ -50,15 +50,15 @@ class OrderService
                     'receiver_phone' => $address->receiver_phone,
                     'province_id' => $address->province_id,
                     'city_id' => $address->city_id,
-                    'province_name' => $address->province?->name ?? $address->province,
-                    'city_name' => $address->city?->name ?? $address->city,
-                    'province' => $address->province,
-                    'city' => $address->city,
+                    'province_name' => $this->addressRegionName($address, 'province'),
+                    'city_name' => $this->addressRegionName($address, 'city'),
+                    'province' => $this->addressRegionName($address, 'province'),
+                    'city' => $this->addressRegionName($address, 'city'),
                     'address' => $address->address,
                     'is_default' => $address->is_default,
                     'label' => trim(implode(' | ', array_filter([
                         $address->title ?: 'آدرس',
-                        trim(($address->province?->name ?? $address->province ?? '-') . ' / ' . ($address->city?->name ?? $address->city ?? '-')),
+                        trim(($this->addressRegionName($address, 'province') ?? '-') . ' / ' . ($this->addressRegionName($address, 'city') ?? '-')),
                         $address->address,
                     ]))),
                 ])->values(),
@@ -112,7 +112,10 @@ class OrderService
         DB::transaction(function () use ($order, $data, $userId) {
             $order = Order::query()->lockForUpdate()->findOrFail($order->id);
 
-            if ($order->inventory_reduced_at && ! $order->inventory_returned_at) {
+            if ($order->stock_reserved_at && ! $order->stock_released_at) {
+                $this->inventory->release($order, $userId, 'correction');
+                $order->forceFill(['stock_reserved_at' => null, 'stock_released_at' => null])->save();
+            } elseif ($order->inventory_reduced_at && ! $order->inventory_returned_at) {
                 $this->inventory->return($order, $userId, 'correction');
                 $order->forceFill(['inventory_reduced_at' => null])->save();
             }
@@ -130,7 +133,9 @@ class OrderService
         DB::transaction(function () use ($order, $userId) {
             $order = Order::query()->lockForUpdate()->findOrFail($order->id);
 
-            if ($order->inventory_reduced_at && ! $order->inventory_returned_at) {
+            if ($order->stock_reserved_at && ! $order->stock_released_at) {
+                $this->inventory->release($order, $userId, 'return');
+            } elseif ($order->inventory_reduced_at && ! $order->inventory_returned_at) {
                 $this->inventory->return($order, $userId, 'return');
             }
 
@@ -231,8 +236,8 @@ class OrderService
         return [
             'shipping_receiver_name' => $address->receiver_name,
             'shipping_receiver_phone' => $address->receiver_phone,
-            'shipping_province_name' => $address->province?->name ?? $address->province,
-            'shipping_city_name' => $address->city?->name ?? $address->city,
+            'shipping_province_name' => $this->addressRegionName($address, 'province'),
+            'shipping_city_name' => $this->addressRegionName($address, 'city'),
             'shipping_address' => $address->address,
             'shipping_postal_code' => $address->postal_code,
             'shipping_plaque' => $address->plaque,
@@ -276,6 +281,13 @@ class OrderService
         }
 
         return $data;
+    }
+
+    private function addressRegionName(Address $address, string $relation): ?string
+    {
+        $related = $address->relationLoaded($relation) ? $address->getRelation($relation) : null;
+
+        return $related?->name ?: $address->getAttribute($relation);
     }
 
     private function generateNumber(): string

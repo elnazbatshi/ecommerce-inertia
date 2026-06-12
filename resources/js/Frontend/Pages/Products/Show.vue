@@ -4,6 +4,7 @@ import { computed, ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import FrontLayout from '../../Layouts/FrontLayout.vue';
 import ProductCard from '@/Components/Site/ProductCard.vue';
+import { useCart } from '@/Composables/useCart';
 
 const props = defineProps({
     product: { type: Object, required: true },
@@ -11,6 +12,7 @@ const props = defineProps({
 });
 
 const toast = useToast();
+const { addItem } = useCart();
 const selectedImageIndex = ref(0);
 const selectedVariantId = ref(props.product.variants?.find((variant) => variant.stock > 0)?.id ?? props.product.variants?.[0]?.id ?? null);
 const quantity = ref(1);
@@ -59,11 +61,24 @@ const selectVariant = (variant) => {
 };
 
 const addToCart = () => {
-    // TODO: connect this action to the real cart module when checkout is ready.
+    addItem({
+        id: props.product.id,
+        variant_id: selectedVariant.value?.id ?? null,
+        slug: props.product.slug,
+        name: props.product.name,
+        variant_label: selectedVariant.value?.label ?? null,
+        brand: props.product.brand?.name,
+        sku: activeSku.value,
+        image: currentImage.value?.url,
+        price: activePrice.value,
+        old_price: oldPrice.value,
+        stock: activeStock.value,
+    }, quantity.value);
+
     toast.add({
-        severity: 'info',
+        severity: 'success',
         summary: 'سبد خرید',
-        detail: 'رابط سبد خرید هنوز نهایی نشده؛ انتخاب محصول فعلا در همین صفحه مدیریت می‌شود.',
+        detail: 'محصول به سبد خرید اضافه شد.',
         life: 2200,
     });
 };
