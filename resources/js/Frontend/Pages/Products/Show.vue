@@ -133,7 +133,7 @@ const addToCart = () => {
                             <Tag v-if="product.brand" :value="product.brand.name" severity="secondary" />
                         </div>
 
-                        <h1 class="text-2xl font-black leading-10 text-surface-950 md:text-3xl">{{ product.name }}</h1>
+                        <h2 class="text-2xl font-black leading-10 text-surface-950 md:text-3xl">{{ product.name }}</h2>
                         <p v-if="metaDescription" class="mt-3 text-sm leading-7 text-surface-600">{{ metaDescription }}</p>
 
                         <dl class="mt-5 grid grid-cols-2 gap-3 text-sm">
@@ -213,10 +213,10 @@ const addToCart = () => {
                     </section>
 
                     <section class="rounded-2xl border border-surface-200 bg-white p-5">
-                        <h2 class="mb-4 text-xl font-black text-surface-950">مشخصات فنی</h2>
+                        <h3 class="mb-4 text-xl font-black text-surface-950">مشخصات فنی</h3>
                         <div v-if="groupedSpecs.length" class="space-y-5">
                             <div v-for="group in groupedSpecs" :key="group.group">
-                                <h3 class="mb-2 text-sm font-black text-[#D4A017]">{{ group.group }}</h3>
+                                <h4 class="mb-2 text-sm font-black text-[#D4A017]">{{ group.group }}</h4>
                                 <dl class="grid grid-cols-1 overflow-hidden rounded-xl border border-surface-200 md:grid-cols-2">
                                     <div v-for="spec in group.specs" :key="`${group.group}-${spec.name}`" class="flex justify-between gap-4 border-b border-surface-100 p-3 text-sm">
                                         <dt class="text-surface-500">{{ spec.name }}</dt>
@@ -230,12 +230,12 @@ const addToCart = () => {
                 </div>
 
                 <section class="rounded-2xl border border-surface-200 bg-white p-5 lg:self-start">
-                    <h2 class="mb-4 text-xl font-black text-surface-950">سازگار با خودرو / موتورسیکلت</h2>
+                    <h3 class="mb-4 text-xl font-black text-surface-950">سازگار با خودرو / موتورسیکلت</h3>
                     <div v-if="product.vehicles?.length" class="space-y-3">
                         <div v-for="vehicle in product.vehicles" :key="vehicle.id" class="rounded-xl border border-surface-200 p-3">
                             <div class="flex items-start justify-between gap-3">
                                 <div>
-                                    <h3 class="font-black text-surface-900">{{ [vehicle.brand, vehicle.name].filter(Boolean).join(' ') }}</h3>
+                                    <h4 class="font-black text-surface-900">{{ [vehicle.brand, vehicle.name].filter(Boolean).join(' ') }}</h4>
                                     <p class="mt-1 text-xs text-surface-500">
                                         {{ [vehicle.trim, vehicle.engine].filter(Boolean).join(' / ') || 'جزئیات تکمیلی ثبت نشده' }}
                                     </p>
