@@ -38,6 +38,7 @@ class StoreProductRequest extends FormRequest
             'gallery_images' => ['nullable', 'array'],
             'gallery_images.*' => ['nullable', 'integer', 'exists:media,id'],
             'status' => ['required', Rule::in(['active', 'inactive', 'draft'])],
+            'is_featured' => ['boolean'],
             'type' => ['required', Rule::in(['simple', 'variable'])],
             'stock' => ['nullable', 'integer', 'min:0', 'required_if:type,simple'],
             'related_post_ids' => ['nullable', 'array'],

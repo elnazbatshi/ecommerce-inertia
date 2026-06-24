@@ -38,6 +38,7 @@ class ProductResource extends JsonResource
             'main_image' => $this->main_image,
             'main_image_url' => $this->main_image ? Storage::url($this->main_image) : null,
             'status' => $this->status,
+            'is_featured' => $this->is_featured,
             'type' => $this->type,
             'stock' => $this->stock,
         ];

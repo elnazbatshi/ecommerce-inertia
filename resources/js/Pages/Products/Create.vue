@@ -38,6 +38,7 @@ const form = useForm({
     main_image: null,
     gallery_images: [],
     status: 'draft',
+    is_featured: false,
     type: 'simple',
     stock: 0,
     related_post_ids: [],
@@ -224,6 +225,14 @@ const errorFor = (field) => form.errors[field];
                         <label class="mb-2 block font-medium">موجودی</label>
                         <InputNumber v-model="form.stock" class="w-full" inputClass="w-full" :min="0" />
                         <small v-if="errorFor('stock')" class="text-red-600">{{ errorFor('stock') }}</small>
+                    </div>
+                    <div class="flex items-center gap-3 rounded-xl border border-surface-200 p-3 md:col-span-2">
+                        <ToggleSwitch v-model="form.is_featured" />
+                        <div>
+                            <label class="block font-medium">نمایش در محصولات منتخب MotoPart</label>
+                            <small class="text-surface-500">در صفحه اصلی سایت، بخش محصولات منتخب نمایش داده می‌شود.</small>
+                            <small v-if="form.errors.is_featured" class="block text-red-600">{{ form.errors.is_featured }}</small>
+                        </div>
                     </div>
                 </div>
             </div>

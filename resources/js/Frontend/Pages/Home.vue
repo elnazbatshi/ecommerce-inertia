@@ -9,7 +9,14 @@ import ProductCard from '../Components/ProductCard.vue';
 import PromoBanner from '../Components/PromoBanner.vue';
 import ReviewCard from '../Components/ReviewCard.vue';
 import BrandSlider from '../Components/BrandSlider.vue';
-import { featuredProducts, reviews } from '../data/mockData';
+import { reviews } from '../data/mockData';
+
+const props = defineProps({
+    featuredProducts: {
+        type: Array,
+        default: () => [],
+    },
+});
 </script>
 
 <template>
@@ -23,16 +30,27 @@ import { featuredProducts, reviews } from '../data/mockData';
         <CategoryStrip />
         <PromoBanner />
 
-        <section id="products" class="mx-auto max-w-7xl bg-white px-6 py-16">
-            <SectionTitle title="پرفروش ترین محصولات" subtitle="قطعاتی که توسط رانندگان حرفه ای بیشتر انتخاب شده اند" />
+        <section v-if="props.featuredProducts?.length" id="products" class="mx-auto max-w-7xl bg-white px-6 py-16">
+            <SectionTitle
+                title="محصولات منتخب MotoPart"
+                subtitle="پیشنهاد ویژه کارشناسان ما برای بهترین عملکرد و دوام موتور"
+            />
             <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-                <ProductCard v-for="product in featuredProducts" :key="product.name" :product="product" />
+                <ProductCard
+                    v-for="product in props.featuredProducts"
+                    :key="product.id || product.name"
+                    :product="product"
+                />
             </div>
         </section>
 
         <section class="reviews-luxury border-y border-[#2A2A2A]">
             <div class="mx-auto max-w-7xl px-6 py-14">
-                <SectionTitle title="تجربه رانندگان دیگر" subtitle="بازخورد خریداران پس از نصب قطعات" tone="dark" />
+                <SectionTitle
+                    title="تجربه رانندگان دیگر"
+                    subtitle="بازخورد خریداران پس از نصب قطعات"
+                    tone="dark"
+                />
                 <div class="mt-8 grid gap-5 md:grid-cols-3">
                     <ReviewCard v-for="review in reviews" :key="review.author" :review="review" />
                 </div>
@@ -42,9 +60,11 @@ import { featuredProducts, reviews } from '../data/mockData';
         <section class="mx-auto max-w-7xl px-6 py-16">
             <div class="cta-power p-8 text-center md:p-12">
                 <p class="site-gold-kicker">ثبت تجربه نصب</p>
-                <h2 class="mt-3 text-3xl font-black text-white md:text-5xl">تجربه نصب قطعه را با رانندگان دیگر به اشتراک بگذارید</h2>
+                <h2 class="mt-3 text-3xl font-black text-white md:text-5xl">
+                    تجربه نصب قطعه را با رانندگان دیگر به اشتراک بگذارید
+                </h2>
                 <p class="mx-auto mt-3 max-w-2xl text-sm leading-7 text-[#D6D6D6]">
-                    بازخورد شما به انتخاب دقیق تر قطعات و کاهش خطای خرید در MotoPart کمک می کند.
+                    بازخورد شما به انتخاب دقیق‌تر قطعات و کاهش خطای خرید در MotoPart کمک می‌کند.
                 </p>
                 <button class="site-btn-primary mt-7">ثبت تجربه نصب</button>
             </div>
