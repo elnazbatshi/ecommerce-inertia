@@ -17,11 +17,12 @@ const productUrl = (item) => item.slug ? `/products/${item.slug}` : '/products';
         <button
             type="button"
             class="site-icon-btn"
+            aria-label="سبد خرید"
             aria-haspopup="true"
             :aria-expanded="open"
             @click="open = !open"
         >
-            سبد خرید
+            <i class="pi pi-shopping-cart text-lg" aria-hidden="true" />
             <span class="cart-badge">{{ count }}</span>
         </button>
 

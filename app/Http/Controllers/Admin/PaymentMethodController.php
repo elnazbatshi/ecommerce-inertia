@@ -45,7 +45,7 @@ class PaymentMethodController extends Controller
     public function edit(PaymentMethod $paymentMethod): Response
     {
         return Inertia::render('PaymentMethods/Edit', [
-            'paymentMethod' => PaymentMethodResource::make($paymentMethod),
+            'paymentMethod' => PaymentMethodResource::make($paymentMethod)->resolve(),
         ]);
     }
 
@@ -81,4 +81,3 @@ class PaymentMethodController extends Controller
         return response()->json($this->paymentMethodService->options($request->only(['q', 'driver', 'limit'])));
     }
 }
-

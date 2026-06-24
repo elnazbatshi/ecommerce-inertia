@@ -45,7 +45,7 @@ class ShippingMethodController extends Controller
     public function edit(ShippingMethod $shippingMethod): Response
     {
         return Inertia::render('ShippingMethods/Edit', [
-            'shippingMethod' => ShippingMethodResource::make($shippingMethod),
+            'shippingMethod' => ShippingMethodResource::make($shippingMethod)->resolve(),
         ]);
     }
 
@@ -81,4 +81,3 @@ class ShippingMethodController extends Controller
         return response()->json($this->shippingMethodService->options($request->only(['q', 'type', 'limit'])));
     }
 }
-
