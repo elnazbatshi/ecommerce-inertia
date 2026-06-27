@@ -23,6 +23,8 @@
         "@primeuix/themes": "^2.0.3",
         "@primevue/auto-import-resolver": "^4.5.5",
         "chart.js": "^3.3.2",
+        "embla-carousel-autoplay": "^8.6.0",
+        "embla-carousel-vue": "^8.6.0",
         "jalaali-js": "^1.2.8",
         "mitt": "^3.0.1",
         "moment": "^2.30.1",

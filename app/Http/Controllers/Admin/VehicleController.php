@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateVehicleRequest;
 use App\Http\Resources\VehicleResource;
 use App\Models\Vehicle;
 use App\Services\VehicleService;
+use App\Services\VehicleTypeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,11 +17,14 @@ use Inertia\Response;
 
 class VehicleController extends Controller
 {
-    public function __construct(private readonly VehicleService $vehicleService) {}
+    public function __construct(
+        private readonly VehicleService $vehicleService,
+        private readonly VehicleTypeService $vehicleTypeService,
+    ) {}
 
     public function index(Request $request): Response
     {
-        $filters = $request->only(['search', 'type', 'vehicle_brand_id', 'is_active', 'rows']);
+        $filters = $request->only(['search', 'vehicle_type_id', 'vehicle_brand_id', 'is_active', 'rows']);
         $rows = (int) ($filters['rows'] ?? 15);
         $brands = $this->vehicleService->vehicleBrandOptions();
         $vehicles = $this->vehicleService->paginate($filters, $rows)
@@ -29,15 +33,12 @@ class VehicleController extends Controller
         return Inertia::render('Vehicles/Index', [
             'vehicles' => $vehicles,
             'filters' => $filters,
-            'typeOptions' => [
-                ['label' => 'همه', 'value' => null],
-                ['label' => 'موتور سیکلت', 'value' => 'motorcycle'],
-                ['label' => 'خودرو', 'value' => 'car'],
-            ],
+            'vehicleTypeOptions' => collect([['label' => 'همه نوع‌ها', 'value' => null]])->merge($this->vehicleTypeService->options())->values(),
             'brandOptions' => $brands->map(fn ($brand) => [
                 'label' => $brand->name,
                 'value' => $brand->id,
                 'type' => $brand->type,
+                'vehicle_type_id' => $brand->vehicle_type_id,
             ])->values(),
         ]);
     }
@@ -51,7 +52,9 @@ class VehicleController extends Controller
                 'label' => $brand->name,
                 'value' => $brand->id,
                 'type' => $brand->type,
+                'vehicle_type_id' => $brand->vehicle_type_id,
             ])->values(),
+            'vehicleTypeOptions' => $this->vehicleTypeService->options(),
         ]);
     }
 
@@ -64,7 +67,7 @@ class VehicleController extends Controller
 
     public function edit(Vehicle $vehicle): Response
     {
-        $vehicle->load(['brand:id,name,slug,type', 'imageMedia:id,path,original_name'])->loadCount('products');
+        $vehicle->load(['brand.vehicleType:id,name,slug', 'imageMedia:id,path,original_name'])->loadCount('products');
         $brands = $this->vehicleService->vehicleBrandOptions();
 
         return Inertia::render('Vehicles/Edit', [
@@ -73,7 +76,9 @@ class VehicleController extends Controller
                 'label' => $brand->name,
                 'value' => $brand->id,
                 'type' => $brand->type,
+                'vehicle_type_id' => $brand->vehicle_type_id,
             ])->values(),
+            'vehicleTypeOptions' => $this->vehicleTypeService->options(),
         ]);
     }
 
@@ -102,7 +107,7 @@ class VehicleController extends Controller
     {
         $request->validate([
             'q' => ['nullable', 'string', 'max:255'],
-            'type' => ['nullable', 'in:car,motorcycle'],
+            'type' => ['nullable', 'string'],
             'limit' => ['nullable', 'integer', 'min:1', 'max:100'],
         ]);
 
@@ -115,4 +120,3 @@ class VehicleController extends Controller
         return response()->json($options);
     }
 }
-

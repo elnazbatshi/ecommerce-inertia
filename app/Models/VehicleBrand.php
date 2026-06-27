@@ -13,6 +13,7 @@ class VehicleBrand extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'vehicle_type_id',
         'name',
         'slug',
         'type',
@@ -31,6 +32,11 @@ class VehicleBrand extends Model
     public function vehicles(): HasMany
     {
         return $this->hasMany(Vehicle::class);
+    }
+
+    public function vehicleType(): BelongsTo
+    {
+        return $this->belongsTo(VehicleType::class);
     }
 
     public function logoMedia(): BelongsTo

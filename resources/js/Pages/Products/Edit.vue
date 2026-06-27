@@ -85,9 +85,11 @@ const attributeValueOptions = computed(() => props.attributes.flatMap((attribute
 const vehicleGroups = computed(() => {
     const map = new Map();
     props.vehicles.forEach((vehicle) => {
-        const brand = vehicle.brand?.name ?? 'سایر';
-        if (!map.has(brand)) map.set(brand, []);
-        map.get(brand).push({ label: vehicle.name, value: vehicle.id });
+        const typeName = vehicle.brand?.vehicle_type?.name ?? vehicle.vehicle_type ?? 'سایر';
+        const brand = vehicle.brand?.name ?? vehicle.brand ?? 'سایر';
+        const group = `${typeName} / ${brand}`;
+        if (!map.has(group)) map.set(group, []);
+        map.get(group).push({ label: vehicle.name, value: vehicle.id });
     });
     return Array.from(map.entries()).map(([label, items]) => ({ label, items }));
 });
@@ -103,9 +105,9 @@ const loadVehicleOptions = async (query = '') => {
         });
         const map = new Map();
         (Array.isArray(data) ? data : []).forEach((vehicle) => {
-            const brandName = vehicle.brand ?? 'سایر';
-            if (!map.has(brandName)) map.set(brandName, []);
-            map.get(brandName).push({ label: vehicle.label ?? '', value: vehicle.id });
+            const group = `${vehicle.vehicle_type ?? 'سایر'} / ${vehicle.brand ?? 'سایر'}`;
+            if (!map.has(group)) map.set(group, []);
+            map.get(group).push({ label: vehicle.label ?? '', value: vehicle.id });
         });
         remoteVehicleGroups.value = Array.from(map.entries()).map(([label, items]) => ({ label, items }));
     } finally {

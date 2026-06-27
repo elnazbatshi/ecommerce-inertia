@@ -1,21 +1,80 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
+import { onBeforeUnmount, ref, watch } from 'vue';
+import useEmblaCarousel from 'embla-carousel-vue';
+import Autoplay from 'embla-carousel-autoplay';
 import FrontLayout from '../Layouts/FrontLayout.vue';
 import SectionTitle from '../Components/SectionTitle.vue';
 import HeroSection from '../Components/HeroSection.vue';
 import VehicleFinder from '../Components/VehicleFinder.vue';
 import CategoryStrip from '../Components/CategoryStrip.vue';
 import ProductCard from '../Components/ProductCard.vue';
-import PromoBanner from '../Components/PromoBanner.vue';
-import ReviewCard from '../Components/ReviewCard.vue';
+import HomeBanners from '../Components/HomeBanners.vue';
 import BrandSlider from '../Components/BrandSlider.vue';
-import { reviews } from '../data/mockData';
 
 const props = defineProps({
     featuredProducts: {
         type: Array,
         default: () => [],
     },
+});
+
+const selectedProductSlide = ref(0);
+const productScrollSnaps = ref([]);
+const productAutoplay = Autoplay({
+    delay: 4000,
+    stopOnInteraction: false,
+    stopOnMouseEnter: false,
+});
+
+const [featuredProductsCarousel, featuredProductsCarouselApi] = useEmblaCarousel(
+    {
+        align: 'start',
+        direction: 'rtl',
+        loop: true,
+        dragFree: false,
+        containScroll: 'trimSnaps',
+    },
+    [productAutoplay],
+);
+
+const updateFeaturedProductsCarousel = (api) => {
+    selectedProductSlide.value = api.selectedScrollSnap();
+    productScrollSnaps.value = api.scrollSnapList();
+};
+
+const scrollFeaturedProductsPrev = () => {
+    featuredProductsCarouselApi.value?.scrollPrev();
+};
+
+const scrollFeaturedProductsNext = () => {
+    featuredProductsCarouselApi.value?.scrollNext();
+};
+
+const scrollFeaturedProductsTo = (index) => {
+    featuredProductsCarouselApi.value?.scrollTo(index);
+};
+
+const stopFeaturedProductsAutoplay = () => {
+    productAutoplay.stop();
+};
+
+const playFeaturedProductsAutoplay = () => {
+    productAutoplay.play();
+};
+
+watch(featuredProductsCarouselApi, (api) => {
+    if (!api) {
+        return;
+    }
+
+    updateFeaturedProductsCarousel(api);
+    api.on('select', updateFeaturedProductsCarousel);
+    api.on('reInit', updateFeaturedProductsCarousel);
+});
+
+onBeforeUnmount(() => {
+    productAutoplay.stop();
 });
 </script>
 
@@ -28,34 +87,64 @@ const props = defineProps({
         <HeroSection />
         <VehicleFinder />
         <CategoryStrip />
-        <PromoBanner />
+        <HomeBanners placement="home_top" />
 
         <section v-if="props.featuredProducts?.length" id="products" class="mx-auto max-w-7xl bg-white px-6 py-16">
             <SectionTitle
                 title="محصولات منتخب MotoPart"
                 subtitle="پیشنهاد ویژه کارشناسان ما برای بهترین عملکرد و دوام موتور"
             />
-            <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-                <ProductCard
-                    v-for="product in props.featuredProducts"
-                    :key="product.id || product.name"
-                    :product="product"
-                />
-            </div>
-        </section>
+            <div
+                class="relative mt-8 rounded-3xl border border-gray-100 bg-white p-4 shadow-[0_18px_45px_rgba(17,17,17,0.08)] md:p-5"
+                dir="rtl"
+                @mouseenter="stopFeaturedProductsAutoplay"
+                @mouseleave="playFeaturedProductsAutoplay"
+            >
+                <div ref="featuredProductsCarousel" class="overflow-hidden">
+                    <div class="-mr-4 flex touch-pan-y">
+                        <div
+                            v-for="product in props.featuredProducts"
+                            :key="product.id || product.name"
+                            class="min-w-0 flex-[0_0_83.333%] pr-4 sm:flex-[0_0_40%] lg:flex-[0_0_25%] 2xl:flex-[0_0_20%]"
+                        >
+                            <ProductCard :product="product" class="h-full" />
+                        </div>
+                    </div>
+                </div>
 
-        <section class="reviews-luxury border-y border-[#2A2A2A]">
-            <div class="mx-auto max-w-7xl px-6 py-14">
-                <SectionTitle
-                    title="تجربه رانندگان دیگر"
-                    subtitle="بازخورد خریداران پس از نصب قطعات"
-                    tone="dark"
-                />
-                <div class="mt-8 grid gap-5 md:grid-cols-3">
-                    <ReviewCard v-for="review in reviews" :key="review.author" :review="review" />
+                <button
+                    type="button"
+                    class="absolute right-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-gray-100 bg-white text-lg font-black text-[#111111] shadow-lg transition hover:border-[#D4A017] hover:text-[#D4A017]"
+                    aria-label="محصول قبلی"
+                    @click="scrollFeaturedProductsPrev"
+                >
+                    ‹
+                </button>
+
+                <button
+                    type="button"
+                    class="absolute left-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-gray-100 bg-white text-lg font-black text-[#111111] shadow-lg transition hover:border-[#D4A017] hover:text-[#D4A017]"
+                    aria-label="محصول بعدی"
+                    @click="scrollFeaturedProductsNext"
+                >
+                    ›
+                </button>
+
+                <div class="mt-5 flex items-center justify-center gap-2">
+                    <button
+                        v-for="(_, index) in productScrollSnaps"
+                        :key="index"
+                        type="button"
+                        class="h-2.5 rounded-full transition"
+                        :class="selectedProductSlide === index ? 'w-7 bg-[#D4A017]' : 'w-2.5 bg-gray-300 hover:bg-gray-400'"
+                        :aria-label="`نمایش اسلاید ${index + 1}`"
+                        @click="scrollFeaturedProductsTo(index)"
+                    />
                 </div>
             </div>
         </section>
+
+        <HomeBanners placement="home_middle" />
 
         <section class="mx-auto max-w-7xl px-6 py-16">
             <div class="cta-power p-8 text-center md:p-12">
@@ -70,6 +159,7 @@ const props = defineProps({
             </div>
         </section>
 
+        <HomeBanners placement="home_bottom" />
         <BrandSlider />
     </FrontLayout>
 </template>

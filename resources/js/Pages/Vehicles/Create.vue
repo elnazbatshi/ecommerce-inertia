@@ -5,12 +5,14 @@ import Form from '@/Pages/Vehicles/Form.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 
 const props = defineProps({
-    brandOptions: { type: Array, default: () => [] }
+    brandOptions: { type: Array, default: () => [] },
+    vehicleTypeOptions: { type: Array, default: () => [] }
 });
 
 const form = useForm({
+    vehicle_type_id: null,
     vehicle_brand_id: null,
-    type: 'car',
+    type: null,
     name: '',
     slug: '',
     year_from: null,
@@ -22,11 +24,6 @@ const form = useForm({
     sort_order: 0,
     is_active: true
 });
-
-const typeOptions = [
-    { label: 'خودرو', value: 'car' },
-    { label: 'موتور سیکلت', value: 'motorcycle' }
-];
 
 const save = () => {
     form.post('/admin/vehicles', { preserveScroll: true });
@@ -41,7 +38,7 @@ const save = () => {
             <Form
                 :form="form"
                 :brandOptions="brandOptions"
-                :typeOptions="typeOptions"
+                :vehicleTypeOptions="vehicleTypeOptions"
                 submitLabel="ایجاد خودرو"
                 :processing="form.processing"
                 @submit="save"
@@ -49,4 +46,3 @@ const save = () => {
         </div>
     </AppLayout>
 </template>
-

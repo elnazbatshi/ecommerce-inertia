@@ -27,6 +27,7 @@ const model = ref([
                 label: 'مدیریت خودرو',
                 icon: 'pi pi-fw pi-car',
                 items: [
+                    { label: 'نوع وسیله', icon: 'pi pi-fw pi-th-large', to: '/admin/vehicle-types' },
                     { label: 'برند خودرو', icon: 'pi pi-fw pi-tag', to: '/admin/vehicle-brands' },
                     { label: 'خودروها', icon: 'pi pi-fw pi-car', to: '/admin/vehicles' }
                 ]
@@ -35,6 +36,7 @@ const model = ref([
             { label: 'نقش‌ها و دسترسی‌ها', icon: 'pi pi-fw pi-lock', to: '/admin/accesses' },
             { label: 'سفارش‌ها', icon: 'pi pi-fw pi-shopping-cart', to: '/admin/orders' },
             { label: 'پرداخت‌ها', icon: 'pi pi-fw pi-wallet', to: '/admin/payments' },
+            { label: 'نظرات محصولات', icon: 'pi pi-fw pi-star', to: '/admin/product-reviews' },
             { label: 'مشتریان', icon: 'pi pi-fw pi-users', to: '/admin/customers' }
         ]
     },
@@ -52,7 +54,10 @@ const model = ref([
     },
     {
         label: 'مدیریت سایت',
-        items: [{ label: 'اسلایدر صفحه اصلی', icon: 'pi pi-fw pi-images', to: '/admin/hero-sliders' }]
+        items: [
+            { label: 'اسلایدر صفحه اصلی', icon: 'pi pi-fw pi-images', to: '/admin/hero-sliders' },
+            { label: 'مدیریت بنرها', icon: 'pi pi-fw pi-ticket', to: '/admin/banner-sections' }
+        ]
     },
     {
         label: 'مدیریت سرچ',

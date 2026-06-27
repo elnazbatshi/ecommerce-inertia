@@ -36,6 +36,7 @@ class HeroSlider extends Model
         'accent_color',
         'button_color',
         'layout',
+        'placement',
         'sort_order',
         'is_active',
         'starts_at',

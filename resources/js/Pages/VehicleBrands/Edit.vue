@@ -5,26 +5,22 @@ import Form from '@/Pages/VehicleBrands/Form.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 
 const props = defineProps({
-    brand: { type: Object, required: true }
+    brand: { type: Object, required: true },
+    vehicleTypeOptions: { type: Array, default: () => [] },
 });
 
 const form = useForm({
     _method: 'put',
     name: props.brand.name ?? '',
     slug: props.brand.slug ?? '',
-    type: props.brand.type ?? 'car',
+    vehicle_type_id: props.brand.vehicle_type_id ?? null,
+    type: props.brand.type ?? null,
     logo_media_id: props.brand.logo_media_id ?? null,
     country: props.brand.country ?? '',
     description: props.brand.description ?? '',
     sort_order: props.brand.sort_order ?? 0,
     is_active: props.brand.is_active ?? true
 });
-
-const typeOptions = [
-    { label: 'خودرو', value: 'car' },
-    { label: 'موتور سیکلت', value: 'motorcycle' },
-    { label: 'عمومی', value: 'universal' }
-];
 
 const save = () => {
     form.post(`/admin/vehicle-brands/${props.brand.id}`, { preserveScroll: true });
@@ -38,7 +34,7 @@ const save = () => {
         <div class="card">
             <Form
                 :form="form"
-                :typeOptions="typeOptions"
+                :vehicleTypeOptions="vehicleTypeOptions"
                 :initialLogo="brand.logo_media"
                 submitLabel="ذخیره تغییرات"
                 :processing="form.processing"
@@ -47,4 +43,3 @@ const save = () => {
         </div>
     </AppLayout>
 </template>
-

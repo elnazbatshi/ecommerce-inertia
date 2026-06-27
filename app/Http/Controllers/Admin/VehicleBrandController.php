@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateVehicleBrandRequest;
 use App\Http\Resources\VehicleBrandResource;
 use App\Models\VehicleBrand;
 use App\Services\VehicleBrandService;
+use App\Services\VehicleTypeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,11 +17,14 @@ use Inertia\Response;
 
 class VehicleBrandController extends Controller
 {
-    public function __construct(private readonly VehicleBrandService $vehicleBrandService) {}
+    public function __construct(
+        private readonly VehicleBrandService $vehicleBrandService,
+        private readonly VehicleTypeService $vehicleTypeService,
+    ) {}
 
     public function index(Request $request): Response
     {
-        $filters = $request->only(['search', 'type', 'is_active', 'rows']);
+        $filters = $request->only(['search', 'vehicle_type_id', 'is_active', 'rows']);
         $rows = (int) ($filters['rows'] ?? 15);
         $brands = $this->vehicleBrandService->paginate($filters, $rows)
             ->through(fn (VehicleBrand $brand) => VehicleBrandResource::make($brand)->resolve());
@@ -28,18 +32,15 @@ class VehicleBrandController extends Controller
         return Inertia::render('VehicleBrands/Index', [
             'brands' => $brands,
             'filters' => $filters,
-            'typeOptions' => [
-                ['label' => 'همه', 'value' => null],
-                ['label' => 'موتور سیکلت', 'value' => 'motorcycle'],
-                ['label' => 'خودرو', 'value' => 'car'],
-                ['label' => 'عمومی', 'value' => 'universal'],
-            ],
+            'vehicleTypeOptions' => collect([['label' => 'همه نوع‌ها', 'value' => null]])->merge($this->vehicleTypeService->options())->values(),
         ]);
     }
 
     public function create(): Response
     {
-        return Inertia::render('VehicleBrands/Create');
+        return Inertia::render('VehicleBrands/Create', [
+            'vehicleTypeOptions' => $this->vehicleTypeService->options(),
+        ]);
     }
 
     public function store(StoreVehicleBrandRequest $request): RedirectResponse|JsonResponse
@@ -59,10 +60,11 @@ class VehicleBrandController extends Controller
 
     public function edit(VehicleBrand $vehicleBrand): Response
     {
-        $vehicleBrand->load(['logoMedia:id,path,original_name'])->loadCount('vehicles');
+        $vehicleBrand->load(['logoMedia:id,path,original_name', 'vehicleType:id,name,slug'])->loadCount('vehicles');
 
         return Inertia::render('VehicleBrands/Edit', [
             'brand' => VehicleBrandResource::make($vehicleBrand),
+            'vehicleTypeOptions' => $this->vehicleTypeService->options(),
         ]);
     }
 

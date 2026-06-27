@@ -43,7 +43,7 @@ class ProductController extends Controller
     public function edit(Product $product): Response
     {
         $product->load(['images', 'variants.attributeValues.attribute', 'category:id,name', 'brand:id,name,slug,description,content', 'relatedPosts:id,title,slug']);
-        $product->load(['vehicles.brand:id,name']);
+        $product->load(['vehicles.brand.vehicleType:id,name,slug']);
 
         return Inertia::render('Products/Edit', [
             ...$this->formData(),

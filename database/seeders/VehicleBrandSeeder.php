@@ -3,12 +3,15 @@
 namespace Database\Seeders;
 
 use App\Models\VehicleBrand;
+use App\Models\VehicleType;
 use Illuminate\Database\Seeder;
 
 class VehicleBrandSeeder extends Seeder
 {
     public function run(): void
     {
+        $typeIds = VehicleType::query()->pluck('id', 'slug');
+
         $brands = [
             ['name' => 'Honda', 'slug' => 'honda', 'type' => 'motorcycle', 'country' => 'Japan'],
             ['name' => 'Yamaha', 'slug' => 'yamaha', 'type' => 'motorcycle', 'country' => 'Japan'],
@@ -34,6 +37,7 @@ class VehicleBrandSeeder extends Seeder
                 ->firstOrNew(['slug' => $brand['slug']]);
 
             $record->fill([
+                'vehicle_type_id' => $typeIds[$brand['type']] ?? $typeIds['car'] ?? null,
                 'name' => $brand['name'],
                 'type' => $brand['type'],
                 'country' => $brand['country'],

@@ -18,7 +18,7 @@ class UpdateVehicleRequest extends FormRequest
 
         return [
             'vehicle_brand_id' => ['required', 'integer', 'exists:vehicle_brands,id'],
-            'type' => ['required', Rule::in(['motorcycle', 'car'])],
+            'type' => ['nullable', Rule::in(['motorcycle', 'car', 'truck', 'pickup'])],
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', Rule::unique('vehicles', 'slug')->ignore($vehicle?->id)],
             'year_from' => ['nullable', 'integer', 'min:1300', 'max:2100'],

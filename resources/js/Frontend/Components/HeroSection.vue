@@ -39,7 +39,6 @@ const activeSlide = computed(() => slides.value[activeIndex.value] ?? fallbackSl
 const hasMultiple = computed(() => slides.value.length > 1);
 const normalizeColor = (value, fallback) => {
     if (!value) return fallback;
-
     return String(value).startsWith('#') ? value : `#${value}`;
 };
 const textColor = computed(() => normalizeColor(activeSlide.value.colors?.text, '#ffffff'));

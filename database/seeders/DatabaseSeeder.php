@@ -16,11 +16,14 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             MenuSeeder::class,
+            VehicleTypeSeeder::class,
             VehicleBrandSeeder::class,
             ShippingMethodSeeder::class,
             PaymentMethodSeeder::class,
             ProvinceSeeder::class,
             CitySeeder::class,
+            HomeBannerSeeder::class,
+            HomeBannerSectionSeeder::class,
         ]);
 
         $admin = User::query()->updateOrCreate([

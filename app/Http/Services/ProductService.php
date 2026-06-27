@@ -58,7 +58,7 @@ class ProductService
     public function vehicleOptions()
     {
         return Vehicle::query()
-            ->with('brand:id,name')
+            ->with('brand.vehicleType:id,name,slug')
             ->active()
             ->ordered()
             ->get(['id', 'vehicle_brand_id', 'name', 'type']);

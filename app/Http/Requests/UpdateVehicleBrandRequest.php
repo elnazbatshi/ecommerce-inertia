@@ -18,8 +18,9 @@ class UpdateVehicleBrandRequest extends FormRequest
 
         return [
             'name' => ['required', 'string', 'max:255'],
+            'vehicle_type_id' => ['required', 'integer', 'exists:vehicle_types,id'],
             'slug' => ['nullable', 'string', 'max:255', Rule::unique('vehicle_brands', 'slug')->ignore($brand?->id)],
-            'type' => ['required', Rule::in(['motorcycle', 'car', 'universal'])],
+            'type' => ['nullable', Rule::in(['motorcycle', 'car', 'universal', 'truck', 'pickup'])],
             'logo_media_id' => ['nullable', 'integer', 'exists:media,id'],
             'country' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],

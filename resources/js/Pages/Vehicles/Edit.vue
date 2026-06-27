@@ -6,13 +6,15 @@ import { Head, useForm } from '@inertiajs/vue3';
 
 const props = defineProps({
     vehicle: { type: Object, required: true },
-    brandOptions: { type: Array, default: () => [] }
+    brandOptions: { type: Array, default: () => [] },
+    vehicleTypeOptions: { type: Array, default: () => [] }
 });
 
 const form = useForm({
     _method: 'put',
+    vehicle_type_id: props.vehicle.vehicle_type_id ?? props.vehicle.brand?.vehicle_type?.id ?? null,
     vehicle_brand_id: props.vehicle.vehicle_brand_id ?? null,
-    type: props.vehicle.type ?? 'car',
+    type: props.vehicle.type ?? null,
     name: props.vehicle.name ?? '',
     slug: props.vehicle.slug ?? '',
     year_from: props.vehicle.year_from ?? null,
@@ -24,11 +26,6 @@ const form = useForm({
     sort_order: props.vehicle.sort_order ?? 0,
     is_active: props.vehicle.is_active ?? true
 });
-
-const typeOptions = [
-    { label: 'خودرو', value: 'car' },
-    { label: 'موتور سیکلت', value: 'motorcycle' }
-];
 
 const save = () => {
     form.post(`/admin/vehicles/${props.vehicle.id}`, { preserveScroll: true });
@@ -43,7 +40,7 @@ const save = () => {
             <Form
                 :form="form"
                 :brandOptions="brandOptions"
-                :typeOptions="typeOptions"
+                :vehicleTypeOptions="vehicleTypeOptions"
                 :initialImage="vehicle.image_media"
                 submitLabel="ذخیره تغییرات"
                 :processing="form.processing"
@@ -52,4 +49,3 @@ const save = () => {
         </div>
     </AppLayout>
 </template>
-

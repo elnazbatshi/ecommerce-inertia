@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Services\SlugService;
 use App\Models\VehicleBrand;
+use App\Models\VehicleType;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class VehicleBrandService
@@ -13,7 +14,7 @@ class VehicleBrandService
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         return VehicleBrand::query()
-            ->with('logoMedia:id,path,original_name')
+            ->with(['logoMedia:id,path,original_name', 'vehicleType:id,name,slug'])
             ->withCount('vehicles')
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where(function ($builder) use ($search) {
@@ -22,7 +23,7 @@ class VehicleBrandService
                         ->orWhere('country', 'like', "%{$search}%");
                 });
             })
-            ->when($filters['type'] ?? null, fn ($query, $type) => $query->where('type', $type))
+            ->when($filters['vehicle_type_id'] ?? null, fn ($query, $typeId) => $query->where('vehicle_type_id', $typeId))
             ->when(isset($filters['is_active']) && $filters['is_active'] !== '', fn ($query) => $query->where('is_active', (bool) $filters['is_active']))
             ->orderBy('sort_order')
             ->orderBy('name')
@@ -42,7 +43,7 @@ class VehicleBrandService
         $payload = $this->preparePayload($data, $vehicleBrand->id);
         $vehicleBrand->update($payload);
 
-        return $vehicleBrand->fresh(['logoMedia:id,path,original_name']);
+        return $vehicleBrand->fresh(['logoMedia:id,path,original_name', 'vehicleType:id,name,slug']);
     }
 
     public function destroy(VehicleBrand $vehicleBrand): void
@@ -62,10 +63,15 @@ class VehicleBrandService
         $slugInput = trim((string) ($data['slug'] ?? ''));
         $slugBase = $slugInput !== '' ? $slugInput : (string) $data['name'];
         $data['slug'] = $this->slugService->unique(VehicleBrand::class, $slugBase, $ignoreId);
+        $vehicleType = VehicleType::query()->find($data['vehicle_type_id'] ?? null);
+        $data['type'] = match ($vehicleType?->slug) {
+            'motorcycle' => 'motorcycle',
+            'truck', 'pickup' => 'universal',
+            default => 'car',
+        };
         $data['sort_order'] = (int) ($data['sort_order'] ?? 0);
         $data['is_active'] = (bool) ($data['is_active'] ?? true);
 
         return $data;
     }
 }
-

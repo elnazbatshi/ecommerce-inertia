@@ -6,18 +6,23 @@ use App\Http\Controllers\Controller;
 use App\Models\HeroSlider;
 use App\Models\Media;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class HeroSliderController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
+        $placement = $request->query('placement', 'hero');
+
         $sliders = HeroSlider::query()
             ->with(['backgroundMedia', 'foregroundMedia'])
             ->currentlyVisible()
+            ->where('placement', $placement)
             ->ordered()
             ->get()
             ->map(fn (HeroSlider $slider) => [
                 'id' => $slider->id,
+                'placement' => $slider->placement,
                 'eyebrow_text' => $slider->eyebrow_text,
                 'title' => $slider->title,
                 'subtitle' => $slider->subtitle,

@@ -6,6 +6,7 @@ import { computed, ref } from 'vue';
 const props = defineProps({
     form: { type: Object, required: true },
     layouts: { type: Array, default: () => [] },
+    placements: { type: Array, default: () => [] },
     submitLabel: { type: String, default: 'ذخیره' },
     processing: { type: Boolean, default: false }
 });
@@ -178,6 +179,11 @@ const errorFor = (field) => props.form.errors?.[field];
                         <div>
                             <label class="mb-2 block font-medium">چینش</label>
                             <Select v-model="form.layout" :options="layouts" optionLabel="label" optionValue="value" class="w-full" />
+                        </div>
+                        <div>
+                            <label class="mb-2 block font-medium">جایگاه نمایش</label>
+                            <Select v-model="form.placement" :options="placements" optionLabel="label" optionValue="value" class="w-full" />
+                            <small v-if="errorFor('placement')" class="text-red-600">{{ errorFor('placement') }}</small>
                         </div>
                         <div>
                             <label class="mb-2 block font-medium">Opacity لایه تیره</label>

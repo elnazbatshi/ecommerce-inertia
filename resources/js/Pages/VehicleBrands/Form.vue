@@ -6,7 +6,7 @@ const props = defineProps({
     form: { type: Object, required: true },
     submitLabel: { type: String, default: 'ذخیره' },
     processing: { type: Boolean, default: false },
-    typeOptions: { type: Array, default: () => [] },
+    vehicleTypeOptions: { type: Array, default: () => [] },
     initialLogo: { type: Object, default: null }
 });
 
@@ -66,9 +66,9 @@ const logoAlt = computed(() => logoPreview.value?.original_name || 'لوگو');
                 <small v-if="form.errors.slug" class="text-red-600">{{ form.errors.slug }}</small>
             </div>
             <div>
-                <label class="mb-2 block font-medium">نوع</label>
-                <Dropdown v-model="form.type" :options="typeOptions" optionLabel="label" optionValue="value" class="w-full" />
-                <small v-if="form.errors.type" class="text-red-600">{{ form.errors.type }}</small>
+                <label class="mb-2 block font-medium">نوع وسیله</label>
+                <Dropdown v-model="form.vehicle_type_id" :options="vehicleTypeOptions" optionLabel="label" optionValue="value" class="w-full" />
+                <small v-if="form.errors.vehicle_type_id" class="text-red-600">{{ form.errors.vehicle_type_id }}</small>
             </div>
             <div>
                 <label class="mb-2 block font-medium">کشور</label>
@@ -110,4 +110,3 @@ const logoAlt = computed(() => logoPreview.value?.original_name || 'لوگو');
         <MediaBrowser v-model:visible="logoBrowserVisible" mode="single" @select="chooseLogo" />
     </form>
 </template>
-
