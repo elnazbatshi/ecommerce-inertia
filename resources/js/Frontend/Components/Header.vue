@@ -12,6 +12,7 @@ const page = usePage();
 const isLoading = ref(true);
 const isMobileOpen = ref(false);
 const isAuthModalOpen = ref(false);
+const isAccountMenuOpen = ref(false);
 const menu = ref({ location: 'header', items: [], popular_brands: [], popular_vehicles: [], quick_links: [] });
 const hoveredItem = ref(null);
 let menuController = null;
@@ -21,7 +22,29 @@ const activeMega = computed(() => hoveredItem.value && hoveredItem.value.childre
 const customer = computed(() => page.props.customer || null);
 
 const reloadAuth = () => {
+    isAuthModalOpen.value = false;
+    isAccountMenuOpen.value = false;
+
     router.reload({ only: ['customer'] });
+};
+
+const handleAccountClick = () => {
+    if (customer.value) {
+        isAccountMenuOpen.value = !isAccountMenuOpen.value;
+        return;
+    }
+
+    isAuthModalOpen.value = true;
+};
+
+const logoutCustomer = () => {
+    router.post('/customer/logout', {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            isAccountMenuOpen.value = false;
+            router.reload({ only: ['customer'] });
+        },
+    });
 };
 
 const loadMenu = async () => {
@@ -49,7 +72,9 @@ onBeforeUnmount(() => menuController?.abort());
 
         <div class="header-main">
             <div class="site-container grid items-center gap-4 py-5 lg:grid-cols-[260px_1fr_280px]">
-                <button class="site-icon-btn lg:hidden" type="button" @click="isMobileOpen = !isMobileOpen">☰</button>
+                <button class="site-icon-btn lg:hidden" type="button" @click="isMobileOpen = !isMobileOpen">
+                    <i class="pi pi-bars" aria-hidden="true"></i>
+                </button>
 
                 <Link href="/" class="order-2 block lg:order-1">
                     <h1 class="text-2xl font-black text-[var(--site-dark)]">MotoPart</h1>
@@ -61,9 +86,44 @@ onBeforeUnmount(() => menuController?.abort());
                 </div>
 
                 <div class="order-1 flex items-center justify-end gap-2 lg:order-3">
-                    <button type="button" class="site-icon-btn" @click="isAuthModalOpen = true">
-                        {{ customer ? (customer.name || customer.phone) : 'ورود / ثبت نام' }}
-                    </button>
+                    <div class="relative">
+                        <button type="button" class="site-icon-btn" @click="handleAccountClick">
+                            {{ customer ? (customer.name || customer.phone) : 'ورود / ثبت نام' }}
+                        </button>
+
+                        <div
+                            v-if="customer && isAccountMenuOpen"
+                            class="absolute left-0 top-full z-[100] mt-3 w-56 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl"
+                        >
+                            <Link
+                                href="/profile/orders"
+                                class="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                                @click="isAccountMenuOpen = false"
+                            >
+                                <span>سفارش‌های من</span>
+                                <i class="pi pi-shopping-bag"></i>
+                            </Link>
+
+                            <Link
+                                href="/profile/addresses"
+                                class="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                                @click="isAccountMenuOpen = false"
+                            >
+                                <span>آدرس‌های من</span>
+                                <i class="pi pi-map-marker"></i>
+                            </Link>
+
+                            <button
+                                type="button"
+                                class="flex w-full items-center justify-between px-4 py-3 text-sm text-red-600 hover:bg-red-50"
+                                @click="logoutCustomer"
+                            >
+                                <span>خروج</span>
+                                <i class="pi pi-sign-out"></i>
+                            </button>
+                        </div>
+                    </div>
+
                     <MiniCart />
                 </div>
             </div>
@@ -90,6 +150,6 @@ onBeforeUnmount(() => menuController?.abort());
             />
         </div>
 
-        <CustomerAuthModal v-model:visible="isAuthModalOpen" @authenticated="reloadAuth" />
+        <CustomerAuthModal v-if="!customer" v-model:visible="isAuthModalOpen" @authenticated="reloadAuth" />
     </header>
 </template>

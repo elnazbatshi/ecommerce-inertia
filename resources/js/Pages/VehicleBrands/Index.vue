@@ -8,12 +8,12 @@ import { ref, watch } from 'vue';
 const props = defineProps({
     brands: { type: Object, required: true },
     filters: { type: Object, default: () => ({}) },
-    typeOptions: { type: Array, default: () => [] }
+    vehicleTypeOptions: { type: Array, default: () => [] }
 });
 
 const confirm = useConfirm();
 const search = ref(props.filters.search ?? '');
-const type = ref(props.filters.type ?? null);
+const vehicleTypeId = ref(props.filters.vehicle_type_id ? Number(props.filters.vehicle_type_id) : null);
 const isActive = ref(props.filters.is_active === '' ? '' : (props.filters.is_active ?? ''));
 const rows = ref(Number(props.filters.rows ?? props.brands.per_page ?? 15));
 const timeout = ref();
@@ -21,14 +21,14 @@ const timeout = ref();
 const load = (extra = {}) => {
     router.get('/admin/vehicle-brands', {
         search: search.value || undefined,
-        type: type.value || undefined,
+        vehicle_type_id: vehicleTypeId.value || undefined,
         is_active: isActive.value === '' ? undefined : isActive.value,
         rows: rows.value,
         ...extra
     }, { preserveState: true, replace: true });
 };
 
-watch(type, () => load({ page: 1 }));
+watch(vehicleTypeId, () => load({ page: 1 }));
 watch(isActive, () => load({ page: 1 }));
 watch(search, () => {
     clearTimeout(timeout.value);
@@ -94,7 +94,7 @@ const statusOptions = [
                             <InputIcon><i class="pi pi-search" /></InputIcon>
                             <InputText v-model="search" class="w-full" placeholder="جستجو نام، نامک، کشور" />
                         </IconField>
-                        <Dropdown v-model="type" :options="typeOptions" optionLabel="label" optionValue="value" class="w-full" placeholder="نوع برند" showClear />
+                        <Dropdown v-model="vehicleTypeId" :options="vehicleTypeOptions" optionLabel="label" optionValue="value" class="w-full" placeholder="نوع وسیله" showClear />
                         <Dropdown v-model="isActive" :options="statusOptions" optionLabel="label" optionValue="value" class="w-full" />
                     </div>
                 </template>
@@ -108,7 +108,9 @@ const statusOptions = [
                     </template>
                 </Column>
                 <Column field="name" header="نام" sortable />
-                <Column field="type" header="نوع" sortable />
+                <Column header="نوع وسیله" sortable>
+                    <template #body="{ data }">{{ data.vehicle_type?.name || '-' }}</template>
+                </Column>
                 <Column field="country" header="کشور" sortable />
                 <Column field="vehicles_count" header="تعداد خودرو" sortable style="width: 8rem" />
                 <Column header="وضعیت" style="width: 7rem">
@@ -129,4 +131,3 @@ const statusOptions = [
         </div>
     </AppLayout>
 </template>
-

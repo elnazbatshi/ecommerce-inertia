@@ -4,22 +4,21 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import Form from '@/Pages/VehicleBrands/Form.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 
+defineProps({
+    vehicleTypeOptions: { type: Array, default: () => [] },
+});
+
 const form = useForm({
     name: '',
     slug: '',
-    type: 'car',
+    vehicle_type_id: null,
+    type: null,
     logo_media_id: null,
     country: '',
     description: '',
     sort_order: 0,
     is_active: true
 });
-
-const typeOptions = [
-    { label: 'خودرو', value: 'car' },
-    { label: 'موتور سیکلت', value: 'motorcycle' },
-    { label: 'عمومی', value: 'universal' }
-];
 
 const save = () => {
     form.post('/admin/vehicle-brands', { preserveScroll: true });
@@ -31,8 +30,7 @@ const save = () => {
     <AppLayout>
         <TopNavTitle title="ایجاد برند خودرو" :breadcrumb="[{ label: 'برند خودرو', to: '/admin/vehicle-brands' }, { label: 'ایجاد' }]" />
         <div class="card">
-            <Form :form="form" :typeOptions="typeOptions" submitLabel="ایجاد برند" :processing="form.processing" @submit="save" />
+            <Form :form="form" :vehicleTypeOptions="vehicleTypeOptions" submitLabel="ایجاد برند" :processing="form.processing" @submit="save" />
         </div>
     </AppLayout>
 </template>
-

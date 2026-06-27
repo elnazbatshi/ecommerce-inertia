@@ -19,6 +19,7 @@ class ProductArchiveService
             'category' => $request->query('category'),
             'in_stock' => $request->boolean('in_stock', false),
             'discounted' => $request->boolean('discounted', false),
+            'vehicle' => $request->query('vehicle'),
             'sort' => (string) $request->query('sort', 'newest'),
             'mode' => (string) $request->query('mode', 'grid'),
             'rows' => (int) $request->query('rows', 12),
@@ -39,6 +40,7 @@ class ProductArchiveService
             })
             ->when($filters['brand'], fn (Builder $builder, $brandSlug) => $builder->whereHas('brand', fn (Builder $b) => $b->where('slug', $brandSlug)))
             ->when($filters['category'], fn (Builder $builder, $categorySlug) => $builder->whereHas('category', fn (Builder $c) => $c->where('slug', $categorySlug)))
+            ->when($filters['vehicle'], fn (Builder $builder, $vehicleId) => $builder->whereHas('vehicles', fn (Builder $v) => $v->where('vehicles.id', $vehicleId)->orWhere('vehicles.slug', $vehicleId)))
             ->when($filters['in_stock'], fn (Builder $builder) => $builder->where('stock', '>', 0))
             ->when($filters['discounted'], fn (Builder $builder) => $builder->whereNotNull('discount_price'));
 

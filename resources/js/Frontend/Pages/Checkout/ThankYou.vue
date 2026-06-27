@@ -25,7 +25,7 @@ onMounted(() => clearCart());
                 <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#D4A017]/15 text-3xl text-[#D4A017]">
                     <i class="pi pi-check" />
                 </div>
-                <h1 class="text-2xl font-black text-surface-950">سفارش شما ثبت شد</h1>
+                <h2 class="text-2xl font-black text-surface-950">سفارش شما ثبت شد</h2>
                 <p class="mt-2 text-sm text-surface-500">سفارش با وضعیت pending ساخته شد و منتظر ادامه فرایند پرداخت/پردازش است.</p>
 
                 <div class="mt-6 rounded-lg bg-surface-50 p-4 text-right">

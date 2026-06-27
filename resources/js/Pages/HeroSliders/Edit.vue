@@ -6,7 +6,8 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 
 const props = defineProps({
     slider: { type: Object, required: true },
-    layouts: { type: Array, default: () => [] }
+    layouts: { type: Array, default: () => [] },
+    placements: { type: Array, default: () => [] }
 });
 
 const form = useForm({
@@ -35,6 +36,7 @@ const form = useForm({
     accent_color: props.slider.accent_color ?? '#D4A017',
     button_color: props.slider.button_color ?? '#D4A017',
     layout: props.slider.layout ?? 'image_left_content_right',
+    placement: props.slider.placement ?? 'hero',
     sort_order: Number(props.slider.sort_order ?? 0),
     is_active: Boolean(props.slider.is_active),
     starts_at: props.slider.starts_at ?? '',
@@ -58,6 +60,6 @@ const submit = () => {
             </template>
         </TopNavTitle>
 
-        <HeroSliderForm :form="form" :layouts="layouts" submitLabel="ذخیره تغییرات" :processing="form.processing" @submit="submit" />
+        <HeroSliderForm :form="form" :layouts="layouts" :placements="placements" submitLabel="ذخیره تغییرات" :processing="form.processing" @submit="submit" />
     </AppLayout>
 </template>

@@ -5,6 +5,8 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\BannerController;
+use App\Http\Controllers\BannerSectionController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\Frontend\CartController as FrontendCartController;
@@ -13,6 +15,9 @@ use App\Http\Controllers\Frontend\OrderConfirmationController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\CustomerAuthController;
 use App\Http\Controllers\Frontend\PaymentController as FrontendPaymentController;
+use App\Http\Controllers\Frontend\Profile\AddressController as FrontendProfileAddressController;
+use App\Http\Controllers\Frontend\Profile\OrderController as FrontendProfileOrderController;
+use App\Http\Controllers\Frontend\ProductReviewController as FrontendProductReviewController;
 use App\Http\Controllers\HeroSliderController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\MenuController;
@@ -24,11 +29,13 @@ use App\Http\Controllers\PostCategoryController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostTagController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductReviewController;
 use App\Http\Controllers\PublicContentController;
 use App\Http\Controllers\SearchLogController;
 use App\Http\Controllers\SearchSuggestionController;
 use App\Http\Controllers\Admin\VehicleBrandController as AdminVehicleBrandController;
 use App\Http\Controllers\Admin\VehicleController as AdminVehicleController;
+use App\Http\Controllers\Admin\VehicleTypeController as AdminVehicleTypeController;
 use App\Http\Controllers\Admin\ShippingMethodController as AdminShippingMethodController;
 use App\Http\Controllers\Admin\PaymentMethodController as AdminPaymentMethodController;
 use App\Http\Controllers\Admin\ProvinceController as AdminProvinceController;
@@ -40,6 +47,7 @@ Route::get('/', [HomeController::class, 'index'])->name('site.home');
 Route::get('/cart', fn () => Inertia::render('Frontend/Cart/Index'))->name('site.cart');
 Route::post('/customer/auth/otp', [CustomerAuthController::class, 'requestOtp'])->name('site.customer-auth.otp');
 Route::post('/customer/auth/verify', [CustomerAuthController::class, 'verifyOtp'])->name('site.customer-auth.verify');
+Route::post('/customer/logout', [CustomerAuthController::class, 'logout'])->name('customer.logout');
 Route::post('/cart/sync', [FrontendCartController::class, 'sync'])->name('frontend.cart.sync');
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('frontend.checkout.index');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('frontend.checkout.store');
@@ -47,8 +55,16 @@ Route::get('/payments/{payment}/start', [FrontendPaymentController::class, 'star
 Route::get('/payments/{payment}/fake/success', [FrontendPaymentController::class, 'fakeSuccess'])->name('frontend.payments.fake.success');
 Route::get('/payments/{payment}/fake/fail', [FrontendPaymentController::class, 'fakeFail'])->name('frontend.payments.fake.fail');
 Route::get('/order/thank-you/{order}', [OrderConfirmationController::class, 'show'])->name('frontend.orders.thank-you');
+Route::get('/profile/orders', [FrontendProfileOrderController::class, 'index'])->name('frontend.profile.orders');
+Route::get('/profile/addresses', [FrontendProfileAddressController::class, 'index'])->name('frontend.profile.addresses');
+Route::post('/profile/addresses', [FrontendProfileAddressController::class, 'store'])->name('frontend.profile.addresses.store');
+Route::put('/profile/addresses/{address}', [FrontendProfileAddressController::class, 'update'])->name('frontend.profile.addresses.update');
+Route::delete('/profile/addresses/{address}', [FrontendProfileAddressController::class, 'destroy'])->name('frontend.profile.addresses.destroy');
+Route::patch('/profile/addresses/{address}/default', [FrontendProfileAddressController::class, 'setDefault'])->name('frontend.profile.addresses.default');
 Route::get('/products', [PublicContentController::class, 'products'])->name('site.products.index');
 Route::get('/products/{product:slug}', [PublicContentController::class, 'product'])->name('site.products.show');
+Route::post('/products/{product:slug}/reviews', [FrontendProductReviewController::class, 'store'])->name('site.products.reviews.store');
+Route::patch('/products/{product:slug}/reviews', [FrontendProductReviewController::class, 'update'])->name('site.products.reviews.update');
 Route::get('/category/{category:slug}', [PublicContentController::class, 'category'])->name('site.categories.show');
 Route::get('/brand/{brand:slug}', [PublicContentController::class, 'brand'])->name('site.brands.show');
 Route::get('/blog', [PublicContentController::class, 'blog'])->name('site.blog.index');
@@ -76,6 +92,10 @@ Route::middleware(['auth'])
         Route::post('/accesses', [AccessController::class, 'store'])->name('accesses.store');
         Route::put('/accesses/{role}', [AccessController::class, 'update'])->name('accesses.update');
 
+        Route::get('/product-reviews', [ProductReviewController::class, 'index'])->name('product-reviews.index');
+        Route::patch('/product-reviews/{productReview}/approve', [ProductReviewController::class, 'approve'])->name('product-reviews.approve');
+        Route::patch('/product-reviews/{productReview}/reject', [ProductReviewController::class, 'reject'])->name('product-reviews.reject');
+        Route::delete('/product-reviews/{productReview}', [ProductReviewController::class, 'destroy'])->name('product-reviews.destroy');
         Route::resource('products', ProductController::class);
         Route::resource('customers', CustomerController::class);
         Route::patch('/orders/{order}/status', [OrderController::class, 'changeStatus'])->name('orders.change-status');
@@ -93,6 +113,10 @@ Route::middleware(['auth'])
         Route::resource('categories', CategoryController::class)->except(['create', 'show', 'edit']);
         Route::resource('brands', BrandController::class)->except(['create', 'show', 'edit']);
         Route::resource('attributes', AttributeController::class)->except(['create', 'show', 'edit']);
+        Route::patch('/vehicle-types/{vehicleType}/toggle-status', [AdminVehicleTypeController::class, 'toggleStatus'])->name('vehicle-types.toggle-status');
+        Route::resource('vehicle-types', AdminVehicleTypeController::class)
+            ->parameters(['vehicle-types' => 'vehicleType'])
+            ->except(['show']);
         Route::patch('/vehicle-brands/{vehicleBrand}/toggle-status', [AdminVehicleBrandController::class, 'toggleStatus'])->name('vehicle-brands.toggle-status');
         Route::resource('vehicle-brands', AdminVehicleBrandController::class)
             ->parameters(['vehicle-brands' => 'vehicleBrand'])
@@ -129,6 +153,16 @@ Route::middleware(['auth'])
         Route::resource('hero-sliders', HeroSliderController::class)
             ->parameters(['hero-sliders' => 'heroSlider'])
             ->except(['show']);
+        Route::resource('banner-sections', BannerSectionController::class)
+            ->parameters(['banner-sections' => 'bannerSection'])
+            ->except(['show']);
+        Route::get('/banner-sections/{bannerSection}/banners', [BannerController::class, 'index'])->name('banner-sections.banners.index');
+        Route::get('/banner-sections/{bannerSection}/banners/create', [BannerController::class, 'create'])->name('banner-sections.banners.create');
+        Route::post('/banner-sections/{bannerSection}/banners', [BannerController::class, 'store'])->name('banner-sections.banners.store');
+        Route::get('/banners/{banner}/edit', [BannerController::class, 'edit'])->name('banners.edit');
+        Route::put('/banners/{banner}', [BannerController::class, 'update'])->name('banners.update');
+        Route::patch('/banners/{banner}', [BannerController::class, 'update']);
+        Route::delete('/banners/{banner}', [BannerController::class, 'destroy'])->name('banners.destroy');
 
         Route::get('/search/suggestions', [SearchSuggestionController::class, 'index'])->name('search.suggestions.index');
         Route::post('/search/suggestions', [SearchSuggestionController::class, 'store'])->name('search.suggestions.store');

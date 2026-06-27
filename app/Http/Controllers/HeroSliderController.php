@@ -51,7 +51,7 @@ class HeroSliderController extends Controller
     {
         HeroSlider::query()->create($request->validated());
 
-        return redirect()->route('admin.hero-sliders.index')->with('success', 'اسلایدر صفحه اصلی ساخته شد.');
+        return redirect()->route('admin.hero-sliders.index')->with('success', 'اسلایدر ساخته شد.');
     }
 
     public function edit(HeroSlider $heroSlider): Response
@@ -68,14 +68,14 @@ class HeroSliderController extends Controller
     {
         $heroSlider->update($request->validated());
 
-        return redirect()->route('admin.hero-sliders.index')->with('success', 'اسلایدر صفحه اصلی به‌روزرسانی شد.');
+        return redirect()->route('admin.hero-sliders.index')->with('success', 'اسلایدر به‌روزرسانی شد.');
     }
 
     public function destroy(HeroSlider $heroSlider): RedirectResponse
     {
         $heroSlider->delete();
 
-        return back()->with('success', 'اسلایدر صفحه اصلی حذف شد.');
+        return back()->with('success', 'اسلایدر حذف شد.');
     }
 
     public function reorder(Request $request): JsonResponse
@@ -109,6 +109,11 @@ class HeroSliderController extends Controller
                 ['label' => 'تصویر چپ، محتوا راست', 'value' => 'image_left_content_right'],
                 ['label' => 'محتوا چپ، تصویر راست', 'value' => 'image_right_content_left'],
                 ['label' => 'محتوا وسط', 'value' => 'content_center'],
+            ],
+            'placements' => [
+                ['label' => 'اسلایدر اصلی صفحه اول', 'value' => 'hero'],
+                ['label' => 'بنر میانی صفحه اول', 'value' => 'middle_banner'],
+                ['label' => 'بنر پایین صفحه اول', 'value' => 'footer_banner'],
             ],
         ];
     }
@@ -150,6 +155,7 @@ class HeroSliderController extends Controller
             'accent_color' => $slider->accent_color,
             'button_color' => $slider->button_color,
             'layout' => $slider->layout,
+            'placement' => $slider->placement ?? 'hero',
             'sort_order' => $slider->sort_order,
             'is_active' => $slider->is_active,
             'starts_at' => optional($slider->starts_at)->format('Y-m-d H:i:s'),

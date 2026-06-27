@@ -8,13 +8,13 @@ import { ref, watch } from 'vue';
 const props = defineProps({
     vehicles: { type: Object, required: true },
     filters: { type: Object, default: () => ({}) },
-    typeOptions: { type: Array, default: () => [] },
+    vehicleTypeOptions: { type: Array, default: () => [] },
     brandOptions: { type: Array, default: () => [] }
 });
 
 const confirm = useConfirm();
 const search = ref(props.filters.search ?? '');
-const type = ref(props.filters.type ?? null);
+const vehicleTypeId = ref(props.filters.vehicle_type_id ? Number(props.filters.vehicle_type_id) : null);
 const vehicleBrandId = ref(props.filters.vehicle_brand_id ? Number(props.filters.vehicle_brand_id) : null);
 const isActive = ref(props.filters.is_active === '' ? '' : (props.filters.is_active ?? ''));
 const rows = ref(Number(props.filters.rows ?? props.vehicles.per_page ?? 15));
@@ -23,7 +23,7 @@ const timeout = ref();
 const load = (extra = {}) => {
     router.get('/admin/vehicles', {
         search: search.value || undefined,
-        type: type.value || undefined,
+        vehicle_type_id: vehicleTypeId.value || undefined,
         vehicle_brand_id: vehicleBrandId.value || undefined,
         is_active: isActive.value === '' ? undefined : isActive.value,
         rows: rows.value,
@@ -31,7 +31,7 @@ const load = (extra = {}) => {
     }, { preserveState: true, replace: true });
 };
 
-watch([type, vehicleBrandId, isActive], () => load({ page: 1 }));
+watch([vehicleTypeId, vehicleBrandId, isActive], () => load({ page: 1 }));
 watch(search, () => {
     clearTimeout(timeout.value);
     timeout.value = setTimeout(() => load({ page: 1 }), 400);
@@ -96,7 +96,7 @@ const statusOptions = [
                             <InputIcon><i class="pi pi-search" /></InputIcon>
                             <InputText v-model="search" class="w-full" placeholder="جستجو در نام، برند، نامک" />
                         </IconField>
-                        <Dropdown v-model="type" :options="typeOptions" optionLabel="label" optionValue="value" class="w-full" placeholder="نوع" showClear />
+                        <Dropdown v-model="vehicleTypeId" :options="vehicleTypeOptions" optionLabel="label" optionValue="value" class="w-full" placeholder="نوع وسیله" showClear />
                         <Dropdown
                             v-model="vehicleBrandId"
                             :options="brandOptions"
@@ -122,6 +122,9 @@ const statusOptions = [
                 <Column header="برند" sortable>
                     <template #body="{ data }">{{ data.brand?.name || '-' }}</template>
                 </Column>
+                <Column header="نوع وسیله" sortable>
+                    <template #body="{ data }">{{ data.brand?.vehicle_type?.name || '-' }}</template>
+                </Column>
                 <Column field="name" header="نام" sortable />
                 <Column field="engine" header="موتور" sortable />
                 <Column header="سال">
@@ -146,4 +149,3 @@ const statusOptions = [
         </div>
     </AppLayout>
 </template>
-

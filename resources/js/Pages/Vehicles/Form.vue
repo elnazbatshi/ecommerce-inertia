@@ -1,12 +1,12 @@
 <script setup>
 import MediaBrowser from '@/Components/Media/MediaBrowser.vue';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
     form: { type: Object, required: true },
     submitLabel: { type: String, default: 'ذخیره' },
     processing: { type: Boolean, default: false },
-    typeOptions: { type: Array, default: () => [] },
+    vehicleTypeOptions: { type: Array, default: () => [] },
     brandOptions: { type: Array, default: () => [] },
     initialImage: { type: Object, default: null }
 });
@@ -15,6 +15,11 @@ const emit = defineEmits(['submit']);
 const imageBrowserVisible = ref(false);
 const imagePreview = ref(props.initialImage);
 const autoSlug = ref(!props.form.slug);
+const filteredBrandOptions = computed(() => {
+    if (!props.form.vehicle_type_id) return props.brandOptions;
+
+    return props.brandOptions.filter((brand) => Number(brand.vehicle_type_id) === Number(props.form.vehicle_type_id));
+});
 
 const slugify = (value) =>
     String(value || '')
@@ -32,6 +37,15 @@ watch(
         props.form.slug = slugify([brand?.label, props.form.name].filter(Boolean).join(' '));
     },
     { deep: true }
+);
+
+watch(
+    () => props.form.vehicle_type_id,
+    () => {
+        if (!filteredBrandOptions.value.some((brand) => brand.value === props.form.vehicle_brand_id)) {
+            props.form.vehicle_brand_id = null;
+        }
+    }
 );
 
 const onSlugInput = (value) => {
@@ -56,10 +70,15 @@ const clearImage = () => {
     <form class="space-y-4" @submit.prevent="emit('submit')">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
+                <label class="mb-2 block font-medium">نوع وسیله</label>
+                <Dropdown v-model="form.vehicle_type_id" :options="vehicleTypeOptions" optionLabel="label" optionValue="value" class="w-full" />
+                <small v-if="form.errors.vehicle_type_id" class="text-red-600">{{ form.errors.vehicle_type_id }}</small>
+            </div>
+            <div>
                 <label class="mb-2 block font-medium">برند</label>
                 <Dropdown
                     v-model="form.vehicle_brand_id"
-                    :options="brandOptions"
+                    :options="filteredBrandOptions"
                     optionLabel="label"
                     optionValue="value"
                     filter
@@ -68,11 +87,6 @@ const clearImage = () => {
                     placeholder="انتخاب برند"
                 />
                 <small v-if="form.errors.vehicle_brand_id" class="text-red-600">{{ form.errors.vehicle_brand_id }}</small>
-            </div>
-            <div>
-                <label class="mb-2 block font-medium">نوع</label>
-                <Dropdown v-model="form.type" :options="typeOptions" optionLabel="label" optionValue="value" class="w-full" />
-                <small v-if="form.errors.type" class="text-red-600">{{ form.errors.type }}</small>
             </div>
             <div>
                 <label class="mb-2 block font-medium">نام</label>

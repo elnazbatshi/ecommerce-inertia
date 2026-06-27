@@ -69,12 +69,12 @@ const onMode = (value) => {
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-5 lg:grid-cols-[300px_1fr]">
-                <div class="lg:order-1">
+            <div class="grid grid-cols-1 gap-5 lg:h-[calc(100vh-13rem)] lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start lg:overflow-hidden">
+                <div class="lg:order-1 lg:h-full lg:overflow-y-auto lg:pl-1">
                     <ProductArchiveFilters :categories="categories" :brands="brands" />
                 </div>
 
-                <div class="space-y-4 lg:order-2">
+                <div class="min-w-0 space-y-4 lg:order-2 lg:h-full lg:overflow-y-auto lg:pr-1">
                     <div
                         v-if="items.length"
                         class="grid gap-4"

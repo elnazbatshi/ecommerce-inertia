@@ -8,6 +8,7 @@ use App\Models\Page;
 use App\Models\Post;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\ProductReview;
 use App\Models\ProductVariant;
 use App\Services\ProductArchiveService;
 use Illuminate\Http\Request;
@@ -26,7 +27,7 @@ class PublicContentController extends Controller
         ]);
     }
 
-    public function product(Product $product): Response
+    public function product(Product $product, Request $request): Response
     {
         abort_unless($product->status === 'active', 404);
 
@@ -35,7 +36,8 @@ class PublicContentController extends Controller
             'brand:id,name,slug',
             'images',
             'variants.attributeValues.attribute',
-            'vehicles.brand:id,name,slug,type',
+            'vehicles.brand.vehicleType:id,name,slug',
+            'reviews' => fn ($query) => $query->approved()->with('customer:id,name,phone')->latest(),
         ]);
 
         $relatedProducts = Product::query()
@@ -56,6 +58,9 @@ class PublicContentController extends Controller
         return Inertia::render('Frontend/Products/Show', [
             'product' => $this->productDetailPayload($product),
             'relatedProducts' => $relatedProducts,
+            'reviewSummary' => $this->reviewSummary($product),
+            'reviews' => $product->reviews->map(fn (ProductReview $review) => $this->reviewPayload($review))->values(),
+            'customerReview' => $this->customerReviewPayload($product, $request),
         ]);
     }
 
@@ -170,7 +175,8 @@ class PublicContentController extends Controller
             ])->values(),
             'vehicles' => $product->vehicles->map(fn ($vehicle) => [
                 'id' => $vehicle->id,
-                'type' => $vehicle->type,
+                'type' => $vehicle->brand?->vehicleType?->slug ?? $vehicle->type,
+                'type_name' => $vehicle->brand?->vehicleType?->name,
                 'name' => $vehicle->name,
                 'slug' => $vehicle->slug,
                 'brand' => $vehicle->brand?->name,
@@ -181,6 +187,70 @@ class PublicContentController extends Controller
             ])->values(),
             'specs' => $this->productSpecs($product),
         ];
+    }
+
+    private function reviewSummary(Product $product): array
+    {
+        $approved = $product->reviews;
+        $average = round((float) $approved->avg('rating'), 1);
+
+        return [
+            'average' => $average,
+            'count' => $approved->count(),
+            'stars' => collect(range(5, 1))->map(fn (int $star) => [
+                'star' => $star,
+                'count' => $approved->where('rating', $star)->count(),
+            ])->values(),
+        ];
+    }
+
+    private function reviewPayload(ProductReview $review): array
+    {
+        return [
+            'id' => $review->id,
+            'rating' => $review->rating,
+            'title' => $review->title,
+            'comment' => $review->comment,
+            'is_buyer' => $review->is_buyer,
+            'created_at' => $review->created_at?->toDateTimeString(),
+            'customer_name' => $review->customer?->name ?: $this->maskedPhone($review->customer?->phone),
+        ];
+    }
+
+    private function customerReviewPayload(Product $product, Request $request): ?array
+    {
+        $customerId = $request->session()->get('customer_id');
+
+        if (! $customerId) {
+            return null;
+        }
+
+        $review = ProductReview::query()
+            ->where('product_id', $product->id)
+            ->where('customer_id', $customerId)
+            ->first();
+
+        if (! $review) {
+            return null;
+        }
+
+        return [
+            'id' => $review->id,
+            'rating' => $review->rating,
+            'title' => $review->title,
+            'comment' => $review->comment,
+            'status' => $review->status,
+            'is_buyer' => $review->is_buyer,
+        ];
+    }
+
+    private function maskedPhone(?string $phone): string
+    {
+        if (! $phone || strlen($phone) < 7) {
+            return 'مشتری MotoPart';
+        }
+
+        return substr($phone, 0, 4) . '***' . substr($phone, -4);
     }
 
     private function productGallery(Product $product): array

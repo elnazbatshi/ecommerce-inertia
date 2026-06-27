@@ -182,6 +182,14 @@ const destroyProduct = (product) => {
                         <Tag :value="labels[data.type]?.value" :severity="labels[data.type]?.severity" />
                     </template>
                 </Column>
+                <Column field="stock" header="موجودی" sortable style="width: 8rem">
+                    <template #body="{ data }">
+                        <span v-if="data.type === 'simple'" class="font-bold">
+                            {{ Number(data.stock ?? 0).toLocaleString('fa-IR') }}
+                        </span>
+                        <Tag v-else value="تنوع‌ها" severity="secondary" />
+                    </template>
+                </Column>
                 <Column header="عملیات" style="width: 9rem">
                     <template #body="{ data }">
                         <div class="flex justify-center gap-1">

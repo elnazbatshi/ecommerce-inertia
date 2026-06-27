@@ -47,4 +47,9 @@ class Customer extends Model
     {
         return $this->hasMany(Payment::class);
     }
+
+    public function productReviews(): HasMany
+    {
+        return $this->hasMany(ProductReview::class);
+    }
 }

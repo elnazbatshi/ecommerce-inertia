@@ -12,6 +12,7 @@ class VehicleBrandResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'vehicle_type_id' => $this->vehicle_type_id,
             'name' => $this->name,
             'slug' => $this->slug,
             'type' => $this->type,
@@ -20,6 +21,11 @@ class VehicleBrandResource extends JsonResource
             'sort_order' => $this->sort_order,
             'is_active' => $this->is_active,
             'vehicles_count' => $this->whenCounted('vehicles'),
+            'vehicle_type' => $this->whenLoaded('vehicleType', fn () => [
+                'id' => $this->vehicleType?->id,
+                'name' => $this->vehicleType?->name,
+                'slug' => $this->vehicleType?->slug,
+            ]),
             'logo_media_id' => $this->logo_media_id,
             'logo_media' => $this->whenLoaded('logoMedia', fn () => [
                 'id' => $this->logoMedia?->id,
@@ -29,4 +35,3 @@ class VehicleBrandResource extends JsonResource
         ];
     }
 }
-

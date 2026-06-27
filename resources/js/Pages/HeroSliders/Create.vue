@@ -5,7 +5,8 @@ import HeroSliderForm from './Partials/HeroSliderForm.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
 defineProps({
-    layouts: { type: Array, default: () => [] }
+    layouts: { type: Array, default: () => [] },
+    placements: { type: Array, default: () => [] }
 });
 
 const form = useForm({
@@ -34,6 +35,7 @@ const form = useForm({
     accent_color: '#D4A017',
     button_color: '#D4A017',
     layout: 'image_left_content_right',
+    placement: 'hero',
     sort_order: 0,
     is_active: true,
     starts_at: '',
@@ -57,6 +59,6 @@ const submit = () => {
             </template>
         </TopNavTitle>
 
-        <HeroSliderForm :form="form" :layouts="layouts" submitLabel="ذخیره اسلایدر" :processing="form.processing" @submit="submit" />
+        <HeroSliderForm :form="form" :layouts="layouts" :placements="placements" submitLabel="ذخیره اسلایدر" :processing="form.processing" @submit="submit" />
     </AppLayout>
 </template>

@@ -38,6 +38,7 @@ const form = useForm({
     main_image: null,
     gallery_images: [],
     status: 'draft',
+    is_featured: false,
     type: 'simple',
     stock: 0,
     related_post_ids: [],
@@ -54,9 +55,11 @@ const attributeValueOptions = computed(() => props.attributes.flatMap((attribute
 const vehicleGroups = computed(() => {
     const map = new Map();
     props.vehicles.forEach((vehicle) => {
-        const brand = vehicle.brand?.name ?? 'سایر';
-        if (!map.has(brand)) map.set(brand, []);
-        map.get(brand).push({ label: vehicle.name, value: vehicle.id });
+        const typeName = vehicle.brand?.vehicle_type?.name ?? vehicle.vehicle_type ?? 'سایر';
+        const brand = vehicle.brand?.name ?? vehicle.brand ?? 'سایر';
+        const group = `${typeName} / ${brand}`;
+        if (!map.has(group)) map.set(group, []);
+        map.get(group).push({ label: vehicle.name, value: vehicle.id });
     });
     return Array.from(map.entries()).map(([label, items]) => ({ label, items }));
 });
@@ -72,9 +75,9 @@ const loadVehicleOptions = async (query = '') => {
         });
         const map = new Map();
         (Array.isArray(data) ? data : []).forEach((vehicle) => {
-            const brandName = vehicle.brand ?? 'سایر';
-            if (!map.has(brandName)) map.set(brandName, []);
-            map.get(brandName).push({ label: vehicle.label ?? '', value: vehicle.id });
+            const group = `${vehicle.vehicle_type ?? 'سایر'} / ${vehicle.brand ?? 'سایر'}`;
+            if (!map.has(group)) map.set(group, []);
+            map.get(group).push({ label: vehicle.label ?? '', value: vehicle.id });
         });
         remoteVehicleGroups.value = Array.from(map.entries()).map(([label, items]) => ({ label, items }));
     } finally {
@@ -141,7 +144,7 @@ const errorFor = (field) => form.errors[field];
                         <label class="mb-2 block font-medium">وضعیت</label>
                         <Select v-model="form.status" :options="statusOptions" optionLabel="label" optionValue="value" class="w-full" />
                         <small v-if="errorFor('status')" class="text-red-600">{{ errorFor('status') }}</small>
-                    </div>
+                    </div>n
                     <div>
                         <label class="mb-2 block font-medium">برند</label>
                         <Select v-model="form.brand_id" :options="brands" optionLabel="name" optionValue="id" showClear class="w-full" />
@@ -224,6 +227,14 @@ const errorFor = (field) => form.errors[field];
                         <label class="mb-2 block font-medium">موجودی</label>
                         <InputNumber v-model="form.stock" class="w-full" inputClass="w-full" :min="0" />
                         <small v-if="errorFor('stock')" class="text-red-600">{{ errorFor('stock') }}</small>
+                    </div>
+                    <div class="flex items-center gap-3 rounded-xl border border-surface-200 p-3 md:col-span-2">
+                        <ToggleSwitch v-model="form.is_featured" />
+                        <div>
+                            <label class="block font-medium">نمایش در محصولات منتخب MotoPart</label>
+                            <small class="text-surface-500">در صفحه اصلی سایت، بخش محصولات منتخب نمایش داده می‌شود.</small>
+                            <small v-if="form.errors.is_featured" class="block text-red-600">{{ form.errors.is_featured }}</small>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\CustomerOtp;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -23,9 +24,7 @@ class CustomerAuthController extends Controller
         $customerExists = Customer::where('phone', $phone)->exists();
         $code = (string) random_int(100000, 999999);
 
-        CustomerOtp::where('phone', $phone)
-            ->whereNull('verified_at')
-            ->delete();
+        CustomerOtp::where('phone', $phone)->delete();
 
         CustomerOtp::create([
             'phone' => $phone,
@@ -76,23 +75,25 @@ class CustomerAuthController extends Controller
             ]);
         }
 
+        $name = $data['name'] ?? null;
+
         $customer = Customer::firstOrCreate(
             ['phone' => $phone],
             [
-                'name' => $data['name'] ?: "مشتری {$phone}",
+                'name' => $name ?: "مشتری {$phone}",
                 'email' => "{$phone}@customers.motopart.local",
                 'status' => 'active',
             ],
         );
 
-        if ((! $customer->name || str_starts_with($customer->name, 'مشتری ')) && ! empty($data['name'])) {
-            $customer->forceFill(['name' => $data['name']])->save();
+        if ((! $customer->name || str_starts_with($customer->name, 'مشتری ')) && $name) {
+            $customer->forceFill(['name' => $name])->save();
         }
-
-        $otp->forceFill(['verified_at' => now()])->save();
 
         $customer->forceFill(['last_login_at' => now()])->save();
         $request->session()->put('customer_id', $customer->id);
+
+        CustomerOtp::where('phone', $phone)->delete();
 
         return response()->json([
             'message' => 'ورود با موفقیت انجام شد.',
@@ -102,6 +103,13 @@ class CustomerAuthController extends Controller
                 'phone' => $customer->phone,
             ],
         ]);
+    }
+
+    public function logout(Request $request): RedirectResponse
+    {
+        $request->session()->forget('customer_id');
+
+        return back();
     }
 
     private function normalizePhone(string $phone): string

@@ -13,6 +13,7 @@ class VehicleResource extends JsonResource
         return [
             'id' => $this->id,
             'vehicle_brand_id' => $this->vehicle_brand_id,
+            'vehicle_type_id' => $this->brand?->vehicle_type_id,
             'type' => $this->type,
             'name' => $this->name,
             'slug' => $this->slug,
@@ -30,6 +31,11 @@ class VehicleResource extends JsonResource
                 'name' => $this->brand?->name,
                 'slug' => $this->brand?->slug,
                 'type' => $this->brand?->type,
+                'vehicle_type' => $this->brand?->relationLoaded('vehicleType') ? [
+                    'id' => $this->brand?->vehicleType?->id,
+                    'name' => $this->brand?->vehicleType?->name,
+                    'slug' => $this->brand?->vehicleType?->slug,
+                ] : null,
             ]),
             'image_media' => $this->whenLoaded('imageMedia', fn () => [
                 'id' => $this->imageMedia?->id,
@@ -39,4 +45,3 @@ class VehicleResource extends JsonResource
         ];
     }
 }
-

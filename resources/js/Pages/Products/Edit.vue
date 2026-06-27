@@ -41,6 +41,7 @@ const form = useForm({
     remove_main_image: false,
     gallery_images: [],
     status: props.product.status,
+    is_featured: Boolean(props.product.is_featured),
     type: props.product.type,
     stock: props.product.stock ?? 0,
     related_post_ids: props.product.related_post_ids ?? [],
@@ -84,9 +85,11 @@ const attributeValueOptions = computed(() => props.attributes.flatMap((attribute
 const vehicleGroups = computed(() => {
     const map = new Map();
     props.vehicles.forEach((vehicle) => {
-        const brand = vehicle.brand?.name ?? 'سایر';
-        if (!map.has(brand)) map.set(brand, []);
-        map.get(brand).push({ label: vehicle.name, value: vehicle.id });
+        const typeName = vehicle.brand?.vehicle_type?.name ?? vehicle.vehicle_type ?? 'سایر';
+        const brand = vehicle.brand?.name ?? vehicle.brand ?? 'سایر';
+        const group = `${typeName} / ${brand}`;
+        if (!map.has(group)) map.set(group, []);
+        map.get(group).push({ label: vehicle.name, value: vehicle.id });
     });
     return Array.from(map.entries()).map(([label, items]) => ({ label, items }));
 });
@@ -102,9 +105,9 @@ const loadVehicleOptions = async (query = '') => {
         });
         const map = new Map();
         (Array.isArray(data) ? data : []).forEach((vehicle) => {
-            const brandName = vehicle.brand ?? 'سایر';
-            if (!map.has(brandName)) map.set(brandName, []);
-            map.get(brandName).push({ label: vehicle.label ?? '', value: vehicle.id });
+            const group = `${vehicle.vehicle_type ?? 'سایر'} / ${vehicle.brand ?? 'سایر'}`;
+            if (!map.has(group)) map.set(group, []);
+            map.get(group).push({ label: vehicle.label ?? '', value: vehicle.id });
         });
         remoteVehicleGroups.value = Array.from(map.entries()).map(([label, items]) => ({ label, items }));
     } finally {
@@ -252,6 +255,16 @@ const errorFor = (field) => form.errors[field];
             <div class="card">
                 <h2 class="mb-4 text-lg font-semibold">تصاویر</h2>
                 <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                    <div class="card xl:col-span-2">
+                        <div class="flex items-center gap-3">
+                            <ToggleSwitch v-model="form.is_featured" />
+                            <div>
+                                <label class="block font-medium">نمایش در محصولات منتخب MotoPart</label>
+                                <small class="text-surface-500">در صفحه اصلی سایت، بخش محصولات منتخب نمایش داده می‌شود.</small>
+                                <small v-if="form.errors.is_featured" class="block text-red-600">{{ form.errors.is_featured }}</small>
+                            </div>
+                        </div>
+                    </div>
                     <ImageUploader
                         :modelValue="form.main_image"
                         title="تصویر اصلی"
