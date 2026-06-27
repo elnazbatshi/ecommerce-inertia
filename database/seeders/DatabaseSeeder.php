@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             PaymentMethodSeeder::class,
             ProvinceSeeder::class,
             CitySeeder::class,
+            HeroSliderSeeder::class,
             HomeBannerSeeder::class,
             HomeBannerSectionSeeder::class,
         ]);
