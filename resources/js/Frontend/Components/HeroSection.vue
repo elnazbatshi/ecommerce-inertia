@@ -2,62 +2,48 @@
 import axios from 'axios';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 
-const fallbackSlide = {
-    id: 'fallback',
-    eyebrow_text: 'MotoPart',
-    title: 'قطعات اصلی برای موتورهای حرفه‌ای',
-    subtitle: 'فروشگاه تخصصی قطعات موتورسیکلت',
-    description: 'فروشگاه تخصصی روغن موتور و قطعات پریمیوم موتورسیکلت با تضمین اصالت، سازگاری دقیق و تحویل سریع.',
-    background_image: null,
-    foreground_image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1200&q=80',
-    foreground_alt: 'Motorcycle premium parts',
-    overlay_opacity: 0.55,
-    badge: { text: 'Industrial Selection', url: null },
-    buttons: {
-        primary: { text: 'مشاهده محصولات ویژه', url: '#products' },
-        secondary: { text: 'جستجوی قطعه سازگار', url: '#finder' }
-    },
-    stats: [
-        { value: '+1200', label: 'قطعه موجود' },
-        { value: '98%', label: 'رضایت مشتریان' },
-        { value: '24h', label: 'ارسال سریع' }
-    ],
-    colors: {
-        text: '#ffffff',
-        accent: '#D4A017',
-        button: '#D4A017'
-    },
-    layout: 'image_left_content_right'
-};
-
-const slides = ref([fallbackSlide]);
+const slides = ref([]);
 const activeIndex = ref(0);
 const timer = ref(null);
 const loading = ref(true);
 
-const activeSlide = computed(() => slides.value[activeIndex.value] ?? fallbackSlide);
+const activeSlide = computed(() => slides.value[activeIndex.value] ?? null);
 const hasMultiple = computed(() => slides.value.length > 1);
+
 const normalizeColor = (value, fallback) => {
-    if (!value) return fallback;
+    if (!value) {
+        return fallback;
+    }
+
     return String(value).startsWith('#') ? value : `#${value}`;
 };
-const textColor = computed(() => normalizeColor(activeSlide.value.colors?.text, '#ffffff'));
-const accentColor = computed(() => normalizeColor(activeSlide.value.colors?.accent, '#D4A017'));
-const buttonColor = computed(() => normalizeColor(activeSlide.value.colors?.button, '#D4A017'));
-const isCentered = computed(() => activeSlide.value.layout === 'content_center');
-const contentFirst = computed(() => activeSlide.value.layout === 'image_right_content_left');
+
+const textColor = computed(() => normalizeColor(activeSlide.value?.colors?.text, '#ffffff'));
+const accentColor = computed(() => normalizeColor(activeSlide.value?.colors?.accent, '#D4A017'));
+const buttonColor = computed(() => normalizeColor(activeSlide.value?.colors?.button, '#D4A017'));
+const isCentered = computed(() => activeSlide.value?.layout === 'content_center');
+const contentFirst = computed(() => activeSlide.value?.layout === 'image_right_content_left');
 
 const loadSlides = async () => {
     try {
-        const { data } = await axios.get('/api/hero-sliders');
-        slides.value = data.data?.length ? data.data : [fallbackSlide];
+        const { data } = await axios.get('/api/frontend/hero-sliders', {
+            params: { placement: 'hero' },
+        });
+
+        slides.value = Array.isArray(data.data) ? data.data : [];
         activeIndex.value = 0;
+    } catch {
+        slides.value = [];
     } finally {
         loading.value = false;
     }
 };
 
 const goTo = (index) => {
+    if (!slides.value.length) {
+        return;
+    }
+
     activeIndex.value = (index + slides.value.length) % slides.value.length;
 };
 
@@ -67,7 +53,9 @@ const previous = () => goTo(activeIndex.value - 1);
 const startAutoplay = () => {
     stopAutoplay();
     timer.value = window.setInterval(() => {
-        if (hasMultiple.value) next();
+        if (hasMultiple.value) {
+            next();
+        }
     }, 6500);
 };
 
@@ -87,7 +75,12 @@ onBeforeUnmount(stopAutoplay);
 </script>
 
 <template>
-    <section class="hero-cinematic relative overflow-hidden border-b border-[#2A2A2A]" @mouseenter="stopAutoplay" @mouseleave="startAutoplay">
+    <section
+        v-if="activeSlide"
+        class="hero-cinematic relative overflow-hidden border-b border-[#2A2A2A]"
+        @mouseenter="stopAutoplay"
+        @mouseleave="startAutoplay"
+    >
         <Transition name="hero-fade" mode="out-in">
             <div :key="activeSlide.id" class="relative">
                 <img
@@ -104,7 +97,7 @@ onBeforeUnmount(stopAutoplay);
 
                 <div
                     class="relative mx-auto grid min-h-[680px] max-w-7xl items-center gap-10 px-6 py-20"
-                    :class="isCentered ? 'lg:grid-cols-1 text-center' : 'lg:grid-cols-[1fr_1fr]'"
+                    :class="isCentered ? 'text-center lg:grid-cols-1' : 'lg:grid-cols-[1fr_1fr]'"
                     :style="{ color: textColor }"
                 >
                     <div :class="[{ 'lg:order-1': contentFirst, 'lg:order-2': !contentFirst && !isCentered }, isCentered ? 'mx-auto max-w-3xl' : '']">
@@ -116,12 +109,16 @@ onBeforeUnmount(stopAutoplay);
                         >
                             {{ activeSlide.badge.text }}
                         </a>
-                        <p v-if="activeSlide.eyebrow_text" class="site-gold-kicker" :style="{ color: accentColor }">{{ activeSlide.eyebrow_text }}</p>
+                        <p v-if="activeSlide.eyebrow_text" class="site-gold-kicker" :style="{ color: accentColor }">
+                            {{ activeSlide.eyebrow_text }}
+                        </p>
                         <h1 class="mt-5 max-w-3xl text-4xl font-black leading-tight md:text-7xl" :class="{ 'mx-auto': isCentered }">
                             {{ activeSlide.title }}
                         </h1>
-                        <p v-if="activeSlide.subtitle" class="mt-4 text-xl font-bold" :style="{ color: accentColor }">{{ activeSlide.subtitle }}</p>
-                        <p class="mt-6 max-w-2xl text-base leading-8 text-[#D6D6D6]" :class="{ 'mx-auto': isCentered }">
+                        <p v-if="activeSlide.subtitle" class="mt-4 text-xl font-bold" :style="{ color: accentColor }">
+                            {{ activeSlide.subtitle }}
+                        </p>
+                        <p v-if="activeSlide.description" class="mt-6 max-w-2xl text-base leading-8 text-[#D6D6D6]" :class="{ 'mx-auto': isCentered }">
                             {{ activeSlide.description }}
                         </p>
                         <div class="mt-8 flex flex-wrap gap-3" :class="{ 'justify-center': isCentered }">
