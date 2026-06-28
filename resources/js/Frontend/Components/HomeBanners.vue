@@ -40,9 +40,22 @@ const loadSections = async () => {
 
 const bannerImage = (banner) => banner.mobile_image || banner.image;
 
+const normalizeColor = (value, fallback) => {
+    if (!value) {
+        return fallback;
+    }
+
+    return String(value).startsWith('#') ? value : `#${value}`;
+};
+
 const bannerStyle = (banner) => ({
-    backgroundColor: banner.background_color || '#111111',
-    color: banner.text_color || '#ffffff',
+    backgroundColor: normalizeColor(banner.background_color, '#111111'),
+    color: normalizeColor(banner.text_color, '#ffffff'),
+});
+
+const bannerTextStyle = (banner, opacity = 1) => ({
+    color: normalizeColor(banner.text_color, '#ffffff'),
+    opacity,
 });
 
 const bannerClass = (layout, index) => {
@@ -92,13 +105,25 @@ onBeforeUnmount(() => {
                     <div class="absolute inset-0 bg-black/35"></div>
 
                     <div class="relative flex min-h-[180px] flex-col justify-end p-5 md:min-h-[220px] md:p-7">
-                        <p v-if="banner.subtitle" class="text-xs font-black uppercase tracking-[0.2em] text-[#D4A017]">
+                        <p
+                            v-if="banner.subtitle"
+                            class="text-xs font-black uppercase tracking-[0.2em]"
+                            :style="bannerTextStyle(banner, 0.82)"
+                        >
                             {{ banner.subtitle }}
                         </p>
-                        <h3 v-if="banner.title" class="mt-2 max-w-xl text-2xl font-black leading-tight">
+                        <h3
+                            v-if="banner.title"
+                            class="mt-2 max-w-xl text-2xl font-black leading-tight"
+                            :style="bannerTextStyle(banner)"
+                        >
                             {{ banner.title }}
                         </h3>
-                        <p v-if="banner.description" class="mt-2 max-w-xl text-sm leading-7 text-white/80">
+                        <p
+                            v-if="banner.description"
+                            class="mt-2 max-w-xl text-sm leading-7"
+                            :style="bannerTextStyle(banner, 0.82)"
+                        >
                             {{ banner.description }}
                         </p>
                         <span v-if="banner.button_text" class="mt-4 inline-flex w-fit rounded-lg bg-[#D4A017] px-4 py-2 text-sm font-black text-[#111]">
