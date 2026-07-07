@@ -126,6 +126,14 @@ const logoutCustomer = () => {
                             <i class="pi pi-map-marker text-surface-400"></i>
                         </Link>
 
+                        <Link
+                            href="/profile/wishlist"
+                            class="flex items-center justify-between border-t border-surface-100 px-4 py-4 text-sm font-bold text-surface-700 hover:bg-surface-50"
+                        >
+                            <span>علاقه‌مندی‌ها</span>
+                            <i class="pi pi-heart text-surface-400"></i>
+                        </Link>
+
                         <button
                             type="button"
                             class="flex w-full items-center justify-between border-t border-surface-100 px-4 py-4 text-sm font-bold text-red-600 hover:bg-red-50"

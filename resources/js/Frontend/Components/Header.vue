@@ -55,8 +55,21 @@ const loadMenu = async () => {
     isLoading.value = false;
 };
 
-onMounted(loadMenu);
-onBeforeUnmount(() => menuController?.abort());
+const openCustomerAuthModal = () => {
+    if (!customer.value) {
+        isAuthModalOpen.value = true;
+    }
+};
+
+onMounted(() => {
+    loadMenu();
+    window.addEventListener('motopart:open-customer-auth', openCustomerAuthModal);
+});
+
+onBeforeUnmount(() => {
+    menuController?.abort();
+    window.removeEventListener('motopart:open-customer-auth', openCustomerAuthModal);
+});
 </script>
 
 <template>
@@ -102,6 +115,15 @@ onBeforeUnmount(() => menuController?.abort());
                             >
                                 <span>سفارش‌های من</span>
                                 <i class="pi pi-shopping-bag"></i>
+                            </Link>
+
+                            <Link
+                                href="/profile/wishlist"
+                                class="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                                @click="isAccountMenuOpen = false"
+                            >
+                                <span>علاقه‌مندی‌ها</span>
+                                <i class="pi pi-heart"></i>
                             </Link>
 
                             <Link
