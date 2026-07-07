@@ -145,20 +145,6 @@ onBeforeUnmount(() => {
         </section>
 
         <HomeBanners placement="home_middle" />
-
-        <section class="mx-auto max-w-7xl px-6 py-16">
-            <div class="cta-power p-8 text-center md:p-12">
-                <p class="site-gold-kicker">ثبت تجربه نصب</p>
-                <h2 class="mt-3 text-3xl font-black text-white md:text-5xl">
-                    تجربه نصب قطعه را با رانندگان دیگر به اشتراک بگذارید
-                </h2>
-                <p class="mx-auto mt-3 max-w-2xl text-sm leading-7 text-[#D6D6D6]">
-                    بازخورد شما به انتخاب دقیق‌تر قطعات و کاهش خطای خرید در MotoPart کمک می‌کند.
-                </p>
-                <button class="site-btn-primary mt-7">ثبت تجربه نصب</button>
-            </div>
-        </section>
-
         <HomeBanners placement="home_bottom" />
         <BrandSlider />
     </FrontLayout>

@@ -10,11 +10,34 @@ const model = ref([
     {
         label: 'مدیریت فروشگاه',
         items: [
-            { label: 'محصولات', icon: 'pi pi-fw pi-box', to: '/admin/products' },
-            { label: 'دسته‌بندی‌ها', icon: 'pi pi-fw pi-sitemap', to: '/admin/categories' },
-            { label: 'برندها', icon: 'pi pi-fw pi-tags', to: '/admin/brands' },
-            { label: 'روش‌های ارسال', icon: 'pi pi-fw pi-send', to: '/admin/shipping-methods' },
-            { label: 'روش‌های پرداخت', icon: 'pi pi-fw pi-credit-card', to: '/admin/payment-methods' },
+            {
+                label: 'مدیریت کالاها',
+                icon: 'pi pi-fw pi-tags',
+                items: [
+                    { label: 'محصولات', icon: 'pi pi-fw pi-box', to: '/admin/products' },
+                    { label: 'دسته‌بندی‌ها', icon: 'pi pi-fw pi-sitemap', to: '/admin/categories' },
+                    { label: 'برندها', icon: 'pi pi-fw pi-tags', to: '/admin/brands' },
+                    { label: 'ویژگی‌ها', icon: 'pi pi-fw pi-sliders-h', to: '/admin/attributes' },
+                    { label: 'نظرات محصولات', icon: 'pi pi-fw pi-star', to: '/admin/product-reviews' },
+                ]
+            },
+            {
+                label: 'مدیریت سفارشات',
+                icon: 'pi pi-fw pi-shopping-bag',
+                items: [
+                    { label: 'سفارش‌ها', icon: 'pi pi-fw pi-shopping-cart', to: '/admin/orders' },
+                    { label: 'پرداخت‌ها', icon: 'pi pi-fw pi-wallet', to: '/admin/payments' },
+                ]
+            },
+            {
+                label: 'سیستم',
+                icon: 'pi pi-fw pi-cog',
+                items: [
+                    { label: 'روش‌های ارسال', icon: 'pi pi-fw pi-send', to: '/admin/shipping-methods' },
+                    { label: 'روش‌های پرداخت', icon: 'pi pi-fw pi-credit-card', to: '/admin/payment-methods' },
+                    { label: 'نقش‌ها و دسترسی‌ها', icon: 'pi pi-fw pi-lock', to: '/admin/accesses' },
+                ]
+            },
             {
                 label: 'مدیریت آدرس‌ها',
                 icon: 'pi pi-fw pi-map-marker',
@@ -32,11 +55,10 @@ const model = ref([
                     { label: 'خودروها', icon: 'pi pi-fw pi-car', to: '/admin/vehicles' }
                 ]
             },
-            { label: 'ویژگی‌ها', icon: 'pi pi-fw pi-sliders-h', to: '/admin/attributes' },
-            { label: 'نقش‌ها و دسترسی‌ها', icon: 'pi pi-fw pi-lock', to: '/admin/accesses' },
-            { label: 'سفارش‌ها', icon: 'pi pi-fw pi-shopping-cart', to: '/admin/orders' },
-            { label: 'پرداخت‌ها', icon: 'pi pi-fw pi-wallet', to: '/admin/payments' },
-            { label: 'نظرات محصولات', icon: 'pi pi-fw pi-star', to: '/admin/product-reviews' },
+
+
+
+
             { label: 'مشتریان', icon: 'pi pi-fw pi-users', to: '/admin/customers' }
         ]
     },
