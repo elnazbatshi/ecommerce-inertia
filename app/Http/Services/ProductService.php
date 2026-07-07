@@ -29,7 +29,7 @@ class ProductService
         return Product::query()
             ->with(['category:id,name', 'brand:id,name'])
             ->search($request->string('search')->toString())
-            ->filter($request->only(['category_id', 'brand_id', 'status', 'type']))
+            ->filter($request->only(['category_id', 'brand_id', 'status', 'type', 'is_featured']))
             ->orderBy($sortField, $sortDirection)
             ->paginate(Pagination::perPage($request))
             ->withQueryString()

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\ToggleProductFeaturedRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Http\Services\ProductService;
@@ -22,7 +23,7 @@ class ProductController extends Controller
     {
         return Inertia::render('Products/Index', [
             'products' => $this->products->paginated($request),
-            'filters' => $request->only(['search', 'category_id', 'brand_id', 'status', 'type', 'sortField', 'sortOrder', 'rows']),
+            'filters' => $request->only(['search', 'category_id', 'brand_id', 'status', 'type', 'is_featured', 'sortField', 'sortOrder', 'rows']),
             'categories' => $this->products->categoryOptions(),
             'brands' => $this->products->brandOptions(),
         ]);
@@ -61,6 +62,15 @@ class ProductController extends Controller
         $this->products->update($request, $product);
 
         return redirect()->route('admin.products.index')->with('success', 'محصول ویرایش شد.');
+    }
+
+    public function toggleFeatured(ToggleProductFeaturedRequest $request, Product $product): RedirectResponse
+    {
+        $product->update([
+            'is_featured' => $request->boolean('is_featured'),
+        ]);
+
+        return back();
     }
 
     public function destroy(Product $product): RedirectResponse

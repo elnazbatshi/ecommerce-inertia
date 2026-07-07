@@ -88,17 +88,25 @@ html[dir='rtl'] {
         }
     }
 
-    @media (max-width: 991px) {
+    @media (max-width: 1023px) {
         .layout-wrapper {
             .layout-main-container {
-                margin-right: 0;
-                padding-right: 2rem;
+                width: 100%;
+                margin-right: 0 !important;
+                margin-left: 0 !important;
+                padding-right: 1rem;
+                padding-left: 1rem;
             }
 
             .layout-sidebar {
+                position: fixed;
                 transform: translateX(100%);
                 right: 0;
                 left: auto;
+                top: 0;
+                z-index: 1101;
+                width: min(20rem, 86vw);
+                height: 100vh;
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
             }

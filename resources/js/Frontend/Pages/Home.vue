@@ -8,7 +8,7 @@ import SectionTitle from '../Components/SectionTitle.vue';
 import HeroSection from '../Components/HeroSection.vue';
 import VehicleFinder from '../Components/VehicleFinder.vue';
 import CategoryStrip from '../Components/CategoryStrip.vue';
-import ProductCard from '../Components/ProductCard.vue';
+import ProductCard from '@/Components/Site/ProductCard.vue';
 import HomeBanners from '../Components/HomeBanners.vue';
 import BrandSlider from '../Components/BrandSlider.vue';
 
@@ -95,7 +95,7 @@ onBeforeUnmount(() => {
                 subtitle="پیشنهاد ویژه کارشناسان ما برای بهترین عملکرد و دوام موتور"
             />
             <div
-                class="relative mt-8 rounded-3xl border border-gray-100 bg-white p-4 shadow-[0_18px_45px_rgba(17,17,17,0.08)] md:p-5"
+                class="relative mt-8"
                 dir="rtl"
                 @mouseenter="stopFeaturedProductsAutoplay"
                 @mouseleave="playFeaturedProductsAutoplay"
@@ -107,7 +107,7 @@ onBeforeUnmount(() => {
                             :key="product.id || product.name"
                             class="min-w-0 flex-[0_0_83.333%] pr-4 sm:flex-[0_0_40%] lg:flex-[0_0_25%] 2xl:flex-[0_0_20%]"
                         >
-                            <ProductCard :product="product" class="h-full" />
+                            <ProductCard :product="product" />
                         </div>
                     </div>
                 </div>

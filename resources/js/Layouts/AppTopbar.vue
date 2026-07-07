@@ -7,7 +7,7 @@
             <p class="dornika-logo">Dashboard</p>
         </Link>
 
-        <button class="p-link layout-topbar-menu-button layout-topbar-button" @click="onTopBarMenuButton()">
+        <button class="p-link layout-topbar-menu-button layout-topbar-button" @click.stop="onTopBarMenuButton()">
             <i class="pi pi-ellipsis-v"></i>
         </button>
 
@@ -36,11 +36,11 @@
 
 <script setup>
 import { Link, router, usePage } from '@inertiajs/vue3';
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import Popover from 'primevue/popover';
 import { useLayout } from '@/Layouts/composables/layout';
 
-const { toggleMenu: onMenuToggle } = useLayout();
+const { layoutState, toggleMenu: onMenuToggle } = useLayout();
 const page = usePage();
 
 const SelectActionSection = ref(Popover);
@@ -48,10 +48,12 @@ const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 
 const toggleSelectAction = (event) => {
+    topbarMenuActive.value = false;
     SelectActionSection.value?.toggle(event);
 };
 
 const logout = () => {
+    topbarMenuActive.value = false;
     router.post('/logout');
 };
 
@@ -66,6 +68,15 @@ onBeforeUnmount(() => {
 const onTopBarMenuButton = () => {
     topbarMenuActive.value = !topbarMenuActive.value;
 };
+
+watch(
+    () => layoutState.staticMenuMobileActive,
+    (active) => {
+        if (active) {
+            topbarMenuActive.value = false;
+        }
+    }
+);
 
 const topbarMenuClasses = computed(() => ({
     'layout-topbar-menu-mobile-active': topbarMenuActive.value

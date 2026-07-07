@@ -96,6 +96,7 @@ Route::middleware(['auth'])
         Route::patch('/product-reviews/{productReview}/approve', [ProductReviewController::class, 'approve'])->name('product-reviews.approve');
         Route::patch('/product-reviews/{productReview}/reject', [ProductReviewController::class, 'reject'])->name('product-reviews.reject');
         Route::delete('/product-reviews/{productReview}', [ProductReviewController::class, 'destroy'])->name('product-reviews.destroy');
+        Route::patch('/products/{product:slug}/featured', [ProductController::class, 'toggleFeatured'])->name('products.featured');
         Route::resource('products', ProductController::class);
         Route::resource('customers', CustomerController::class);
         Route::patch('/orders/{order}/status', [OrderController::class, 'changeStatus'])->name('orders.change-status');

@@ -131,10 +131,22 @@ class Product extends Model
 
     public function scopeFilter(Builder $query, array $filters): Builder
     {
-        return $query
+        $query
             ->when($filters['category_id'] ?? null, fn (Builder $query, int $id) => $query->where('category_id', $id))
             ->when($filters['brand_id'] ?? null, fn (Builder $query, int $id) => $query->where('brand_id', $id))
             ->when($filters['status'] ?? null, fn (Builder $query, string $status) => $query->where('status', $status))
             ->when($filters['type'] ?? null, fn (Builder $query, string $type) => $query->where('type', $type));
+
+        switch ($filters['is_featured'] ?? null) {
+            case '1':
+                $query->where('is_featured', true);
+                break;
+
+            case '0':
+                $query->where('is_featured', false);
+                break;
+        }
+
+        return $query;
     }
 }
