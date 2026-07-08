@@ -1,7 +1,7 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useCart } from '@/Composables/useCart';
 
 const props = defineProps({
@@ -11,6 +11,8 @@ const props = defineProps({
 
 const toast = useToast();
 const { addItem } = useCart();
+const imageLoaded = ref(false);
+const imageFailed = ref(false);
 
 const hasDiscount = computed(() =>
     props.product.oldPrice && Number(props.product.oldPrice) > Number(props.product.price)
@@ -22,6 +24,31 @@ const discountPercent = computed(() => {
 });
 
 const productUrl = computed(() => props.product.url || (props.product.slug ? `/products/${props.product.slug}` : null));
+const imageSrc = computed(() => {
+    if (imageFailed.value || !props.product.image) {
+        return '/images/product-placeholder.svg';
+    }
+
+    return props.product.image;
+});
+
+watch(
+    () => props.product.image,
+    () => {
+        imageLoaded.value = false;
+        imageFailed.value = false;
+    },
+    { immediate: true }
+);
+
+const handleImageLoad = () => {
+    imageLoaded.value = true;
+};
+
+const handleImageError = () => {
+    imageFailed.value = true;
+    imageLoaded.value = true;
+};
 
 const onAddToCart = () => {
     addItem({
@@ -52,20 +79,51 @@ const onAddToCart = () => {
     >
         <div class="relative" :class="mode === 'list' ? 'w-36 shrink-0' : ''">
             <Link v-if="productUrl" :href="productUrl" class="block">
+                <div
+                    v-if="!imageLoaded"
+                    class="absolute inset-0 z-[1] animate-pulse bg-gradient-to-br from-surface-100 via-surface-50 to-surface-200"
+                    :class="mode === 'list' ? 'rounded-lg' : ''"
+                >
+                    <div class="flex h-full w-full items-center justify-center text-surface-300">
+                        <i class="pi pi-image text-2xl" />
+                    </div>
+                </div>
                 <img
-                    :src="product.image"
+                    :src="imageSrc"
                     :alt="product.name"
-                    class="w-full bg-surface-100 object-cover"
-                    :class="mode === 'list' ? 'h-32 rounded-lg' : 'h-48'"
+                    class="w-full bg-surface-100 object-cover transition-opacity duration-300"
+                    :class="[
+                        mode === 'list' ? 'h-32 rounded-lg' : 'h-48',
+                        imageLoaded ? 'opacity-100' : 'opacity-0'
+                    ]"
+                    loading="lazy"
+                    @load="handleImageLoad"
+                    @error="handleImageError"
                 />
             </Link>
-            <img
-                v-else
-                :src="product.image"
-                :alt="product.name"
-                class="w-full bg-surface-100 object-cover"
-                :class="mode === 'list' ? 'h-32 rounded-lg' : 'h-48'"
-            />
+            <template v-else>
+                <div
+                    v-if="!imageLoaded"
+                    class="absolute inset-0 z-[1] animate-pulse bg-gradient-to-br from-surface-100 via-surface-50 to-surface-200"
+                    :class="mode === 'list' ? 'h-32 rounded-lg' : 'h-48'"
+                >
+                    <div class="flex h-full w-full items-center justify-center text-surface-300">
+                        <i class="pi pi-image text-2xl" />
+                    </div>
+                </div>
+                <img
+                    :src="imageSrc"
+                    :alt="product.name"
+                    class="w-full bg-surface-100 object-cover transition-opacity duration-300"
+                    :class="[
+                        mode === 'list' ? 'h-32 rounded-lg' : 'h-48',
+                        imageLoaded ? 'opacity-100' : 'opacity-0'
+                    ]"
+                    loading="lazy"
+                    @load="handleImageLoad"
+                    @error="handleImageError"
+                />
+            </template>
             <div class="absolute left-2 top-2 flex flex-col gap-1">
                 <Tag v-if="product.isNew" value="جدید" severity="info" />
                 <Tag v-if="product.inStock" value="موجود" severity="success" />

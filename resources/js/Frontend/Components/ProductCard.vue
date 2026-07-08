@@ -27,11 +27,11 @@ defineProps({
         <div class="p-5">
             <p class="text-xs font-bold tracking-[0.12em] text-[#D4A017]">{{ product.category || 'MotoPart' }}</p>
             <Link :href="product.slug ? `/products/${product.slug}` : '/products'">
-                <h3 class="mt-2 line-clamp-2 text-lg font-black text-[#1A1A1A] transition hover:text-[#D4A017]">
+                <h5 class="mt-2 line-clamp-2 text-lg font-black text-[#1A1A1A] transition hover:text-[#D4A017]">
                     {{ product.name || 'قطعه MotoPart' }}
-                </h3>
+                </h5>
             </Link>
-            <p class="mt-2 text-sm leading-6 text-[#666666]">{{ product.description || 'قطعه منتخب فروشگاه MotoPart' }}</p>
+
             <div class="mt-4 flex items-center justify-between">
                 <span class="text-xl font-black text-[#111111]">{{ product.price || 'تماس بگیرید' }}</span>
                 <span class="rounded-full border border-[#D4A017] px-3 py-1 text-[11px] font-bold text-[#111111]">اصل</span>

@@ -1,7 +1,7 @@
 <script setup>
 import { usePage } from '@inertiajs/vue3';
 import { useLayout } from '@/Layouts/composables/layout';
-import { computed, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import AppFooter from './AppFooter.vue';
 import AppSidebar from './AppSidebar.vue';
@@ -34,6 +34,13 @@ watch(isSidebarActive, (newVal) => {
         unbindOutsideClickListener();
     }
 });
+
+watch(
+    () => layoutState.staticMenuMobileActive,
+    (active) => {
+        document.body.classList.toggle('blocked-scroll', active);
+    }
+);
 
 const containerClass = computed(() => {
     return {
@@ -71,6 +78,16 @@ function isOutsideClicked(event) {
 
     return !(sidebarEl?.contains(event.target) || topbarEl?.contains(event.target));
 }
+
+function closeMobileSidebar() {
+    layoutState.overlayMenuActive = false;
+    layoutState.staticMenuMobileActive = false;
+    layoutState.menuHoverActive = false;
+}
+
+onBeforeUnmount(() => {
+    document.body.classList.remove('blocked-scroll');
+});
 </script>
 
 <template>
@@ -83,7 +100,7 @@ function isOutsideClicked(event) {
             </div>
             <app-footer></app-footer>
         </div>
-        <div class="layout-mask animate-fadein"></div>
+        <div class="layout-mask animate-fadein" @click="closeMobileSidebar"></div>
     </div>
     <Toast />
 </template>

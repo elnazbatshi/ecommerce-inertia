@@ -60,7 +60,7 @@ return [
     ],
 
     'products' => [
-        'sortable_fields' => ['id', 'name', 'sku', 'price', 'status', 'type'],
+        'sortable_fields' => ['id', 'name', 'sku', 'price', 'status', 'type', 'is_featured'],
         'status_options' => [
             ['label' => 'فعال', 'value' => 'active'],
             ['label' => 'غیرفعال', 'value' => 'inactive'],

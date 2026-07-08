@@ -3,7 +3,7 @@
 .layout-topbar {
     position: fixed;
     height: 4rem;
-    z-index: 997;
+    z-index: 1090;
     left: 0;
     top: 0;
     width: 100%;
@@ -85,6 +85,11 @@
         gap: 1rem;
     }
 
+    .layout-topbar-menu {
+        display: flex;
+        align-items: center;
+    }
+
     .layout-topbar-menu-content {
         display: flex;
         gap: 1rem;
@@ -96,7 +101,7 @@
     }
 }
 
-@media (max-width: 991px) {
+@media (max-width: 1023px) {
     .layout-topbar {
         padding: 0 2rem;
 
@@ -114,7 +119,9 @@
         }
 
         .layout-topbar-menu {
+            display: none;
             position: absolute;
+            z-index: 1095;
             background-color: var(--surface-overlay);
             transform-origin: top;
             box-shadow:
@@ -127,6 +134,10 @@
             top: 4rem;
             min-width: 15rem;
             border: 1px solid var(--surface-border);
+
+            &.layout-topbar-menu-mobile-active {
+                display: block;
+            }
 
             .layout-topbar-menu-content {
                 gap: 0.5rem;
@@ -198,4 +209,9 @@
         flex-direction: column;
         gap: 0.5rem;
     }
+}
+
+.customer-action-overlay,
+.p-popover.customer-action-overlay {
+    z-index: 1096 !important;
 }
