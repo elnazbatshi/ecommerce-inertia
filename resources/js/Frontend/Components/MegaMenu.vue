@@ -68,3 +68,36 @@ const children = computed(() => props.category?.children ?? []);
         </div>
     </transition>
 </template>
+
+<style scoped>
+.mega-overlay {
+    background: rgba(5, 6, 8, 0.42);
+    backdrop-filter: blur(10px);
+}
+
+.mega-panel {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #111318;
+    color: #e5e7eb;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+}
+
+.mega-title,
+.mega-subtitle {
+    color: #ffffff;
+}
+
+.mega-link,
+.mega-chip,
+.mega-vehicle-link,
+.mega-quick-link {
+    color: #d6d8dc;
+}
+
+.mega-link:hover,
+.mega-chip:hover,
+.mega-vehicle-link:hover,
+.mega-quick-link:hover {
+    color: #d4a017;
+}
+</style>

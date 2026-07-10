@@ -35,6 +35,7 @@ use App\Http\Controllers\ProductReviewController;
 use App\Http\Controllers\PublicContentController;
 use App\Http\Controllers\SearchLogController;
 use App\Http\Controllers\SearchSuggestionController;
+use App\Http\Controllers\SiteSettingController;
 use App\Http\Controllers\Admin\VehicleBrandController as AdminVehicleBrandController;
 use App\Http\Controllers\Admin\VehicleController as AdminVehicleController;
 use App\Http\Controllers\Admin\VehicleTypeController as AdminVehicleTypeController;
@@ -91,6 +92,9 @@ Route::middleware(['auth'])
         Route::get('/dashboard', function () {
             return Inertia::render('Dashboard');
         })->name('dashboard');
+
+        Route::get('/site-settings', [SiteSettingController::class, 'index'])->name('site-settings.index');
+        Route::put('/site-settings', [SiteSettingController::class, 'update'])->name('site-settings.update');
 
         Route::get('/accesses', [AccessController::class, 'index'])->name('accesses.index');
         Route::post('/accesses', [AccessController::class, 'store'])->name('accesses.store');

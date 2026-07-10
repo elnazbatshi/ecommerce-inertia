@@ -14,14 +14,22 @@ defineEmits(['hover-item', 'leave-nav', 'toggle-mobile']);
 </script>
 
 <template>
-    <nav class="site-navbar hidden lg:block">
-        <div class="site-container flex h-16 items-center justify-between">
-            <ul class="flex items-center gap-1 text-sm font-bold text-[#1A1A1A]">
+    <nav class="hidden border-y border-white/10 bg-[#08090b] lg:block">
+        <div class="site-container flex h-14 items-center gap-3">
+            <a
+                href="/products"
+                class="inline-flex h-10 items-center gap-2 rounded-xl bg-[#D4A017] px-4 text-sm font-black text-[#111111] transition hover:bg-[#f0bd38]"
+            >
+                <i class="pi pi-th-large"></i>
+                <span>دسته‌بندی کالاها</span>
+            </a>
+
+            <ul class="flex min-w-0 flex-1 items-center gap-1 overflow-hidden text-sm font-bold text-[#d6d8dc]">
                 <li v-for="item in items" :key="item.slug || item.title" class="relative">
                     <a
                         :href="item.url || '#'"
-                        class="site-nav-link"
-                        :class="{ 'is-active': activeSlug === item.slug }"
+                        class="inline-flex h-10 items-center gap-1 rounded-xl px-3 text-[#d6d8dc] transition hover:bg-white/5 hover:text-[#D4A017]"
+                        :class="{ 'bg-white/5 text-[#D4A017]': activeSlug === item.slug }"
                         @mouseenter="$emit('hover-item', item)"
                     >
                         <span>{{ item.title }}</span>

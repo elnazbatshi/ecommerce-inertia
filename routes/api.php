@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\BannerSectionController;
 use App\Http\Controllers\Api\VehicleFinderController;
 use App\Http\Controllers\Api\HeroSliderController;
 use App\Http\Controllers\Api\RolePermissionController;
+use App\Http\Controllers\Api\SiteSettingController;
 use App\Http\Controllers\Api\SiteSearchController;
 use App\Models\Menu;
 use App\Services\MenuService;
@@ -48,6 +49,7 @@ Route::prefix('frontend')->name('frontend.')->group(function () {
     Route::get('menu', [FrontendCatalogController::class, 'menu'])->name('menu');
     Route::get('categories', [FrontendCatalogController::class, 'categories'])->name('categories');
     Route::get('brands', [FrontendCatalogController::class, 'brands'])->name('brands');
+    Route::get('site-settings', [SiteSettingController::class, 'index'])->name('site-settings.index');
 Route::get('vehicles/popular', [FrontendCatalogController::class, 'popularVehicles'])->name('vehicles.popular');
 Route::get('vehicle-finder/types', [VehicleFinderController::class, 'types'])->name('vehicle-finder.types');
 Route::get('vehicle-finder/brands', [VehicleFinderController::class, 'brands'])->name('vehicle-finder.brands');

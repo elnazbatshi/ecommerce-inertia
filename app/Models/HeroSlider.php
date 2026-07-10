@@ -20,6 +20,7 @@ class HeroSlider extends Model
         'background_media_id',
         'foreground_media_id',
         'overlay_opacity',
+        'show_overlay_content',
         'button_primary_text',
         'button_primary_url',
         'button_secondary_text',
@@ -45,6 +46,7 @@ class HeroSlider extends Model
 
     protected $casts = [
         'overlay_opacity' => 'decimal:2',
+        'show_overlay_content' => 'boolean',
         'sort_order' => 'integer',
         'is_active' => 'boolean',
         'starts_at' => 'datetime',
