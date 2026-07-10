@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             HeroSliderSeeder::class,
             HomeBannerSeeder::class,
             HomeBannerSectionSeeder::class,
+            SiteSettingSeeder::class,
         ]);
 
         $admin = User::query()->updateOrCreate([

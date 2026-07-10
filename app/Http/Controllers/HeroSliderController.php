@@ -139,6 +139,7 @@ class HeroSliderController extends Controller
             'background_media' => $this->mediaPayload($slider->backgroundMedia),
             'foreground_media' => $this->mediaPayload($slider->foregroundMedia),
             'overlay_opacity' => $slider->overlay_opacity ? (float) $slider->overlay_opacity : 0.55,
+            'show_overlay_content' => $slider->show_overlay_content ?? true,
             'button_primary_text' => $slider->button_primary_text,
             'button_primary_url' => $slider->button_primary_url,
             'button_secondary_text' => $slider->button_secondary_text,

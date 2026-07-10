@@ -19,6 +19,7 @@ const form = useForm({
     background_media: null,
     foreground_media: null,
     overlay_opacity: 0.55,
+    show_overlay_content: true,
     button_primary_text: '',
     button_primary_url: '',
     button_secondary_text: '',

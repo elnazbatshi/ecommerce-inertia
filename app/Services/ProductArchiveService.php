@@ -26,9 +26,13 @@ class ProductArchiveService
         ];
 
         $rows = max(6, min($filters['rows'], 36));
+        $customerId = $request->session()->get('customer_id');
 
         $query = $baseQuery
             ->with(['brand:id,name,slug', 'category:id,name,slug'])
+            ->when($customerId, fn (Builder $builder) => $builder->withExists([
+                'wishlistedByCustomers as is_wishlisted' => fn (Builder $wishlist) => $wishlist->where('customers.id', $customerId),
+            ]))
             ->where('status', 'active')
             ->when($filters['q'] !== '', function (Builder $builder) use ($filters) {
                 $q = $filters['q'];
@@ -61,6 +65,7 @@ class ProductArchiveService
                 'inStock' => (int) ($product->stock ?? 0) > 0,
                 'isNew' => $product->created_at?->gt(now()->subDays(10)) ?? false,
                 'image' => $product->main_image ? Storage::url($product->main_image) : 'https://picsum.photos/seed/product-' . $product->id . '/600/420',
+                'is_wishlisted' => (bool) ($product->is_wishlisted ?? false),
             ]);
 
         $brandOptions = Brand::query()
