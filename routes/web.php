@@ -25,9 +25,6 @@ use App\Http\Controllers\MenuItemController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\PostCategoryController;
-use App\Http\Controllers\PostController;
-use App\Http\Controllers\PostTagController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductReviewController;
 use App\Http\Controllers\PublicContentController;
@@ -147,7 +144,6 @@ Route::middleware(['auth'])
         Route::patch('/cities/{city}/toggle-status', [AdminCityController::class, 'toggleStatus'])->name('cities.toggle-status');
         Route::resource('cities', AdminCityController::class)->except(['show']);
         Route::get('/api/cities/options', [AdminCityController::class, 'options'])->name('cities.options');
-        Route::resource('posts', PostController::class);
         Route::patch('/blog-posts/{blogPost:slug}/featured', [AdminBlogPostController::class, 'toggleFeatured'])->name('blog-posts.featured');
         Route::resource('blog-posts', AdminBlogPostController::class)
             ->parameters(['blog-posts' => 'blogPost'])
@@ -158,12 +154,6 @@ Route::middleware(['auth'])
         Route::resource('blog-tags', AdminBlogTagController::class)
             ->parameters(['blog-tags' => 'blogTag'])
             ->except(['show']);
-        Route::resource('post-categories', PostCategoryController::class)
-            ->parameters(['post-categories' => 'post_category'])
-            ->except(['create', 'show', 'edit']);
-        Route::resource('post-tags', PostTagController::class)
-            ->parameters(['post-tags' => 'post_tag'])
-            ->except(['create', 'show', 'edit']);
         Route::resource('pages', PageController::class);
         Route::post('/hero-sliders/reorder', [HeroSliderController::class, 'reorder'])->name('hero-sliders.reorder');
         Route::patch('/hero-sliders/{heroSlider}/toggle-status', [HeroSliderController::class, 'toggleStatus'])->name('hero-sliders.toggle-status');
