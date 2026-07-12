@@ -3,11 +3,11 @@
 namespace App\Services;
 
 use App\Models\Brand;
+use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Models\Page;
-use App\Models\Post;
 use App\Models\Product;
 use App\Models\Vehicle;
 use Illuminate\Database\Eloquent\Builder;
@@ -204,17 +204,17 @@ class MenuService
 
     private function postChildren(): array
     {
-        if (! Schema::hasTable('posts')) {
+        if (! Schema::hasTable('blog_posts')) {
             return [];
         }
 
-        return Post::query()
-            ->when(Schema::hasColumn('posts', 'status'), fn (Builder $query) => $query->where('status', 'published'))
+        return BlogPost::query()
+            ->published()
             ->latest('published_at')
             ->latest('id')
             ->limit(12)
             ->get(['id', 'title', 'slug'])
-            ->map(fn (Post $post) => $this->autoItem($post->id, $post->slug, $post->title, "/blog/{$post->slug}", 'post'))
+            ->map(fn (BlogPost $post) => $this->autoItem($post->id, $post->slug, $post->title, "/blog/{$post->slug}", 'post'))
             ->values()
             ->all();
     }

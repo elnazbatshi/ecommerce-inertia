@@ -5,12 +5,12 @@ namespace App\Http\Services;
 use App\Http\Resources\ProductResource;
 use App\Models\Attribute;
 use App\Models\Brand;
+use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\Media;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
-use App\Models\Post;
 use App\Models\Vehicle;
 use App\Support\Pagination;
 use Illuminate\Http\Request;
@@ -53,7 +53,7 @@ class ProductService
 
     public function publishedPostOptions()
     {
-        return Post::query()->select(['id', 'title', 'slug'])->where('status', 'published')->latest('published_at')->get();
+        return BlogPost::query()->select(['id', 'title', 'slug'])->published()->latest('published_at')->get();
     }
     public function vehicleOptions()
     {

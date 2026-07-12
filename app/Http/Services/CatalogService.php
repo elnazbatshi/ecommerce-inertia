@@ -3,9 +3,9 @@
 namespace App\Http\Services;
 
 use App\Models\Attribute;
+use App\Models\BlogCategory;
+use App\Models\BlogTag;
 use App\Models\Category;
-use App\Models\PostCategory;
-use App\Models\PostTag;
 
 class CatalogService
 {
@@ -26,11 +26,11 @@ class CatalogService
 
     public function postCategories()
     {
-        return PostCategory::query()->withCount('posts')->orderBy('name')->get();
+        return BlogCategory::query()->withCount('posts')->orderBy('name')->get();
     }
 
     public function postTags()
     {
-        return PostTag::query()->withCount('posts')->orderBy('name')->get();
+        return BlogTag::query()->withCount('posts')->orderBy('name')->get();
     }
 }

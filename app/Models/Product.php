@@ -99,14 +99,14 @@ class Product extends Model
 
     public function relatedPosts(): BelongsToMany
     {
-        return $this->belongsToMany(Post::class);
+        return $this->belongsToMany(BlogPost::class, 'blog_post_product')
+            ->withPivot('sort_order')
+            ->orderByPivot('sort_order');
     }
 
     public function blogPosts(): BelongsToMany
     {
-        return $this->belongsToMany(BlogPost::class, 'blog_post_product')
-            ->withPivot('sort_order')
-            ->orderByPivot('sort_order');
+        return $this->relatedPosts();
     }
     public function vehicles(): BelongsToMany
     {

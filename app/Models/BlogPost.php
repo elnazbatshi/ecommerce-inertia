@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class BlogPost extends Model
 {
@@ -82,6 +83,13 @@ class BlogPost extends Model
         return $this->belongsToMany(Product::class, 'blog_post_product')
             ->withPivot('sort_order')
             ->orderByPivot('sort_order');
+    }
+
+    public function media(): MorphToMany
+    {
+        return $this->morphToMany(Media::class, 'mediable', 'mediables')
+            ->withPivot(['collection', 'sort_order', 'is_featured', 'custom_properties'])
+            ->withTimestamps();
     }
 
     public function scopePublished(Builder $query): Builder
