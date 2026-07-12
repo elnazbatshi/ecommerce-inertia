@@ -65,9 +65,9 @@ const model = ref([
     {
         label: 'مدیریت محتوا',
         items: [
-            { label: 'مقالات', icon: 'pi pi-fw pi-file-edit', to: '/admin/posts' },
-            { label: 'دسته‌بندی مقالات', icon: 'pi pi-fw pi-folder', to: '/admin/post-categories' },
-            { label: 'برچسب‌ها', icon: 'pi pi-fw pi-tags', to: '/admin/post-tags' },
+            { label: 'مقالات', icon: 'pi pi-fw pi-file-edit', to: '/admin/blog-posts' },
+            { label: 'دسته‌بندی مقالات', icon: 'pi pi-fw pi-folder', to: '/admin/blog-categories' },
+            { label: 'برچسب‌ها', icon: 'pi pi-fw pi-tags', to: '/admin/blog-tags' },
             { label: 'صفحات', icon: 'pi pi-fw pi-file', to: '/admin/pages' },
             { label: 'رسانه‌ها', icon: 'pi pi-fw pi-images', to: '/admin/media' },
             { label: 'محتوای برندها', icon: 'pi pi-fw pi-bookmark', to: '/admin/brands' },
@@ -89,6 +89,7 @@ const model = ref([
         ]
     }
 ]);
+
 </script>
 
 <template>

@@ -96,6 +96,13 @@ class Product extends Model
     {
         return $this->belongsToMany(Post::class);
     }
+
+    public function blogPosts(): BelongsToMany
+    {
+        return $this->belongsToMany(BlogPost::class, 'blog_post_product')
+            ->withPivot('sort_order')
+            ->orderByPivot('sort_order');
+    }
     public function vehicles(): BelongsToMany
     {
         return $this->belongsToMany(Vehicle::class, 'product_vehicle')->withTimestamps();

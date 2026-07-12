@@ -40,6 +40,10 @@ use App\Http\Controllers\Admin\ShippingMethodController as AdminShippingMethodCo
 use App\Http\Controllers\Admin\PaymentMethodController as AdminPaymentMethodController;
 use App\Http\Controllers\Admin\ProvinceController as AdminProvinceController;
 use App\Http\Controllers\Admin\CityController as AdminCityController;
+use App\Http\Controllers\Admin\BlogCategoryController as AdminBlogCategoryController;
+use App\Http\Controllers\Admin\BlogPostController as AdminBlogPostController;
+use App\Http\Controllers\Admin\BlogTagController as AdminBlogTagController;
+use App\Http\Controllers\Frontend\BlogController as FrontendBlogController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -67,8 +71,10 @@ Route::post('/products/{product:slug}/reviews', [FrontendProductReviewController
 Route::patch('/products/{product:slug}/reviews', [FrontendProductReviewController::class, 'update'])->name('site.products.reviews.update');
 Route::get('/category/{category:slug}', [PublicContentController::class, 'category'])->name('site.categories.show');
 Route::get('/brand/{brand:slug}', [PublicContentController::class, 'brand'])->name('site.brands.show');
-Route::get('/blog', [PublicContentController::class, 'blog'])->name('site.blog.index');
-Route::get('/blog/{post:slug}', [PublicContentController::class, 'post'])->name('site.blog.show');
+Route::get('/blog', [FrontendBlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/category/{blogCategory:slug}', [FrontendBlogController::class, 'category'])->name('blog.category');
+Route::get('/blog/tag/{blogTag:slug}', [FrontendBlogController::class, 'tag'])->name('blog.tag');
+Route::get('/blog/{blogPost:slug}', [FrontendBlogController::class, 'show'])->name('blog.show');
 Route::get('/page/{page:slug}', [PublicContentController::class, 'page'])->name('site.pages.show');
 
 Route::middleware('guest')->group(function () {
@@ -142,6 +148,16 @@ Route::middleware(['auth'])
         Route::resource('cities', AdminCityController::class)->except(['show']);
         Route::get('/api/cities/options', [AdminCityController::class, 'options'])->name('cities.options');
         Route::resource('posts', PostController::class);
+        Route::patch('/blog-posts/{blogPost:slug}/featured', [AdminBlogPostController::class, 'toggleFeatured'])->name('blog-posts.featured');
+        Route::resource('blog-posts', AdminBlogPostController::class)
+            ->parameters(['blog-posts' => 'blogPost'])
+            ->except(['show']);
+        Route::resource('blog-categories', AdminBlogCategoryController::class)
+            ->parameters(['blog-categories' => 'blogCategory'])
+            ->except(['show']);
+        Route::resource('blog-tags', AdminBlogTagController::class)
+            ->parameters(['blog-tags' => 'blogTag'])
+            ->except(['show']);
         Route::resource('post-categories', PostCategoryController::class)
             ->parameters(['post-categories' => 'post_category'])
             ->except(['create', 'show', 'edit']);

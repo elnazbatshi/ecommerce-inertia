@@ -86,6 +86,10 @@ onBeforeUnmount(() => menuController?.abort());
                 </div>
 
                 <div class="order-1 flex items-center justify-end gap-2 lg:order-3">
+                    <Link href="/blog" class="hidden rounded-lg border border-[var(--site-border)] px-3 py-2 text-sm font-black text-[var(--site-dark)] hover:border-[var(--site-gold)] hover:text-[var(--site-gold)] md:inline-flex">
+                        مجله موتوپارت
+                    </Link>
+
                     <div class="relative">
                         <button type="button" class="site-icon-btn" @click="handleAccountClick">
                             {{ customer ? (customer.name || customer.phone) : 'ورود / ثبت نام' }}
@@ -151,5 +155,29 @@ onBeforeUnmount(() => menuController?.abort());
         </div>
 
         <CustomerAuthModal v-if="!customer" v-model:visible="isAuthModalOpen" @authenticated="reloadAuth" />
+
+        <div v-if="isMobileOpen" class="fixed inset-0 z-[80] bg-black/40 lg:hidden" @click="isMobileOpen = false"></div>
+        <aside v-if="isMobileOpen" class="mobile-drawer p-5 lg:hidden">
+            <div class="mb-5 flex items-center justify-between">
+                <strong class="text-lg font-black text-[var(--site-dark)]">MotoPart</strong>
+                <button class="site-icon-btn" type="button" @click="isMobileOpen = false">
+                    <i class="pi pi-times" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div class="grid gap-2">
+                <Link href="/" class="mobile-accordion" @click="isMobileOpen = false">خانه</Link>
+                <Link href="/blog" class="mobile-accordion" @click="isMobileOpen = false">مجله موتوپارت</Link>
+                <a
+                    v-for="item in navItems"
+                    :key="item.slug || item.title"
+                    :href="item.url || '#'"
+                    class="mobile-accordion"
+                    @click="isMobileOpen = false"
+                >
+                    {{ item.title }}
+                </a>
+            </div>
+        </aside>
     </header>
 </template>
