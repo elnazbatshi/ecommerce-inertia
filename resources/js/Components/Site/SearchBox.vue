@@ -24,11 +24,11 @@ onBeforeUnmount(() => clearTimeout(timer));
 
 <template>
     <div class="relative">
-        <div class="site-search">
+        <div class="site-search site-search-dark">
             <input
                 v-model="query"
                 type="search"
-                placeholder="جستجو برای محصولات..."
+                placeholder="جستجوی محصول، برند یا کد قطعه..."
                 @focus="focused = true; load()"
                 @blur="setTimeout(() => { focused = false }, 120)"
             >
@@ -44,3 +44,24 @@ onBeforeUnmount(() => clearTimeout(timer));
         </div>
     </div>
 </template>
+
+<style scoped>
+.site-search-dark {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: #15171b;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.site-search-dark input {
+    color: #f5f5f5;
+}
+
+.site-search-dark input::placeholder {
+    color: #8f949d;
+}
+
+.site-search-dark button {
+    background: #d4a017;
+    color: #111111;
+}
+</style>

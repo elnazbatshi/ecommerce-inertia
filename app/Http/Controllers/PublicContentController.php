@@ -39,9 +39,13 @@ class PublicContentController extends Controller
             'vehicles.brand.vehicleType:id,name,slug',
             'reviews' => fn ($query) => $query->approved()->with('customer:id,name,phone')->latest(),
         ]);
+        $customerId = $request->session()->get('customer_id');
 
         $relatedProducts = Product::query()
             ->with(['brand:id,name,slug', 'category:id,name,slug'])
+            ->when($customerId, fn ($builder) => $builder->withExists([
+                'wishlistedByCustomers as is_wishlisted' => fn ($wishlist) => $wishlist->where('customers.id', $customerId),
+            ]))
             ->where('status', 'active')
             ->whereKeyNot($product->id)
             ->where(function ($query) use ($product) {
@@ -303,6 +307,7 @@ class PublicContentController extends Controller
             'oldPrice' => $product->discount_price ? (float) $product->price : null,
             'inStock' => (int) ($product->stock ?? 0) > 0,
             'isNew' => $product->created_at?->gt(now()->subDays(10)) ?? false,
+            'is_wishlisted' => (bool) ($product->is_wishlisted ?? false),
         ];
     }
 

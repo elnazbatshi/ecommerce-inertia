@@ -17,7 +17,9 @@ use App\Http\Controllers\Frontend\CustomerAuthController;
 use App\Http\Controllers\Frontend\PaymentController as FrontendPaymentController;
 use App\Http\Controllers\Frontend\Profile\AddressController as FrontendProfileAddressController;
 use App\Http\Controllers\Frontend\Profile\OrderController as FrontendProfileOrderController;
+use App\Http\Controllers\Frontend\Profile\WishlistController as FrontendProfileWishlistController;
 use App\Http\Controllers\Frontend\ProductReviewController as FrontendProductReviewController;
+use App\Http\Controllers\Frontend\WishlistController;
 use App\Http\Controllers\HeroSliderController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\MenuController;
@@ -33,6 +35,7 @@ use App\Http\Controllers\ProductReviewController;
 use App\Http\Controllers\PublicContentController;
 use App\Http\Controllers\SearchLogController;
 use App\Http\Controllers\SearchSuggestionController;
+use App\Http\Controllers\SiteSettingController;
 use App\Http\Controllers\Admin\VehicleBrandController as AdminVehicleBrandController;
 use App\Http\Controllers\Admin\VehicleController as AdminVehicleController;
 use App\Http\Controllers\Admin\VehicleTypeController as AdminVehicleTypeController;
@@ -60,11 +63,13 @@ Route::get('/payments/{payment}/fake/success', [FrontendPaymentController::class
 Route::get('/payments/{payment}/fake/fail', [FrontendPaymentController::class, 'fakeFail'])->name('frontend.payments.fake.fail');
 Route::get('/order/thank-you/{order}', [OrderConfirmationController::class, 'show'])->name('frontend.orders.thank-you');
 Route::get('/profile/orders', [FrontendProfileOrderController::class, 'index'])->name('frontend.profile.orders');
+Route::get('/profile/wishlist', [FrontendProfileWishlistController::class, 'index'])->name('profile.wishlist');
 Route::get('/profile/addresses', [FrontendProfileAddressController::class, 'index'])->name('frontend.profile.addresses');
 Route::post('/profile/addresses', [FrontendProfileAddressController::class, 'store'])->name('frontend.profile.addresses.store');
 Route::put('/profile/addresses/{address}', [FrontendProfileAddressController::class, 'update'])->name('frontend.profile.addresses.update');
 Route::delete('/profile/addresses/{address}', [FrontendProfileAddressController::class, 'destroy'])->name('frontend.profile.addresses.destroy');
 Route::patch('/profile/addresses/{address}/default', [FrontendProfileAddressController::class, 'setDefault'])->name('frontend.profile.addresses.default');
+Route::post('/wishlist/products/{product:slug}/toggle', [WishlistController::class, 'toggle'])->name('wishlist.products.toggle');
 Route::get('/products', [PublicContentController::class, 'products'])->name('site.products.index');
 Route::get('/products/{product:slug}', [PublicContentController::class, 'product'])->name('site.products.show');
 Route::post('/products/{product:slug}/reviews', [FrontendProductReviewController::class, 'store'])->name('site.products.reviews.store');
@@ -93,6 +98,9 @@ Route::middleware(['auth'])
         Route::get('/dashboard', function () {
             return Inertia::render('Dashboard');
         })->name('dashboard');
+
+        Route::get('/site-settings', [SiteSettingController::class, 'index'])->name('site-settings.index');
+        Route::put('/site-settings', [SiteSettingController::class, 'update'])->name('site-settings.update');
 
         Route::get('/accesses', [AccessController::class, 'index'])->name('accesses.index');
         Route::post('/accesses', [AccessController::class, 'store'])->name('accesses.store');

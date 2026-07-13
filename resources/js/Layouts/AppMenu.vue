@@ -77,6 +77,7 @@ const model = ref([
     {
         label: 'مدیریت سایت',
         items: [
+            { label: 'تنظیمات سایت', icon: 'pi pi-fw pi-cog', to: '/admin/site-settings' },
             { label: 'اسلایدر صفحه اصلی', icon: 'pi pi-fw pi-images', to: '/admin/hero-sliders' },
             { label: 'مدیریت بنرها', icon: 'pi pi-fw pi-ticket', to: '/admin/banner-sections' }
         ]
