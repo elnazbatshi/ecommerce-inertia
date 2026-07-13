@@ -124,6 +124,10 @@ onBeforeUnmount(() => {
                 </div>
 
                 <div class="order-1 flex items-center justify-end gap-2 lg:order-3">
+                    <Link href="/blog" class="hidden rounded-lg border border-[var(--site-border)] px-3 py-2 text-sm font-black text-[var(--site-dark)] hover:border-[var(--site-gold)] hover:text-[var(--site-gold)] md:inline-flex">
+                        مجله موتوپارت
+                    </Link>
+
                     <div class="relative">
                         <button type="button" class="flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-black text-white transition hover:border-[#D4A017] hover:text-[#D4A017]" @click="handleAccountClick">
                             {{ customer ? (customer.name || customer.phone) : 'ورود / ثبت نام' }}
