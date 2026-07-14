@@ -20,6 +20,7 @@ const form = useForm({
     background_media: props.slider.background_media ?? null,
     foreground_media: props.slider.foreground_media ?? null,
     overlay_opacity: Number(props.slider.overlay_opacity ?? 0.55),
+    show_overlay_content: props.slider.show_overlay_content !== false,
     button_primary_text: props.slider.button_primary_text ?? '',
     button_primary_url: props.slider.button_primary_url ?? '',
     button_secondary_text: props.slider.button_secondary_text ?? '',

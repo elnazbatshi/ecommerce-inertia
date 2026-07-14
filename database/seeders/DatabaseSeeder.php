@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             HeroSliderSeeder::class,
             HomeBannerSeeder::class,
             HomeBannerSectionSeeder::class,
-            AdminUserSeeder::class,
+            SiteSettingSeeder::class,
         ]);
 
         if (! app()->environment('production')) {

@@ -9,10 +9,14 @@ const props = defineProps({
     mode: { type: String, default: 'grid' }
 });
 
+const emit = defineEmits(['wishlist-updated']);
+
 const toast = useToast();
 const { addItem } = useCart();
 const imageLoaded = ref(false);
 const imageFailed = ref(false);
+const isWishlisted = ref(Boolean(props.product.is_wishlisted));
+const isWishlistBusy = ref(false);
 
 const hasDiscount = computed(() =>
     props.product.oldPrice && Number(props.product.oldPrice) > Number(props.product.price)
@@ -41,6 +45,13 @@ watch(
     { immediate: true }
 );
 
+watch(
+    () => props.product.is_wishlisted,
+    (value) => {
+        isWishlisted.value = Boolean(value);
+    }
+);
+
 const handleImageLoad = () => {
     imageLoaded.value = true;
 };
@@ -48,6 +59,53 @@ const handleImageLoad = () => {
 const handleImageError = () => {
     imageFailed.value = true;
     imageLoaded.value = true;
+};
+
+const requestCustomerAuth = () => {
+    window.dispatchEvent(new CustomEvent('motopart:open-customer-auth'));
+};
+
+const toggleWishlist = async () => {
+    if (!props.product.slug || isWishlistBusy.value) {
+        return;
+    }
+
+    const previousValue = isWishlisted.value;
+    isWishlistBusy.value = true;
+    isWishlisted.value = !previousValue;
+
+    try {
+        const { data } = await window.axios.post(`/wishlist/products/${props.product.slug}/toggle`);
+        isWishlisted.value = Boolean(data.is_wishlisted);
+        props.product.is_wishlisted = isWishlisted.value;
+        emit('wishlist-updated', {
+            product: props.product,
+            is_wishlisted: isWishlisted.value,
+        });
+
+        toast.add({
+            severity: isWishlisted.value ? 'success' : 'info',
+            summary: 'علاقه‌مندی‌ها',
+            detail: data.message,
+            life: 1600
+        });
+    } catch (error) {
+        isWishlisted.value = previousValue;
+
+        if (error.response?.status === 401) {
+            requestCustomerAuth();
+            return;
+        }
+
+        toast.add({
+            severity: 'error',
+            summary: 'علاقه‌مندی‌ها',
+            detail: 'امکان بروزرسانی علاقه‌مندی‌ها وجود ندارد.',
+            life: 2200
+        });
+    } finally {
+        isWishlistBusy.value = false;
+    }
 };
 
 const onAddToCart = () => {
@@ -130,11 +188,14 @@ const onAddToCart = () => {
                 <Tag v-if="hasDiscount" :value="`${discountPercent}% تخفیف`" severity="danger" />
             </div>
             <Button
-                icon="pi pi-heart"
+                :icon="isWishlisted ? 'pi pi-heart-fill' : 'pi pi-heart'"
                 text
                 rounded
-                severity="secondary"
-                class="absolute right-2 top-2 bg-white/90"
+                :severity="isWishlisted ? 'danger' : 'secondary'"
+                :loading="isWishlistBusy"
+                class="absolute right-2 top-2 z-[2] bg-white/90"
+                :aria-label="isWishlisted ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'"
+                @click.stop.prevent="toggleWishlist"
             />
         </div>
 

@@ -92,6 +92,11 @@ class Product extends Model
         return $this->hasMany(ProductReview::class);
     }
 
+    public function wishlistedByCustomers(): BelongsToMany
+    {
+        return $this->belongsToMany(Customer::class, 'customer_wishlists')->withTimestamps();
+    }
+
     public function relatedPosts(): BelongsToMany
     {
         return $this->belongsToMany(BlogPost::class, 'blog_post_product')

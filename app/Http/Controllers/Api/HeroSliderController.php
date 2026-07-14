@@ -32,6 +32,7 @@ class HeroSliderController extends Controller
                 'foreground_image' => $slider->foregroundMedia?->url,
                 'foreground_alt' => $this->mediaAlt($slider->foregroundMedia, $slider->title),
                 'overlay_opacity' => $slider->overlay_opacity ? (float) $slider->overlay_opacity : 0.55,
+                'show_overlay_content' => $slider->show_overlay_content ?? true,
                 'badge' => [
                     'text' => $slider->badge_text,
                     'url' => $slider->badge_url,

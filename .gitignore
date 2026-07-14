@@ -3,7 +3,6 @@
 /public/build
 /public/hot
 /public/inertia-views
-/public/storage
 /storage/*.key
 /storage/framework/inertia-views
 /storage/pail

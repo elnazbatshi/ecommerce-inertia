@@ -189,6 +189,23 @@ const errorFor = (field) => props.form.errors?.[field];
                             <label class="mb-2 block font-medium">Opacity لایه تیره</label>
                             <InputNumber v-model="form.overlay_opacity" class="w-full" inputClass="w-full" :min="0" :max="1" :step="0.05" mode="decimal" />
                         </div>
+                        <div class="rounded-lg border border-surface-200 bg-surface-50/70 p-4 md:col-span-3">
+                            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <label class="block font-medium">نمایش متن روی Hero</label>
+                                    <small class="mt-1 block text-surface-500">
+                                        اگر خاموش باشد، فقط تصویر Hero نمایش داده می‌شود و عنوان، توضیحات، دکمه‌ها، Badge و آمار روی تصویر نمایش داده نخواهند شد.
+                                    </small>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-sm text-surface-600">
+                                        {{ form.show_overlay_content ? 'نمایش عنوان، توضیحات و دکمه‌ها' : 'فقط تصویر Hero نمایش داده می‌شود' }}
+                                    </span>
+                                    <ToggleSwitch v-model="form.show_overlay_content" />
+                                </div>
+                            </div>
+                            <small v-if="errorFor('show_overlay_content')" class="mt-2 block text-red-600">{{ errorFor('show_overlay_content') }}</small>
+                        </div>
                         <div>
                             <label class="mb-2 block font-medium">ترتیب</label>
                             <InputNumber v-model="form.sort_order" class="w-full" inputClass="w-full" />
@@ -239,7 +256,7 @@ const errorFor = (field) => props.form.errors?.[field];
                         <img v-if="backgroundUrl" :src="backgroundUrl" class="absolute inset-0 h-full w-full object-cover" alt="" />
                         <div class="absolute inset-0 bg-black" :style="{ opacity: Number(form.overlay_opacity ?? 0.55) }"></div>
                         <div class="relative grid min-h-[420px] items-center gap-6 p-6" :class="previewClass">
-                            <div :class="contentClass">
+                            <div v-if="form.show_overlay_content !== false" :class="contentClass">
                                 <a v-if="form.badge_text" :href="form.badge_url || '#'" class="mb-4 inline-flex rounded-full border px-3 py-1 text-xs font-bold" :style="{ borderColor: accentColor, color: accentColor }">
                                     {{ form.badge_text }}
                                 </a>

@@ -87,7 +87,7 @@ onBeforeUnmount(() => {
         <HeroSection />
         <VehicleFinder />
         <CategoryStrip />
-        <HomeBanners placement="home_top" />
+
 
         <section v-if="props.featuredProducts?.length" id="products" class="mx-auto max-w-7xl bg-white px-6 py-16">
             <SectionTitle
@@ -143,7 +143,7 @@ onBeforeUnmount(() => {
                 </div>
             </div>
         </section>
-
+        <HomeBanners placement="home_top" />
         <HomeBanners placement="home_middle" />
         <HomeBanners placement="home_bottom" />
         <BrandSlider />
