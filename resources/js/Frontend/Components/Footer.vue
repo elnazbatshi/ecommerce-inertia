@@ -13,6 +13,7 @@ const props = defineProps({
 const { settings, footerLinks, serviceFeatures } = useSiteSettings();
 
 const siteName = computed(() => settings.value.general?.site_name || 'MotoPart');
+const logoUrl = computed(() => settings.value.general?.logo_url || null);
 const footerDescription = computed(() => (
     settings.value.footer?.description
     || settings.value.general?.site_description
@@ -61,7 +62,8 @@ const copyrightText = computed(() => (
         <div class="site-container py-14">
             <div class="grid gap-8 lg:grid-cols-[1.2fr_0.9fr_0.9fr_1fr]">
                 <div>
-                    <h3 class="text-3xl font-black text-[#111111]">{{ siteName }}</h3>
+                    <img v-if="logoUrl" :src="logoUrl" :alt="siteName" class="h-14 max-w-[180px] object-contain" />
+                    <h3 v-else class="text-3xl font-black text-[#111111]">{{ siteName }}</h3>
                     <p class="mt-3 text-sm leading-7 text-[#666666]">
                         {{ footerDescription }}
                     </p>
