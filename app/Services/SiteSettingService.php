@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\SiteSetting;
+use App\Models\Media;
 use Illuminate\Support\Facades\Cache;
 
 class SiteSettingService
@@ -52,13 +53,15 @@ class SiteSettingService
 
     public function allGrouped(): array
     {
-        return SiteSetting::query()
+        return $this->withResolvedMedia(
+            SiteSetting::query()
             ->orderBy('group')
             ->orderBy('key')
             ->get()
             ->groupBy('group')
             ->map(fn ($settings) => $settings->mapWithKeys(fn (SiteSetting $setting) => [$setting->key => $setting->value])->all())
-            ->all();
+            ->all()
+        );
     }
 
     public function clearPublicCache(): void
@@ -68,13 +71,34 @@ class SiteSettingService
 
     private function publicSettingsQuery(): array
     {
-        return SiteSetting::query()
+        return $this->withResolvedMedia(
+            SiteSetting::query()
             ->where('is_public', true)
             ->orderBy('group')
             ->orderBy('key')
             ->get()
             ->groupBy('group')
             ->map(fn ($settings) => $settings->mapWithKeys(fn (SiteSetting $setting) => [$setting->key => $setting->value])->all())
-            ->all();
+            ->all()
+        );
+    }
+
+    private function withResolvedMedia(array $settings): array
+    {
+        $logoId = $settings['general']['logo'] ?? null;
+
+        if ($logoId) {
+            $logo = Media::query()->find($logoId);
+
+            $settings['general']['logo_url'] = $logo?->url;
+            $settings['general']['logo_media'] = $logo ? [
+                'id' => $logo->id,
+                'name' => $logo->original_name,
+                'url' => $logo->url,
+                'size' => $logo->size,
+            ] : null;
+        }
+
+        return $settings;
     }
 }

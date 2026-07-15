@@ -1,5 +1,6 @@
 <script setup>
 import TopNavTitle from '@/Components/Global/TopNavTitle.vue';
+import ImageUploader from '@/Components/ImageUploader.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
@@ -108,6 +109,17 @@ const form = useForm({
 });
 
 const activeTabMeta = computed(() => tabs.find((tab) => tab.key === activeTab.value) ?? tabs[0]);
+const logoExistingImages = computed(() => {
+    const media = settingsFor('general').logo_media;
+    const url = media?.url ?? settingsFor('general').logo_url;
+
+    return url ? [{
+        id: media?.id ?? 'site-logo',
+        name: media?.name ?? 'لوگوی فعلی سایت',
+        url,
+        size: media?.size,
+    }] : [];
+});
 
 const iconMeta = (value) => iconOptions.find((option) => option.value === value) ?? iconOptions[0];
 
@@ -174,6 +186,11 @@ const submit = () => {
     form
         .transform((data) => ({
             ...data,
+            general: {
+                site_name: data.general.site_name,
+                site_description: data.general.site_description,
+                logo: data.general.logo,
+            },
             topbar: {
                 ...data.topbar,
                 items: cleanItems(data.topbar.items),
@@ -258,10 +275,20 @@ const submit = () => {
 
                         <div class="field">
                             <label class="mb-2 block font-bold">لوگو</label>
-                            <div class="flex min-h-12 items-center justify-between rounded-xl border border-dashed border-surface-300 px-4 py-3 text-sm text-surface-500">
+                            <div v-if="false" class="flex min-h-12 items-center justify-between rounded-xl border border-dashed border-surface-300 px-4 py-3 text-sm text-surface-500">
                                 <span>{{ form.general.logo || 'لوگو هنوز از این فرم آپلود نمی‌شود' }}</span>
                                 <Tag value="آماده برای مرحله بعد" severity="secondary" />
                             </div>
+                            <ImageUploader
+                                v-model="form.general.logo"
+                                title="لوگوی سایت"
+                                subtitle="لوگوی سایت را از مرکز رسانه انتخاب یا تصویر جدید آپلود کنید"
+                                emptyText="هنوز لوگویی برای سایت انتخاب نشده است."
+                                mode="single"
+                                :existingImages="logoExistingImages"
+                                :error="errorFor('general.logo')"
+                                :sortable="false"
+                            />
                         </div>
 
                         <div class="field lg:col-span-2">

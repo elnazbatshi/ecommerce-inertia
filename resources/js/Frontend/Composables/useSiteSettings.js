@@ -6,6 +6,8 @@ const fallbackSettings = {
         site_name: 'MotoPart',
         site_description: 'فروشگاه آنلاین روغن موتور و قطعات',
         logo: null,
+        logo_url: null,
+        logo_media: null,
     },
     topbar: {
         items: [

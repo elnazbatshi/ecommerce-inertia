@@ -25,6 +25,7 @@ const navItems = computed(() => menu.value.items || []);
 const activeMega = computed(() => hoveredItem.value && hoveredItem.value.children?.length);
 const customer = computed(() => page.props.customer || null);
 const siteName = computed(() => settings.value.general?.site_name || 'MotoPart');
+const logoUrl = computed(() => settings.value.general?.logo_url || null);
 const siteDescription = computed(() => settings.value.general?.site_description || 'فروشگاه آنلاین روغن موتور و قطعات');
 const brandTail = computed(() => siteName.value.startsWith('Moto') ? siteName.value.slice(4) : siteName.value);
 
@@ -114,8 +115,9 @@ onBeforeUnmount(() => {
                     <i class="pi pi-bars" aria-hidden="true"></i>
                 </button>
 
-                <Link href="/" class="order-2 block lg:order-1">
-                    <h1 class="text-2xl font-black text-white"><span class="text-[#D4A017]">Moto</span>{{ brandTail }}</h1>
+                <Link href="/" class="order-2 flex items-center gap-3 lg:order-1">
+                    <img v-if="logoUrl" :src="logoUrl" :alt="siteName" class="h-12 max-w-[160px] object-contain" />
+                    <h1 v-else class="text-2xl font-black text-white"><span class="text-[#D4A017]">Moto</span>{{ brandTail }}</h1>
                     <p class="mt-1 line-clamp-1 text-xs text-[#9ca3af]">{{ siteDescription }}</p>
                 </Link>
 
