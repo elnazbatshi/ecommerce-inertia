@@ -9,6 +9,7 @@ import HeroSection from '../Components/HeroSection.vue';
 import VehicleFinder from '../Components/VehicleFinder.vue';
 import CategoryStrip from '../Components/CategoryStrip.vue';
 import ProductCard from '@/Components/Site/ProductCard.vue';
+import HomeProductTabs from '../Components/HomeProductTabs.vue';
 import HomeBanners from '../Components/HomeBanners.vue';
 import BrandSlider from '../Components/BrandSlider.vue';
 
@@ -16,6 +17,14 @@ const props = defineProps({
     featuredProducts: {
         type: Array,
         default: () => [],
+    },
+    productRankings: {
+        type: Object,
+        default: () => ({
+            best_sellers: [],
+            most_viewed: [],
+            most_reviewed: [],
+        }),
     },
 });
 
@@ -87,8 +96,8 @@ onBeforeUnmount(() => {
         <HeroSection />
         <VehicleFinder />
         <CategoryStrip />
-
-
+        <HomeProductTabs :productRankings="props.productRankings" />
+        <HomeBanners placement="home_top" />
         <section v-if="props.featuredProducts?.length" id="products" class="mx-auto max-w-7xl bg-white px-6 py-16">
             <SectionTitle
                 title="محصولات منتخب MotoPart"
@@ -143,8 +152,9 @@ onBeforeUnmount(() => {
                 </div>
             </div>
         </section>
-        <HomeBanners placement="home_top" />
+
         <HomeBanners placement="home_middle" />
+
         <HomeBanners placement="home_bottom" />
         <BrandSlider />
     </FrontLayout>

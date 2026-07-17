@@ -31,6 +31,12 @@ class PublicContentController extends Controller
     {
         abort_unless($product->status === 'active', 404);
 
+        $viewedSessionKey = "product_viewed_{$product->id}";
+        if (! $request->session()->has($viewedSessionKey)) {
+            $product->increment('views');
+            $request->session()->put($viewedSessionKey, true);
+        }
+
         $product->load([
             'category:id,name,slug',
             'brand:id,name,slug',
@@ -162,6 +168,7 @@ class PublicContentController extends Controller
             'type' => $product->type,
             'is_original' => $product->is_original,
             'stock' => (int) ($product->stock ?? 0),
+            'views' => (int) ($product->views ?? 0),
             'gallery' => $this->productGallery($product),
             'variants' => $product->variants->map(fn (ProductVariant $variant) => [
                 'id' => $variant->id,

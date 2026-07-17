@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Services\HomeProductRankingService;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -12,6 +13,10 @@ use Inertia\Response;
 
 class HomeController extends Controller
 {
+    public function __construct(private readonly HomeProductRankingService $rankings)
+    {
+    }
+
     public function index(Request $request): Response
     {
         $customerId = $request->session()->get('customer_id');
@@ -31,6 +36,7 @@ class HomeController extends Controller
 
         return Inertia::render('Frontend/Home', [
             'featuredProducts' => $featuredProducts,
+            'productRankings' => $this->rankings->rankings($customerId),
         ]);
     }
 

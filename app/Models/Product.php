@@ -45,6 +45,7 @@ class Product extends Model
         'price' => 'decimal:2',
         'discount_price' => 'decimal:2',
         'stock' => 'integer',
+        'views' => 'integer',
         'is_original' => 'boolean',
         'is_featured' => 'boolean',
         'seo_index' => 'boolean',

@@ -6,7 +6,8 @@ import { useCart } from '@/Composables/useCart';
 
 const props = defineProps({
     product: { type: Object, required: true },
-    mode: { type: String, default: 'grid' }
+    mode: { type: String, default: 'grid' },
+    metricType: { type: String, default: null }
 });
 
 const emit = defineEmits(['wishlist-updated']);
@@ -28,12 +29,35 @@ const discountPercent = computed(() => {
 });
 
 const productUrl = computed(() => props.product.url || (props.product.slug ? `/products/${props.product.slug}` : null));
+const displayBrand = computed(() => {
+    if (typeof props.product.brand === 'string') {
+        return props.product.brand;
+    }
+
+    return props.product.brand?.name || props.product.brand_name || '-';
+});
 const imageSrc = computed(() => {
     if (imageFailed.value || !props.product.image) {
         return '/images/product-placeholder.svg';
     }
 
     return props.product.image;
+});
+
+const metricBadge = computed(() => {
+    if (props.metricType === 'sales' && Number(props.product.sold_count) > 0) {
+        return `${Number(props.product.sold_count).toLocaleString('fa-IR')} فروش`;
+    }
+
+    if (props.metricType === 'views' && Number(props.product.views) > 0) {
+        return `${Number(props.product.views).toLocaleString('fa-IR')} بازدید`;
+    }
+
+    if (props.metricType === 'reviews' && Number(props.product.approved_reviews_count) > 0) {
+        return `${Number(props.product.approved_reviews_count).toLocaleString('fa-IR')} نظر`;
+    }
+
+    return null;
 });
 
 watch(
@@ -113,7 +137,7 @@ const onAddToCart = () => {
         id: props.product.id,
         slug: props.product.slug,
         name: props.product.name,
-        brand: props.product.brand,
+        brand: displayBrand.value,
         sku: props.product.sku,
         image: props.product.image,
         price: props.product.price,
@@ -186,6 +210,7 @@ const onAddToCart = () => {
                 <Tag v-if="product.isNew" value="جدید" severity="info" />
                 <Tag v-if="product.inStock" value="موجود" severity="success" />
                 <Tag v-if="hasDiscount" :value="`${discountPercent}% تخفیف`" severity="danger" />
+                <Tag v-if="metricBadge" :value="metricBadge" severity="contrast" />
             </div>
             <Button
                 :icon="isWishlisted ? 'pi pi-heart-fill' : 'pi pi-heart'"
@@ -200,7 +225,7 @@ const onAddToCart = () => {
         </div>
 
         <div class="flex min-w-0 flex-1 flex-col p-4" :class="mode === 'list' ? 'p-1' : ''">
-            <p class="text-xs font-semibold text-surface-500">{{ product.brand }}</p>
+            <p class="text-xs font-semibold text-surface-500">{{ displayBrand }}</p>
             <Link v-if="productUrl" :href="productUrl" class="mt-1 line-clamp-2 text-sm font-bold text-surface-900 hover:text-[#D4A017]">{{ product.name }}</Link>
             <h3 v-else class="mt-1 line-clamp-2 text-sm font-bold text-surface-900">{{ product.name }}</h3>
             <p class="mt-2 line-clamp-2 text-xs text-surface-600">{{ product.feature }}</p>
