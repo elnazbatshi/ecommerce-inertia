@@ -45,7 +45,7 @@ class UpdateProductRequest extends FormRequest
             'type' => ['required', Rule::in(['simple', 'variable'])],
             'stock' => ['nullable', 'integer', 'min:0', 'required_if:type,simple'],
             'related_post_ids' => ['nullable', 'array'],
-            'related_post_ids.*' => ['integer', 'exists:posts,id'],
+            'related_post_ids.*' => ['integer', 'exists:blog_posts,id'],
             'vehicle_ids' => ['nullable', 'array'],
             'vehicle_ids.*' => ['integer', 'exists:vehicles,id'],
             'variants' => ['nullable', 'array', 'required_if:type,variable'],

@@ -9,9 +9,9 @@ use App\Http\Requests\ReorderMediaRequest;
 use App\Http\Requests\StoreMediaRequest;
 use App\Http\Requests\UpdateMediaRequest;
 use App\Models\Brand;
+use App\Models\BlogPost;
 use App\Models\Media;
 use App\Models\Page;
-use App\Models\Post;
 use App\Models\Product;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Http\JsonResponse;
@@ -189,7 +189,7 @@ class MediaController extends Controller
                 ->orWhere('featured_image', $media->path)
                 ->orWhere('cover_image', $media->path)
                 ->exists()
-            || DB::table('posts')->where('featured_image', $media->path)->exists()
+            || DB::table('blog_posts')->where('featured_image', $media->path)->exists()
             || DB::table('pages')->where('featured_image', $media->path)->exists()
             || DB::table('hero_sliders')
                 ->where('background_media_id', $media->id)
@@ -202,7 +202,7 @@ class MediaController extends Controller
         return match ($type) {
             'product' => Product::class,
             'brand' => Brand::class,
-            'post' => Post::class,
+            'post' => BlogPost::class,
             'page' => Page::class,
         };
     }
@@ -212,7 +212,7 @@ class MediaController extends Controller
         return match ($type) {
             'product' => Product::class,
             'brand' => Brand::class,
-            'post' => Post::class,
+            'post' => BlogPost::class,
             'page' => Page::class,
         };
     }

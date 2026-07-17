@@ -224,15 +224,15 @@ class FrontendCatalogController extends Controller
 
     private function searchPosts(string $query): array
     {
-        $table = Schema::hasTable('blog_posts') ? 'blog_posts' : (Schema::hasTable('posts') ? 'posts' : null);
-
-        if ($table === null) {
+        if (! Schema::hasTable('blog_posts')) {
             return [];
         }
 
-        return DB::table($table)
+        return DB::table('blog_posts')
             ->where('title', 'like', "%{$query}%")
-            ->when(Schema::hasColumn($table, 'status'), fn ($builder) => $builder->whereIn('status', ['published', 'active']))
+            ->where('status', 'published')
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
             ->limit(6)
             ->get(['id', 'title', 'slug'])
             ->map(fn ($post) => [

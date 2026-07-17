@@ -61,7 +61,7 @@ class Media extends Model
 
     public function posts(): MorphToMany
     {
-        return $this->morphedByMany(Post::class, 'mediable', 'mediables')
+        return $this->morphedByMany(BlogPost::class, 'mediable', 'mediables')
             ->withPivot(['collection', 'sort_order', 'is_featured', 'custom_properties'])
             ->withTimestamps();
     }

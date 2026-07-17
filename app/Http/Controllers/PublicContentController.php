@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Page;
-use App\Models\Post;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductReview;
@@ -78,26 +77,6 @@ class PublicContentController extends Controller
         return Inertia::render('Frontend/Categories/Show', [
             ...$archive,
             'category' => $category->only(['id', 'name', 'slug', 'meta_description']),
-        ]);
-    }
-
-    public function blog(): Response
-    {
-        return Inertia::render('Frontend/Blog/Index', [
-            'posts' => Post::query()
-                ->where('status', 'published')
-                ->latest('published_at')
-                ->paginate(12),
-        ]);
-    }
-
-    public function post(Post $post): Response
-    {
-        abort_unless($post->status === 'published', 404);
-        $post->increment('view_count');
-
-        return Inertia::render('Frontend/Blog/Show', [
-            'post' => $post->load(['category:id,name,slug', 'tags:id,name,slug', 'products:id,name,slug']),
         ]);
     }
 

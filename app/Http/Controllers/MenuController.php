@@ -6,11 +6,11 @@ use App\Http\Requests\StoreMenuRequest;
 use App\Http\Requests\UpdateMenuRequest;
 use App\Http\Services\SlugService;
 use App\Models\Brand;
+use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Models\Page;
-use App\Models\Post;
 use App\Models\Product;
 use App\Services\MenuService;
 use Illuminate\Http\JsonResponse;
@@ -137,8 +137,8 @@ class MenuController extends Controller
                 ->map(fn (Product $product) => $this->option($product->id, $product->name, $product->slug, '/products/'.$product->slug))->values()->all(),
             'brands' => Brand::query()->orderBy('name')->limit(100)->get(['id', 'name', 'slug'])
                 ->map(fn (Brand $brand) => $this->option($brand->id, $brand->name, $brand->slug, '/brand/'.$brand->slug))->values()->all(),
-            'posts' => Post::query()->orderBy('title')->limit(100)->get(['id', 'title', 'slug'])
-                ->map(fn (Post $post) => $this->option($post->id, $post->title, $post->slug, '/blog/'.$post->slug))->values()->all(),
+            'posts' => BlogPost::query()->orderBy('title')->limit(100)->get(['id', 'title', 'slug'])
+                ->map(fn (BlogPost $post) => $this->option($post->id, $post->title, $post->slug, '/blog/'.$post->slug))->values()->all(),
         ];
     }
 

@@ -42,7 +42,7 @@ class AttachMediaRequest extends FormRequest
         return match ($type) {
             'product' => \App\Models\Product::class,
             'brand' => \App\Models\Brand::class,
-            'post' => \App\Models\Post::class,
+            'post' => \App\Models\BlogPost::class,
             'page' => \App\Models\Page::class,
         };
     }
