@@ -41,7 +41,24 @@ class ProductResource extends JsonResource
             'is_featured' => $this->is_featured,
             'type' => $this->type,
             'stock' => $this->stock,
+            'views' => (int) ($this->views ?? 0),
+            'image' => $this->relationLoaded('mainImage')
+                ? ($this->mainImage->first()?->url ?: ($this->main_image ? Storage::url($this->main_image) : null))
+                : ($this->main_image ? Storage::url($this->main_image) : null),
+            'oldPrice' => $this->discount_price ? (float) $this->price : null,
+            'inStock' => (int) ($this->stock ?? 0) > 0,
+            'isNew' => $this->created_at?->gt(now()->subDays(10)) ?? false,
+            'feature' => $this->material ?: ($this->origin ?: 'کیفیت تضمین‌شده فروشگاه'),
+            'is_wishlisted' => (bool) ($this->is_wishlisted ?? false),
         ];
+
+        if (array_key_exists('sold_count', $this->resource->getAttributes())) {
+            $data['sold_count'] = (int) ($this->sold_count ?? 0);
+        }
+
+        if (array_key_exists('approved_reviews_count', $this->resource->getAttributes())) {
+            $data['approved_reviews_count'] = (int) ($this->approved_reviews_count ?? 0);
+        }
 
         if ($this->relationLoaded('images')) {
             $data['images'] = $this->images->map(fn (ProductImage $image) => [

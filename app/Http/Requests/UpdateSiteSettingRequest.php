@@ -16,7 +16,7 @@ class UpdateSiteSettingRequest extends FormRequest
         return [
             'general.site_name' => ['nullable', 'string', 'max:255'],
             'general.site_description' => ['nullable', 'string'],
-            'general.logo' => ['nullable'],
+            'general.logo' => ['nullable', 'integer', 'exists:media,id'],
 
             'topbar.items' => ['nullable', 'array'],
             'topbar.items.*.title' => ['required', 'string', 'max:255'],
