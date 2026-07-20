@@ -126,7 +126,7 @@ onBeforeUnmount(() => {
                 </div>
 
                 <div class="order-1 flex items-center justify-end gap-2 lg:order-3">
-                    <Link href="/blog" class="hidden rounded-lg border border-[var(--site-border)] px-3 py-2 text-sm font-black text-[var(--site-dark)] hover:border-[var(--site-gold)] hover:text-[var(--site-gold)] md:inline-flex">
+                    <Link href="/blog" class="hidden rounded-lg border  px-3 py-2 text-sm font-black hover:bg-[#d4a01717]  border-[var(--site-gold)] text-[var(--site-gold)] md:inline-flex">
                         مجله موتوپارت
                     </Link>
 
