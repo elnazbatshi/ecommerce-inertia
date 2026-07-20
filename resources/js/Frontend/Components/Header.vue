@@ -99,36 +99,36 @@ onBeforeUnmount(() => {
     <header
         class="sticky top-0 z-50 border-b border-white/10 bg-[#0b0d10] text-white shadow-[0_16px_50px_rgba(0,0,0,0.35)]">
         <div
-            class="overflow-hidden border-b border-white/10 bg-[#08090b] transition-all duration-300"
+            class="overflow-hidden border-b border-white/10 bg-[#08090b] transition-all duration-200"
             :class="isScrolled ? 'max-h-0 opacity-0' : 'max-h-10 opacity-100'"
         >
             <div
-                class="site-container flex h-8 items-center justify-center gap-7 overflow-x-auto whitespace-nowrap text-xs font-bold text-[#c8cbd0] [scrollbar-width:none]">
+                class="site-container flex h-9 items-center justify-center gap-9 overflow-x-auto whitespace-nowrap text-[13px] font-bold leading-none text-[#c8cbd0] [scrollbar-width:none]">
                 <span v-for="item in topbarItems" :key="`${item.title}-${item.sort_order}`"
-                      class="inline-flex items-center gap-2">
-                    <SiteSettingIcon :name="item.icon" class="text-[#D4A017]"/>
+                      class="inline-flex items-center gap-2.5 leading-none">
+                    <SiteSettingIcon :name="item.icon" class="translate-y-px text-[#D4A017]"/>
                     {{ item.title }}
                 </span>
             </div>
         </div>
 
-        <div class="bg-[#0b0d10] transition-all duration-300" :class="isScrolled ? 'lg:-mt-1' : ''">
-            <div class="site-container grid items-center gap-4 py-4 lg:grid-cols-[260px_1fr_300px] lg:py-5">
+        <div class="bg-[#0b0d10] transition-all duration-200" :class="isScrolled ? 'lg:-mt-1' : ''">
+            <div class="site-container grid items-center gap-3 py-3.5 lg:grid-cols-[225px_minmax(0,1.18fr)_280px] lg:gap-5 lg:py-4">
 
                     <button
-                        class="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white transition hover:border-[#D4A017] hover:text-[#D4A017] lg:hidden"
+                        class="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white transition duration-200 hover:border-[#D4A017] hover:text-[#D4A017] lg:hidden"
                         type="button" @click="isMobileOpen = true">
                         <i class="pi pi-bars" aria-hidden="true"></i>
                     </button>
 
-                    <Link href="/" class="order-2 flex items-center gap-3 lg:order-1 w-48">
-                        <img v-if="logoUrl" :src="logoUrl" :alt="siteName" class="h-18 max-w-[150px] object-contain"/>
+                    <Link href="/" class="order-2 flex w-44 items-center gap-2 lg:order-1 lg:w-[210px]">
+                        <img v-if="logoUrl" :src="logoUrl" :alt="siteName" class="h-[5.15rem] w-auto max-w-[176px] object-contain [image-rendering:auto]"/>
                         <h1 v-else class="text-2xl font-black text-white">
                             <span
                             class="text-[#D4A017]">Moto</span>{{ brandTail }}</h1>
                     </Link>
 
-                    <div class=" order-3 lg:order-2 min-w-28">
+                    <div class="order-3 min-w-0 lg:order-2">
                         <SearchBox  />
                     </div>
 
@@ -138,15 +138,15 @@ onBeforeUnmount(() => {
 
 
 
-                <div class="order-1 flex items-center justify-end gap-2 lg:order-3">
+                <div class="order-1 flex items-center justify-end gap-2.5 lg:order-3">
                     <Link href="/blog"
-                          class="hidden rounded-lg border border-[var(--site-border)] px-3 py-2 text-sm font-black text-[var(--site-dark)] hover:border-[var(--site-gold)] hover:text-[var(--site-gold)] md:inline-flex">
+                          class="hidden rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-black text-white transition duration-200 hover:border-[var(--site-gold)] hover:text-[var(--site-gold)] md:inline-flex">
                         مجله موتوپارت
                     </Link>
 
                     <div class="relative">
                         <button type="button"
-                                class="flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-black text-white transition hover:border-[#D4A017] hover:text-[#D4A017]"
+                                class="flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-black text-white transition duration-200 hover:border-[#D4A017] hover:text-[#D4A017] hover:shadow-[0_10px_24px_rgba(212,160,23,0.14)]"
                                 @click="handleAccountClick">
                             {{ customer ? (customer.name || customer.phone) : 'ورود / ثبت نام' }}
                         </button>
@@ -221,10 +221,9 @@ onBeforeUnmount(() => {
                             <strong class="text-xl font-black"><span class="text-[#D4A017]">Moto</span>{{
                                     brandTail
                                 }}</strong>
-                            <p class="mt-1 text-xs text-[#9ca3af]">{{ siteDescription }}</p>
                         </div>
                         <button type="button"
-                                class="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 text-white"
+                                class="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 text-white transition duration-200 hover:border-[#D4A017] hover:text-[#D4A017]"
                                 @click="closeMobileMenu">
                             <i class="pi pi-times"></i>
                         </button>
@@ -235,7 +234,7 @@ onBeforeUnmount(() => {
                             v-for="item in navItems"
                             :key="item.slug || item.title"
                             :href="item.url || '#'"
-                            class="flex items-center justify-between rounded-xl px-3 py-3 text-sm font-bold text-[#d6d8dc] transition hover:bg-white/5 hover:text-[#D4A017]"
+                            class="flex items-center justify-between rounded-xl px-3 py-3 text-sm font-bold text-[#d6d8dc] transition duration-200 hover:bg-white/5 hover:text-[#D4A017]"
                             @click="closeMobileMenu"
                         >
                             <span>{{ item.title }}</span>
