@@ -250,7 +250,7 @@ class FrontendCatalogController extends Controller
         return [
             ['title' => 'راهنمای انتخاب روغن موتور', 'url' => '/blog?topic=engine-oil'],
             ['title' => 'راهنمای انتخاب لنت ترمز', 'url' => '/blog?topic=brake-pad'],
-            ['title' => 'سؤال از کارشناس', 'url' => '/page/contact-expert'],
+            ['title' => 'سؤال از کارشناس', 'url' => '/contact'],
         ];
     }
 

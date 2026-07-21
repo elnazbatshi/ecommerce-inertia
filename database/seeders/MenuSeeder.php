@@ -6,7 +6,6 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Menu;
 use App\Models\MenuItem;
-use App\Models\Page;
 use Illuminate\Database\Seeder;
 
 class MenuSeeder extends Seeder
@@ -163,14 +162,12 @@ class MenuSeeder extends Seeder
             'sort_order' => 7,
         ]);
 
-        $contactPage = Page::query()->where('slug', 'contact-expert')->first();
-
         $this->upsertItem($menu, [
             'title' => 'تماس با ما',
-            'type' => $contactPage ? 'page' : 'custom',
-            'reference_id' => $contactPage?->id,
-            'url' => $contactPage ? $contactPage->slug : '/page/contact-expert',
-            'route_params' => $contactPage ? ['slug' => $contactPage->slug] : null,
+            'type' => 'custom',
+            'reference_id' => null,
+            'url' => '/contact',
+            'route_params' => null,
             'sort_order' => 8,
         ]);
     }

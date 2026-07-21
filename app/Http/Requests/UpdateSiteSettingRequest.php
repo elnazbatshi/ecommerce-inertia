@@ -31,6 +31,17 @@ class UpdateSiteSettingRequest extends FormRequest
             'contact.address' => ['nullable', 'string'],
             'contact.working_hours' => ['nullable', 'string', 'max:255'],
 
+            'page_heroes.contact' => ['nullable', 'array'],
+            'page_heroes.contact.image_url' => ['nullable', 'string', 'max:2048'],
+            'page_heroes.contact.image_media' => ['nullable', 'integer', 'exists:media,id'],
+            'page_heroes.contact.title' => ['nullable', 'string', 'max:255'],
+            'page_heroes.contact.subtitle' => ['nullable', 'string', 'max:255'],
+            'page_heroes.contact.description' => ['nullable', 'string'],
+            'page_heroes.contact.badge' => ['nullable', 'string', 'max:255'],
+            'page_heroes.contact.overlay_opacity' => ['nullable', 'integer', 'min:0', 'max:100'],
+            'page_heroes.contact.text_position' => ['nullable', 'string', 'in:right,center,left'],
+            'page_heroes.contact.is_active' => ['boolean'],
+
             'footer.description' => ['nullable', 'string'],
             'footer.copyright' => ['nullable', 'string', 'max:255'],
             'footer.links' => ['nullable', 'array'],
