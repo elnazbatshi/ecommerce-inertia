@@ -37,7 +37,7 @@ const visibleLinks = computed(() => {
 
     return [
         { id: 'fallback-blog', title: 'وبلاگ', url: '/blog', target: '_self', rel: null },
-        { id: 'fallback-contact', title: 'تماس با ما', url: '/page/contact-expert', target: '_self', rel: null },
+        { id: 'fallback-contact', title: 'تماس با ما', url: '/contact', target: '_self', rel: null },
     ];
 });
 

@@ -70,10 +70,6 @@ const submit = () => {
 
                     <Button label="Sign In" type="submit" class="w-full" :loading="form.processing" />
                 </form>
-
-                <div class="mt-6 rounded-2xl bg-stone-100 p-4 text-sm text-stone-600">
-                    Demo admin: <b>09126860148</b> / <b>123456789</b>
-                </div>
             </div>
         </section>
     </main>

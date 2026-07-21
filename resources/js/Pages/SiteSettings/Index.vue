@@ -38,6 +38,14 @@ const tabs = [
     { key: 'service_features', label: 'مزیت‌های فروشگاه', icon: 'pi pi-star' },
 ];
 
+tabs.splice(3, 0, { key: 'page_heroes', label: 'Hero صفحه تماس با ما', icon: 'pi pi-image' });
+
+const textPositionOptions = [
+    { label: 'راست', value: 'right' },
+    { label: 'وسط', value: 'center' },
+    { label: 'چپ', value: 'left' },
+];
+
 const activeTab = ref('general');
 
 const makeKey = () => {
@@ -81,6 +89,19 @@ const form = useForm({
         address: settingsFor('contact').address ?? '',
         working_hours: settingsFor('contact').working_hours ?? '',
     },
+    page_heroes: {
+        contact: {
+            image_url: settingsFor('page_heroes').contact?.image_url ?? null,
+            image_media: settingsFor('page_heroes').contact?.image_media ?? null,
+            title: settingsFor('page_heroes').contact?.title ?? 'تماس با ما',
+            subtitle: settingsFor('page_heroes').contact?.subtitle ?? '',
+            description: settingsFor('page_heroes').contact?.description ?? '',
+            badge: settingsFor('page_heroes').contact?.badge ?? '',
+            overlay_opacity: settingsFor('page_heroes').contact?.overlay_opacity ?? 60,
+            text_position: settingsFor('page_heroes').contact?.text_position ?? 'right',
+            is_active: settingsFor('page_heroes').contact?.is_active ?? true,
+        },
+    },
     footer: {
         description: settingsFor('footer').description ?? '',
         copyright: settingsFor('footer').copyright ?? '',
@@ -116,6 +137,19 @@ const logoExistingImages = computed(() => {
     return url ? [{
         id: media?.id ?? 'site-logo',
         name: media?.name ?? 'لوگوی فعلی سایت',
+        url,
+        size: media?.size,
+    }] : [];
+});
+
+const contactHeroExistingImages = computed(() => {
+    const hero = settingsFor('page_heroes').contact ?? {};
+    const media = hero.image_media_data;
+    const url = media?.url ?? hero.image_url;
+
+    return url ? [{
+        id: media?.id ?? hero.image_media ?? 'contact-hero',
+        name: media?.name ?? 'تصویر فعلی Hero تماس با ما',
         url,
         size: media?.size,
     }] : [];
@@ -190,6 +224,19 @@ const submit = () => {
                 site_name: data.general.site_name,
                 site_description: data.general.site_description,
                 logo: data.general.logo,
+            },
+            page_heroes: {
+                contact: {
+                    image_url: data.page_heroes.contact.image_url,
+                    image_media: data.page_heroes.contact.image_media,
+                    title: data.page_heroes.contact.title,
+                    subtitle: data.page_heroes.contact.subtitle,
+                    description: data.page_heroes.contact.description,
+                    badge: data.page_heroes.contact.badge,
+                    overlay_opacity: data.page_heroes.contact.overlay_opacity,
+                    text_position: data.page_heroes.contact.text_position,
+                    is_active: data.page_heroes.contact.is_active,
+                },
             },
             topbar: {
                 ...data.topbar,
@@ -381,6 +428,83 @@ const submit = () => {
                         <div class="field lg:col-span-2">
                             <label class="mb-2 block font-bold">آدرس</label>
                             <Textarea v-model="form.contact.address" rows="4" class="w-full" />
+                        </div>
+                    </div>
+
+                    <div v-else-if="activeTab === 'page_heroes'" class="space-y-5">
+                        <div class="rounded-2xl border border-surface-200 p-4">
+                            <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <h3 class="m-0 text-lg font-black">Hero صفحه تماس با ما</h3>
+                                    <p class="mt-1 text-sm text-surface-500">
+                                        تصویر، متن و وضعیت نمایش Hero صفحه تماس با ما را مدیریت کنید.
+                                    </p>
+                                </div>
+                                <div class="flex h-12 items-center gap-3">
+                                    <ToggleSwitch v-model="form.page_heroes.contact.is_active" />
+                                    <span>{{ form.page_heroes.contact.is_active ? 'فعال' : 'غیرفعال' }}</span>
+                                </div>
+                            </div>
+
+                            <div class="grid gap-4 lg:grid-cols-2">
+                                <div class="field lg:col-span-2">
+                                    <label class="mb-2 block font-bold">تصویر پس‌زمینه</label>
+                                    <ImageUploader
+                                        v-model="form.page_heroes.contact.image_media"
+                                        title="تصویر Hero تماس با ما"
+                                        subtitle="تصویر پس‌زمینه Hero را از مرکز رسانه انتخاب یا تصویر جدید آپلود کنید"
+                                        emptyText="هنوز تصویری برای Hero تماس با ما انتخاب نشده است."
+                                        mode="single"
+                                        :existingImages="contactHeroExistingImages"
+                                        :error="errorFor('page_heroes.contact.image_media')"
+                                        :sortable="false"
+                                    />
+                                </div>
+
+                                <div class="field">
+                                    <label class="mb-2 block font-bold">Badge</label>
+                                    <InputText v-model="form.page_heroes.contact.badge" class="w-full" :invalid="Boolean(errorFor('page_heroes.contact.badge'))" />
+                                    <small v-if="errorFor('page_heroes.contact.badge')" class="text-red-600">{{ errorFor('page_heroes.contact.badge') }}</small>
+                                </div>
+
+                                <div class="field">
+                                    <label class="mb-2 block font-bold">Title</label>
+                                    <InputText v-model="form.page_heroes.contact.title" class="w-full" :invalid="Boolean(errorFor('page_heroes.contact.title'))" />
+                                    <small v-if="errorFor('page_heroes.contact.title')" class="text-red-600">{{ errorFor('page_heroes.contact.title') }}</small>
+                                </div>
+
+                                <div class="field">
+                                    <label class="mb-2 block font-bold">Subtitle</label>
+                                    <InputText v-model="form.page_heroes.contact.subtitle" class="w-full" :invalid="Boolean(errorFor('page_heroes.contact.subtitle'))" />
+                                    <small v-if="errorFor('page_heroes.contact.subtitle')" class="text-red-600">{{ errorFor('page_heroes.contact.subtitle') }}</small>
+                                </div>
+
+                                <div class="field">
+                                    <label class="mb-2 block font-bold">Text Position</label>
+                                    <Select
+                                        v-model="form.page_heroes.contact.text_position"
+                                        :options="textPositionOptions"
+                                        optionLabel="label"
+                                        optionValue="value"
+                                        class="w-full"
+                                        :invalid="Boolean(errorFor('page_heroes.contact.text_position'))"
+                                    />
+                                    <small v-if="errorFor('page_heroes.contact.text_position')" class="text-red-600">{{ errorFor('page_heroes.contact.text_position') }}</small>
+                                </div>
+
+                                <div class="field lg:col-span-2">
+                                    <label class="mb-2 block font-bold">Description</label>
+                                    <Textarea v-model="form.page_heroes.contact.description" rows="4" class="w-full" :invalid="Boolean(errorFor('page_heroes.contact.description'))" />
+                                    <small v-if="errorFor('page_heroes.contact.description')" class="text-red-600">{{ errorFor('page_heroes.contact.description') }}</small>
+                                </div>
+
+                                <div class="field lg:col-span-2">
+                                    <label class="mb-2 block font-bold">Overlay Opacity: {{ form.page_heroes.contact.overlay_opacity ?? 0 }}%</label>
+                                    <Slider v-model="form.page_heroes.contact.overlay_opacity" :min="0" :max="100" class="mt-4" />
+                                    <InputNumber v-model="form.page_heroes.contact.overlay_opacity" class="mt-4 w-full max-w-48" :min="0" :max="100" />
+                                    <small v-if="errorFor('page_heroes.contact.overlay_opacity')" class="text-red-600">{{ errorFor('page_heroes.contact.overlay_opacity') }}</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

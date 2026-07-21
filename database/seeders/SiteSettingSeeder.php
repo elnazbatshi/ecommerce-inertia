@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\SiteSetting;
 use App\Services\SiteSettingService;
 use Illuminate\Database\Seeder;
 
@@ -15,6 +16,32 @@ class SiteSettingSeeder extends Seeder
             foreach ($values as $key => $value) {
                 $settings->set($group, $key, $value, is_array($value) ? 'array' : 'string', true);
             }
+        }
+
+        $contactHero = SiteSetting::query()->firstOrCreate(
+            [
+                'group' => 'page_heroes',
+                'key' => 'contact',
+            ],
+            [
+                'value' => [
+                    'image_url' => null,
+                    'image_media' => null,
+                    'title' => 'تماس با ما',
+                    'subtitle' => 'ما اینجاییم تا به شما کمک کنیم',
+                    'description' => 'برای مشاوره قبل از خرید، پیگیری سفارش، پشتیبانی پس از خرید یا همکاری با موتوشهر با ما در ارتباط باشید.',
+                    'badge' => 'ارتباط با پشتیبانی موتوشهر',
+                    'overlay_opacity' => 70,
+                    'text_position' => 'right',
+                    'is_active' => true,
+                ],
+                'type' => 'array',
+                'is_public' => true,
+            ],
+        );
+
+        if ($contactHero->wasRecentlyCreated) {
+            $settings->clearPublicCache();
         }
     }
 
