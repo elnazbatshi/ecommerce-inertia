@@ -10,6 +10,9 @@ return [
         'send_mode' => env('SMSIR_SEND_MODE', 'text'),
         'template_otp' => env('SMSIR_TEMPLATE_OTP'),
         'base_url' => env('SMSIR_BASE_URL', 'https://api.sms.ir/v1'),
-        'verify_ssl' => env('SMSIR_VERIFY_SSL', env('APP_ENV') === 'production'),
+        'verify_ssl' => filter_var(
+            env('SMSIR_VERIFY_SSL', env('APP_ENV') === 'production'),
+            FILTER_VALIDATE_BOOL,
+        ),
     ],
 ];

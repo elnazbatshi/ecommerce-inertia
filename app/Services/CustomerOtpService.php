@@ -20,15 +20,19 @@ class CustomerOtpService
 
     public function request(string $phone): array
     {
+        $requestStartedAt = microtime(true);
+
         $this->ensureRateLimit($phone);
 
         $customerExists = Customer::where('phone', $phone)->exists();
         $code = (string) random_int(100000, 999999);
+        $otpGeneratedAt = microtime(true);
 
         Log::info('Customer OTP request started.', [
             'phone' => $this->maskPhone($phone),
             'driver' => config('sms.driver'),
             'send_mode' => config('sms.smsir.send_mode'),
+            'elapsed_ms' => $this->elapsedMs($requestStartedAt),
         ]);
 
         DB::transaction(function () use ($phone, $code): void {
@@ -40,22 +44,30 @@ class CustomerOtpService
                 'expires_at' => now()->addMinutes(2),
             ]);
         });
+        $otpStoredAt = microtime(true);
 
         Log::info('Customer OTP stored; SMS sender will be called.', [
             'phone' => $this->maskPhone($phone),
             'driver' => config('sms.driver'),
             'send_mode' => config('sms.smsir.send_mode'),
+            'generate_otp_ms' => $this->durationMs($requestStartedAt, $otpGeneratedAt),
+            'store_otp_ms' => $this->durationMs($otpGeneratedAt, $otpStoredAt),
+            'elapsed_ms' => $this->elapsedMs($requestStartedAt),
         ]);
 
         try {
             $this->sms->sendOtp($phone, $code);
         } catch (Throwable $exception) {
+            $failedAt = microtime(true);
+
             Log::error('OTP SMS sending failed', [
                 'phone' => $this->maskPhone($phone),
                 'exception' => $exception::class,
                 'message' => $exception->getMessage(),
                 'file' => $exception->getFile(),
                 'line' => $exception->getLine(),
+                'sms_send_ms' => $this->durationMs($otpStoredAt, $failedAt),
+                'total_elapsed_ms' => $this->durationMs($requestStartedAt, $failedAt),
             ]);
 
             throw ValidationException::withMessages([
@@ -64,14 +76,24 @@ class CustomerOtpService
                     : 'ارسال کد تایید با خطا مواجه شد. لطفا کمی بعد دوباره تلاش کنید.',
             ]);
         }
+        $smsCompletedAt = microtime(true);
 
         Log::info('Customer OTP SMS sender completed.', [
             'phone' => $this->maskPhone($phone),
             'driver' => config('sms.driver'),
             'send_mode' => config('sms.smsir.send_mode'),
+            'sms_send_ms' => $this->durationMs($otpStoredAt, $smsCompletedAt),
+            'total_elapsed_ms' => $this->elapsedMs($requestStartedAt),
         ]);
 
         $this->recordSuccessfulRequest($phone);
+        $requestCompletedAt = microtime(true);
+
+        Log::info('Customer OTP request completed.', [
+            'phone' => $this->maskPhone($phone),
+            'rate_limit_record_ms' => $this->durationMs($smsCompletedAt, $requestCompletedAt),
+            'total_elapsed_ms' => $this->elapsedMs($requestStartedAt),
+        ]);
 
         return [
             'mode' => $customerExists ? 'login' : 'register',
@@ -165,5 +187,15 @@ class CustomerOtpService
         }
 
         return substr($phone, 0, 4).'***'.substr($phone, -3);
+    }
+
+    private function elapsedMs(float $startedAt): float
+    {
+        return $this->durationMs($startedAt, microtime(true));
+    }
+
+    private function durationMs(float $startedAt, float $finishedAt): float
+    {
+        return round(($finishedAt - $startedAt) * 1000, 2);
     }
 }
