@@ -70,25 +70,46 @@ class SmsIrService implements SmsServiceInterface
 
     private function postToSmsIr(string $endpoint, array $payload, string $mobile, string $apiKey, string $mode): void
     {
+        $requestStartedAt = microtime(true);
+        $httpStartedAt = null;
+
         try {
             Log::info('SMS.ir OTP request started.', [
                 'mobile' => $this->maskMobile($mobile),
                 'mode' => $mode,
                 'endpoint' => $endpoint,
+                'template_id' => $payload['templateId'] ?? null,
+                'template_id_type' => isset($payload['templateId']) ? gettype($payload['templateId']) : null,
+                'parameter_names' => collect($payload['parameters'] ?? [])->pluck('name')->values()->all(),
             ]);
 
-            $response = Http::withHeaders([
+            $httpStartedAt = microtime(true);
+
+            $http = Http::timeout(15);
+
+            if (! config('sms.smsir.verify_ssl', true)) {
+                $http = $http->withoutVerifying();
+            }
+
+            $response = $http->withHeaders([
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
                 'X-API-KEY' => $apiKey,
             ])
-                ->withOptions([
-                    'verify' => (bool) config('sms.smsir.verify_ssl'),
-                ])
-                ->timeout(10)
                 ->post($endpoint, $payload);
+            $httpFinishedAt = microtime(true);
 
             if ($response->failed() || ! $this->smsIrResponseWasSuccessful($response->json())) {
+                Log::warning('SMS.ir OTP request rejected.', [
+                    'mobile' => $this->maskMobile($mobile),
+                    'mode' => $mode,
+                    'http_status' => $response->status(),
+                    'response_status' => data_get($response->json(), 'status'),
+                    'response_message' => data_get($response->json(), 'message'),
+                    'http_ms' => $this->durationMs($httpStartedAt, $httpFinishedAt),
+                    'total_elapsed_ms' => $this->durationMs($requestStartedAt, $httpFinishedAt),
+                ]);
+
                 throw new RuntimeException("SMS.ir {$mode} OTP request failed: ".$response->body());
             }
 
@@ -98,13 +119,19 @@ class SmsIrService implements SmsServiceInterface
                 'http_status' => $response->status(),
                 'response_status' => data_get($response->json(), 'status'),
                 'response_message' => data_get($response->json(), 'message'),
+                'http_ms' => $this->durationMs($httpStartedAt, $httpFinishedAt),
+                'total_elapsed_ms' => $this->durationMs($requestStartedAt, $httpFinishedAt),
             ]);
         } catch (Throwable $exception) {
+            $failedAt = microtime(true);
+
             Log::error('SMS.ir OTP send failed.', [
                 'mobile' => $this->maskMobile($mobile),
                 'mode' => $mode,
                 'exception' => $exception::class,
                 'message' => $exception->getMessage(),
+                'http_ms' => $httpStartedAt ? $this->durationMs($httpStartedAt, $failedAt) : null,
+                'total_elapsed_ms' => $this->durationMs($requestStartedAt, $failedAt),
             ]);
 
             throw $exception;
@@ -174,5 +201,10 @@ class SmsIrService implements SmsServiceInterface
         }
 
         return substr($mobile, 0, 4).str_repeat('*', max(strlen($mobile) - 7, 3)).substr($mobile, -3);
+    }
+
+    private function durationMs(float $startedAt, float $finishedAt): float
+    {
+        return round(($finishedAt - $startedAt) * 1000, 2);
     }
 }
