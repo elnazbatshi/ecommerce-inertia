@@ -16,14 +16,14 @@ const productUrl = (item) => item.slug ? `/products/${item.slug}` : '/products';
     <div class="relative" @mouseenter="open = true" @mouseleave="open = false">
         <button
             type="button"
-            class="relative flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-3 text-white transition hover:border-[#D4A017] hover:text-[#D4A017]"
+            class="relative flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-3 text-white transition duration-200 hover:border-[#D4A017] hover:text-[#D4A017] hover:shadow-[0_10px_24px_rgba(212,160,23,0.14)]"
             aria-label="سبد خرید"
             aria-haspopup="true"
             :aria-expanded="open"
             @click="open = !open"
         >
             <i class="pi pi-shopping-cart text-lg" aria-hidden="true" />
-            <span class="absolute -left-2 -top-2 rounded-full bg-[#D4A017] px-1.5 py-0.5 text-[0.68rem] font-black leading-none text-[#111111]">{{ count }}</span>
+            <span class="absolute -left-1.5 -top-1.5 min-w-4 rounded-full bg-[#D4A017] px-1 py-0.5 text-center text-[0.62rem] font-black leading-none text-[#111111]">{{ count }}</span>
         </button>
 
         <transition name="fade-slide">

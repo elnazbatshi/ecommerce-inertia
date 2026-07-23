@@ -78,7 +78,7 @@ class MenuService
         }
 
         $url = match ($item->type) {
-            'page' => $this->prefixedSlug('/page', $item),
+            'page' => $this->pageUrl($item),
             'category' => $this->prefixedSlug('/category', $item),
             'product' => $this->prefixedSlug('/products', $item),
             'brand' => $this->prefixedSlug('/brand', $item),
@@ -267,17 +267,35 @@ class MenuService
         return $slug ? $prefix.'/'.ltrim((string) $slug, '/') : '#';
     }
 
+    private function pageUrl(MenuItem $item): string
+    {
+        $params = $item->route_params ?? [];
+        $slug = trim((string) ($params['slug'] ?? $item->url), '/');
+
+        if ($slug === 'contact-expert' || $slug === 'contact') {
+            return '/contact';
+        }
+
+        return $slug ? "/page/{$slug}" : '#';
+    }
+
     private function cleanUrl(?string $url): string
     {
         if (! $url) {
             return '#';
         }
 
+        $normalizedUrl = '/'.ltrim($url, '/');
+
+        if ($normalizedUrl === '/page/contact-expert' || $normalizedUrl === '/contact-expert') {
+            return '/contact';
+        }
+
         if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://') || str_starts_with($url, 'mailto:') || str_starts_with($url, 'tel:')) {
             return $url;
         }
 
-        return '/'.ltrim($url, '/');
+        return $normalizedUrl;
     }
 
     private function fallbackItems(string $location): array
@@ -342,7 +360,7 @@ class MenuService
     {
         return [
             ['title' => 'راهنمای انتخاب روغن موتور', 'url' => '/blog?topic=engine-oil'],
-            ['title' => 'سؤال از کارشناس', 'url' => '/page/contact-expert'],
+            ['title' => 'سؤال از کارشناس', 'url' => '/contact'],
         ];
     }
 }

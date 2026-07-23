@@ -99,6 +99,20 @@ class SiteSettingService
             ] : null;
         }
 
+        $contactHeroImageId = $settings['page_heroes']['contact']['image_media'] ?? null;
+
+        if ($contactHeroImageId) {
+            $media = Media::query()->find($contactHeroImageId);
+
+            $settings['page_heroes']['contact']['image_url'] = $media?->url;
+            $settings['page_heroes']['contact']['image_media_data'] = $media ? [
+                'id' => $media->id,
+                'name' => $media->original_name,
+                'url' => $media->url,
+                'size' => $media->size,
+            ] : null;
+        }
+
         return $settings;
     }
 }

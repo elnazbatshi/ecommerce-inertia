@@ -28,7 +28,7 @@ onBeforeUnmount(() => clearTimeout(timer));
             <input
                 v-model="query"
                 type="search"
-                placeholder="جستجوی محصول، برند یا کد قطعه..."
+                placeholder="نام محصول، برند یا کد قطعه را جستجو کنید"
                 @focus="focused = true; load()"
                 @blur="setTimeout(() => { focused = false }, 120)"
             >
@@ -52,16 +52,25 @@ onBeforeUnmount(() => clearTimeout(timer));
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
+.site-search-dark:focus-within {
+    border-color: #d4a017;
+    box-shadow:
+        0 0 0 3px rgba(212, 160, 23, 0.14),
+        0 12px 30px rgba(212, 160, 23, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
 .site-search-dark input {
     color: #f5f5f5;
 }
 
 .site-search-dark input::placeholder {
-    color: #8f949d;
+    color: #aeb3bc;
 }
 
 .site-search-dark button {
     background: #d4a017;
     color: #111111;
+    font-size: 0.88rem;
 }
 </style>

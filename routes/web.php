@@ -44,10 +44,18 @@ use App\Http\Controllers\Admin\BlogCategoryController as AdminBlogCategoryContro
 use App\Http\Controllers\Admin\BlogPostController as AdminBlogPostController;
 use App\Http\Controllers\Admin\BlogTagController as AdminBlogTagController;
 use App\Http\Controllers\Frontend\BlogController as FrontendBlogController;
+use App\Services\SiteSettingService;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('site.home');
+Route::get('/contact', function (SiteSettingService $settings) {
+    $hero = $settings->publicSettings()['page_heroes']['contact'] ?? null;
+
+    return Inertia::render('Frontend/Contact/Index', [
+        'hero' => ($hero && ($hero['is_active'] ?? true)) ? $hero : null,
+    ]);
+})->name('site.contact');
 Route::get('/cart', fn () => Inertia::render('Frontend/Cart/Index'))->name('site.cart');
 Route::post('/customer/auth/otp', [CustomerAuthController::class, 'requestOtp'])->name('site.customer-auth.otp');
 Route::post('/customer/auth/verify', [CustomerAuthController::class, 'verifyOtp'])->name('site.customer-auth.verify');

@@ -1,8 +1,8 @@
 <script setup>
-import axios from 'axios';
 import { router } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import { useCart } from '@/Composables/useCart';
+import { requestCustomerOtp, syncCustomerCart, verifyCustomerOtp } from '@/Frontend/services/customerAuthApi';
 
 const props = defineProps({
     visible: {
@@ -23,7 +23,6 @@ const phone = ref('');
 const name = ref('');
 const code = ref('');
 const mode = ref('login');
-const debugCode = ref(null);
 const loading = ref(false);
 const error = ref('');
 const success = ref('');
@@ -42,7 +41,6 @@ const reset = () => {
     name.value = '';
     code.value = '';
     mode.value = 'login';
-    debugCode.value = null;
     error.value = '';
     success.value = '';
     expiresIn.value = 0;
@@ -64,9 +62,8 @@ const requestOtp = async () => {
     loading.value = true;
 
     try {
-        const { data } = await axios.post('/customer/auth/otp', { phone: phone.value });
+        const data = await requestCustomerOtp(phone.value);
         mode.value = data.mode || 'login';
-        debugCode.value = data.debug_code || null;
         step.value = 'otp';
         code.value = '';
         success.value = data.message || 'کد تایید ارسال شد.';
@@ -84,15 +81,13 @@ const verifyOtp = async () => {
     loading.value = true;
 
     try {
-        await axios.post('/customer/auth/verify', {
+        await verifyCustomerOtp({
             phone: phone.value,
             code: code.value,
             name: mode.value === 'register' ? name.value : null,
         });
 
-        if (items.value.length) {
-            await axios.post('/cart/sync', { items: items.value });
-        }
+        await syncCustomerCart(items.value);
 
         emit('authenticated');
         close();
@@ -189,9 +184,6 @@ watch(() => props.visible, (visible) => {
 
             <Message v-if="error" severity="error" :closable="false">{{ error }}</Message>
             <Message v-if="success" severity="success" :closable="false">{{ success }}</Message>
-            <Message v-if="debugCode" severity="info" :closable="false">
-                کد تست محیط local: <strong dir="ltr">{{ debugCode }}</strong>
-            </Message>
 
             <div class="flex items-center gap-2 pt-2">
                 <Button type="submit" :label="submitLabel" icon="pi pi-check" class="flex-1" :loading="loading" />
