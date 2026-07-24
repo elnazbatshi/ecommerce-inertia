@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Payments\PaymentGatewayManager;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -25,7 +26,7 @@ class StorePaymentMethodRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', 'unique:payment_methods,slug'],
             'description' => ['nullable', 'string'],
-            'driver' => ['required', Rule::in(['zarinpal', 'idpay', 'nextpay', 'card_to_card', 'cash_on_delivery', 'wallet', 'manual'])],
+            'driver' => ['required', Rule::in(PaymentGatewayManager::PROVIDERS)],
             'fee_type' => ['required', Rule::in(['none', 'fixed', 'percent'])],
             'fee_value' => ['nullable', 'numeric', 'min:0'],
             'min_amount' => ['nullable', 'numeric', 'min:0'],
@@ -36,4 +37,3 @@ class StorePaymentMethodRequest extends FormRequest
         ];
     }
 }
-

@@ -17,20 +17,37 @@ class Payment extends Model
     protected $fillable = [
         'order_id',
         'customer_id',
+        'payment_method_id',
         'amount',
+        'currency',
         'method',
         'gateway',
+        'authority',
         'transaction_id',
         'reference_id',
         'status',
+        'initiated_at',
         'paid_at',
+        'verified_at',
+        'failed_at',
+        'error_code',
+        'error_message',
+        'request_payload',
+        'response_payload',
+        'callback_payload',
         'raw_response',
         'admin_note',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'initiated_at' => 'datetime',
         'paid_at' => 'datetime',
+        'verified_at' => 'datetime',
+        'failed_at' => 'datetime',
+        'request_payload' => 'array',
+        'response_payload' => 'array',
+        'callback_payload' => 'array',
         'raw_response' => 'array',
     ];
 
@@ -42,6 +59,11 @@ class Payment extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function paymentMethod(): BelongsTo
+    {
+        return $this->belongsTo(PaymentMethod::class);
     }
 
     public function scopeSearch(Builder $query, ?string $search): Builder

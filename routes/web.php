@@ -58,6 +58,7 @@ Route::post('/cart/sync', [FrontendCartController::class, 'sync'])->name('fronte
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('frontend.checkout.index');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('frontend.checkout.store');
 Route::get('/payments/{payment}/start', [FrontendPaymentController::class, 'start'])->name('frontend.payments.start');
+Route::match(['GET', 'POST'], '/payments/{provider}/callback', [FrontendPaymentController::class, 'callback'])->name('frontend.payments.callback');
 Route::get('/payments/{payment}/fake/success', [FrontendPaymentController::class, 'fakeSuccess'])->name('frontend.payments.fake.success');
 Route::get('/payments/{payment}/fake/fail', [FrontendPaymentController::class, 'fakeFail'])->name('frontend.payments.fake.fail');
 Route::get('/order/thank-you/{order}', [OrderConfirmationController::class, 'show'])->name('frontend.orders.thank-you');

@@ -162,9 +162,18 @@ const submit = () => {
                         <div class="space-y-3">
                             <label v-for="method in paymentMethods" :key="method.id" class="flex cursor-pointer items-start gap-3 rounded-lg border border-surface-200 p-3">
                                 <input v-model="form.payment_method_id" type="radio" :value="method.id" class="mt-1" />
-                                <span>
-                                    <strong class="block text-surface-950">{{ method.name }}</strong>
+                                <span class="flex-1">
+                                    <span class="flex flex-wrap items-center gap-2">
+                                        <strong class="block text-surface-950">{{ method.name }}</strong>
+                                        <span v-if="method.type === 'installment'" class="rounded-full bg-[#D4A017]/15 px-2 py-0.5 text-xs font-bold text-[#8a6500]">اقساطی</span>
+                                        <span v-else-if="method.type === 'cash'" class="rounded-full bg-surface-100 px-2 py-0.5 text-xs font-bold text-surface-600">پرداخت حضوری</span>
+                                    </span>
                                     <span v-if="method.description" class="mt-1 block text-sm text-surface-500">{{ method.description }}</span>
+                                    <span v-if="method.min_amount || method.max_amount" class="mt-2 block text-xs text-surface-500">
+                                        <template v-if="method.min_amount">حداقل: {{ formatPrice(method.min_amount) }}</template>
+                                        <template v-if="method.min_amount && method.max_amount"> · </template>
+                                        <template v-if="method.max_amount">حداکثر: {{ formatPrice(method.max_amount) }}</template>
+                                    </span>
                                 </span>
                             </label>
                         </div>

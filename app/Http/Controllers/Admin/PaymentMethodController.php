@@ -7,6 +7,7 @@ use App\Http\Requests\StorePaymentMethodRequest;
 use App\Http\Requests\UpdatePaymentMethodRequest;
 use App\Http\Resources\PaymentMethodResource;
 use App\Models\PaymentMethod;
+use App\Payments\PaymentGatewayManager;
 use App\Services\PaymentMethodService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -74,7 +75,7 @@ class PaymentMethodController extends Controller
     {
         $request->validate([
             'q' => ['nullable', 'string', 'max:255'],
-            'driver' => ['nullable', 'in:zarinpal,idpay,nextpay,card_to_card,cash_on_delivery,wallet,manual'],
+            'driver' => ['nullable', 'in:'.implode(',', PaymentGatewayManager::PROVIDERS)],
             'limit' => ['nullable', 'integer', 'min:1', 'max:100'],
         ]);
 
