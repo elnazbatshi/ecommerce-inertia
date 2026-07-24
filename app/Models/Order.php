@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
@@ -94,6 +95,26 @@ class Order extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function latestPaidPayment(): HasOne
+    {
+        return $this->hasOne(Payment::class)
+            ->select([
+                'payments.id',
+                'payments.order_id',
+                'payments.method',
+                'payments.transaction_id',
+                'payments.reference_id',
+                'payments.paid_at',
+                'payments.status',
+            ])
+            ->where('payments.status', 'paid')
+            ->whereNotNull('payments.paid_at')
+            ->ofMany([
+                'paid_at' => 'max',
+                'id' => 'max',
+            ]);
     }
 
     public function scopeSearch(Builder $query, ?string $search): Builder
