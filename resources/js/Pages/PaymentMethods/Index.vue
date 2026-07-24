@@ -22,6 +22,10 @@ const driverOptions = [
     { label: 'زرین پال', value: 'zarinpal' },
     { label: 'نکست پی', value: 'nextpay' },
     { label: 'آی دی پی', value: 'idpay' },
+    { label: 'آقای پرداخت', value: 'aqayepardakht' },
+    { label: 'دیجی‌پی', value: 'digipay' },
+    { label: 'اسنپ‌پی', value: 'snappay' },
+    { label: 'تارا', value: 'tara' },
     { label: 'کارت به کارت', value: 'card_to_card' },
     { label: 'پرداخت در محل', value: 'cash_on_delivery' },
     { label: 'کیف پول', value: 'wallet' },
@@ -120,6 +124,19 @@ const formatMoney = (value) => (value == null || value === '' ? '-' : Number(val
 
                 <Column field="name" header="نام" sortable />
                 <Column field="driver" header="درایور" sortable />
+                <Column header="پیکربندی">
+                    <template #body="{ data }">
+                        <div class="flex flex-wrap gap-1">
+                            <Tag
+                                :value="data.provider_status?.configured ? 'آماده' : 'نیازمند تنظیمات'"
+                                :severity="data.provider_status?.configured ? 'success' : 'warning'"
+                            />
+                            <Tag v-if="data.provider_status?.sandbox" value="Sandbox" severity="info" />
+                            <Tag v-if="data.provider_status?.supports_installments" value="اقساطی" severity="secondary" />
+                            <Tag v-if="data.provider_status?.supports_refund" value="Refund" severity="secondary" />
+                        </div>
+                    </template>
+                </Column>
                 <Column header="نوع کارمزد">
                     <template #body="{ data }">{{ feeTypeLabel[data.fee_type] || data.fee_type }}</template>
                 </Column>

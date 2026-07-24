@@ -27,6 +27,14 @@ class PaymentController extends Controller
             return $this->redirectForStatus($payment);
         }
 
+        if ($this->payments->isOnline($payment) && ! app()->environment('local', 'testing')) {
+            $redirectUrl = $this->payments->initiate($payment);
+
+            if ($redirectUrl) {
+                return redirect()->away($redirectUrl);
+            }
+        }
+
         return Inertia::render('Frontend/Payments/FakeGateway', [
             'payment' => [
                 'id' => $payment->id,
@@ -49,6 +57,19 @@ class PaymentController extends Controller
                 'fail' => route('frontend.payments.fake.fail', $payment),
                 'cart' => route('site.cart'),
             ],
+        ]);
+    }
+
+    public function callback(Request $request, string $provider): RedirectResponse
+    {
+        $payment = $this->payments->verifyCallback($provider, $request->all());
+
+        if ($payment->status === 'paid') {
+            return redirect()->route('frontend.orders.thank-you', $payment->order);
+        }
+
+        return redirect()->route('site.cart')->withErrors([
+            'payment' => $payment->error_message ?: 'پرداخت تایید نشد.',
         ]);
     }
 

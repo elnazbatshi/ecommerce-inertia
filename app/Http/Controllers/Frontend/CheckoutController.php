@@ -13,6 +13,7 @@ use App\Models\Province;
 use App\Models\ShippingMethod;
 use App\Services\FrontendCartService;
 use App\Services\FrontendPaymentService;
+use App\Payments\PaymentGatewayManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,7 +24,7 @@ use Inertia\Response;
 
 class CheckoutController extends Controller
 {
-    public function index(Request $request, FrontendCartService $carts): RedirectResponse|Response
+    public function index(Request $request, FrontendCartService $carts, PaymentGatewayManager $gateways): RedirectResponse|Response
     {
         $customer = $this->customer($request);
         if (! $customer) {
@@ -52,14 +53,27 @@ class CheckoutController extends Controller
                 'max_order_amount' => $method->max_order_amount ? (float) $method->max_order_amount : null,
                 'estimated_delivery_days' => $method->estimated_delivery_days,
             ]),
-            'paymentMethods' => PaymentMethod::active()->ordered()->get()->map(fn (PaymentMethod $method) => [
-                'id' => $method->id,
-                'name' => $method->name,
-                'description' => $method->description,
-                'driver' => $method->driver,
-                'fee_type' => $method->fee_type,
-                'fee_value' => (float) $method->fee_value,
-            ]),
+            'paymentMethods' => PaymentMethod::active()->ordered()->get()
+                ->filter(fn (PaymentMethod $method) => ! in_array($method->driver, FrontendPaymentService::ONLINE_DRIVERS, true) || $gateways->configured($method->driver))
+                ->map(function (PaymentMethod $method) use ($gateways) {
+                    $meta = $gateways->metadata($method->driver);
+
+                    return [
+                        'id' => $method->id,
+                        'name' => $method->name,
+                        'description' => $method->description,
+                        'driver' => $method->driver,
+                        'type' => $this->paymentType($method->driver),
+                        'fee_type' => $method->fee_type,
+                        'fee_value' => (float) $method->fee_value,
+                        'min_amount' => $method->min_amount ? (float) $method->min_amount : null,
+                        'max_amount' => $method->max_amount ? (float) $method->max_amount : null,
+                        'configured' => $meta['configured'],
+                        'supports_refund' => $meta['supports_refund'],
+                        'supports_installments' => $meta['supports_installments'],
+                    ];
+                })
+                ->values(),
             'provinces' => Province::active()
                 ->ordered()
                 ->with(['cities' => fn ($query) => $query->active()->ordered()])
@@ -226,6 +240,16 @@ class CheckoutController extends Controller
         }
 
         return (float) $method->base_cost;
+    }
+
+    private function paymentType(string $driver): string
+    {
+        return match ($driver) {
+            'digipay', 'snappay', 'tara' => 'installment',
+            'cash_on_delivery' => 'cash',
+            'wallet' => 'wallet',
+            default => 'online',
+        };
     }
 
     private function generateOrderNumber(): string
