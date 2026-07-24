@@ -27,6 +27,8 @@ const model = ref([
                 items: [
                     { label: 'سفارش‌ها', icon: 'pi pi-fw pi-shopping-cart', to: '/admin/orders' },
                     { label: 'پرداخت‌ها', icon: 'pi pi-fw pi-wallet', to: '/admin/payments' },
+                    { label: 'کارتکس فروش محصولات', icon: 'pi pi-fw pi-chart-line', to: '/admin/product-sales-ledger' },
+                    { label: 'کارتکس خرید مشتریان', icon: 'pi pi-fw pi-users', to: '/admin/customer-purchase-ledger' },
                 ]
             },
             {
